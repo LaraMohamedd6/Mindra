@@ -1,7 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
-import { HTMLProps } from "react";
+import { HTMLProps, forwardRef } from "react";
 
 export interface ResourceCardProps extends HTMLProps<HTMLDivElement> {
   title: string;
@@ -30,7 +30,6 @@ export default function ResourceCard({
             "block group zen-card p-6 transition-all duration-300",
             className
           )}
-          {...props}
         >
           {children}
         </a>
