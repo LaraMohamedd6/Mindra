@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+        // Mental health app color scheme
+        zenPink: "#E69EA2",
+        zenPeach: "#FEC0B3",
+        zenLightPink: "#F8E8E9",
+        zenMint: "#EBFFF5",
+        zenSeafoam: "#CFECE0",
+        zenSage: "#7CAE9E",
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +92,41 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+        'fade-in': {
+          from: { opacity: '0', transform: 'translateY(10px)' },
+          to: { opacity: '1', transform: 'translateY(0)' }
+        },
+        'slide-in': {
+          from: { opacity: '0', transform: 'translateX(-20px)' },
+          to: { opacity: '1', transform: 'translateX(0)' }
+        },
+        'pulse-light': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.8' }
+        },
+        'spin-slow': {
+          from: { transform: 'rotate(0deg)' },
+          to: { transform: 'rotate(360deg)' }
+        },
+        'breathe': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.1)' }
+        }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in': 'fade-in 0.5s ease-out forwards',
+        'slide-in': 'slide-in 0.5s ease-out forwards',
+        'pulse-light': 'pulse-light 3s infinite ease-in-out',
+        'spin-slow': 'spin-slow 12s linear infinite',
+        'breathe': 'breathe 4s infinite ease-in-out'
+			},
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        display: ['Poppins', 'sans-serif'],
+      }
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
