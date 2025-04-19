@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { motion } from "framer-motion";
@@ -11,6 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { Send, Smile, PlusCircle, Users, Hash } from "lucide-react";
 import SectionHeading from "@/components/common/SectionHeading";
 import { useToast } from "@/hooks/use-toast";
+import { MessageReaction } from "@/components/chat/MessageReaction";
+import { ChatHeader } from "@/components/chat/ChatHeader";
+import { TypingIndicator } from "@/components/chat/TypingIndicator";
+import { MediaAttachment } from "@/components/chat/MediaAttachment";
+import { Bell, BellOff } from "lucide-react";
 
 // Mock data for demo purposes
 const mockUsers = [
@@ -54,6 +58,10 @@ export default function ChatRoom() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [mediaPreview, setMediaPreview] = useState<string>();
+  const [isTyping, setIsTyping] = useState(false);
+  const messageSound = useRef(new Audio("/sounds/message.mp3"));
 
   useEffect(() => {
     scrollToBottom();
@@ -98,16 +106,24 @@ export default function ChatRoom() {
     });
   };
 
+  const handleReaction = (messageId: number, reaction: string) => {
+    // In a real app, this would be connected to a backend
+    toast({
+      title: "Reaction added",
+      description: "Message reaction has been saved.",
+    });
+  };
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-        <SectionHeading 
-          title="Student Chat Rooms" 
-          subtitle="Connect with fellow students in a safe, supportive environment"
-          centered={true}
-        />
+        <div className="max-w-6xl mx-auto">
+          <ChatHeader
+            roomName="Student Support Space"
+            memberCount={42}
+            announcement="Welcome to our supportive community! Remember to be kind and respectful. 💚"
+          />
 
-        <div className="max-w-6xl mx-auto mt-8">
           <Card className="border-zenSeafoam">
             <CardContent className="p-0">
               <div className="grid grid-cols-1 md:grid-cols-4 h-[70vh]">
@@ -186,7 +202,6 @@ export default function ChatRoom() {
                   </Tabs>
                 </div>
 
-                {/* Chat Area */}
                 <div className="md:col-span-3 flex flex-col h-full">
                   <div className="border-b border-gray-200 p-4 bg-white">
                     <div className="flex items-center">
@@ -252,44 +267,41 @@ export default function ChatRoom() {
                     ))}
                     <div ref={messagesEndRef} />
                   </div>
+                  
+                  {isTyping && <TypingIndicator />}
 
-                  {/* Message Input */}
                   <div className="p-4 border-t border-gray-200 bg-white">
-                    <div className="flex items-end space-x-2">
-                      <div className="flex-grow relative">
-                        <Input
-                          value={newMessage}
-                          onChange={(e) => setNewMessage(e.target.value)}
-                          onKeyPress={handleKeyPress}
-                          placeholder="Type your message..."
-                          className="pr-10"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-1 bottom-0 top-0 h-full"
-                          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                        >
-                          <Smile className="h-5 w-5 text-gray-500" />
-                        </Button>
-                        {showEmojiPicker && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="absolute right-0 bottom-12 bg-white p-2 rounded-lg shadow-lg border border-gray-200 flex flex-wrap w-48"
-                          >
-                            {emojis.map((emoji) => (
-                              <button
-                                key={emoji}
-                                className="w-8 h-8 text-xl hover:bg-gray-100 rounded"
-                                onClick={() => addEmoji(emoji)}
-                              >
-                                {emoji}
-                              </button>
-                            ))}
-                          </motion.div>
+                    <div className="flex items-center justify-between mb-4">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSoundEnabled(!soundEnabled)}
+                        className="text-gray-500"
+                      >
+                        {soundEnabled ? (
+                          <Bell className="h-4 w-4" />
+                        ) : (
+                          <BellOff className="h-4 w-4" />
                         )}
-                      </div>
+                      </Button>
+                    </div>
+
+                    {mediaPreview && (
+                      <MediaAttachment
+                        preview={mediaPreview}
+                        onAttach={() => {}}
+                        onRemove={() => setMediaPreview(undefined)}
+                      />
+                    )}
+
+                    <div className="flex space-x-2">
+                      <Input
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Type your message..."
+                        className="flex-grow"
+                      />
                       <Button onClick={handleSendMessage} className="bg-zenSage hover:bg-zenSage/90">
                         <Send className="h-4 w-4" />
                       </Button>
