@@ -95,12 +95,39 @@ export default function Header() {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-zenPink">Connect</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                      {[
+                        { title: "Chat Room", href: "/chatroom", description: "Connect with other students" },
+                        { title: "Chat Bot", href: "/chatbot", description: "AI wellness assistant" },
+                        { title: "About Us", href: "/about", description: "Our mission and team" },
+                        { title: "Contact Us", href: "/contact", description: "Get in touch with us" }
+                      ].map((item) => (
+                        <li key={item.title}>
+                          <Link
+                            to={item.href}
+                            className={cn(
+                              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                              pathname === item.href ? "bg-zenLightPink/50" : ""
+                            )}
+                          >
+                            <div className="text-sm font-medium leading-none">{item.title}</div>
+                            <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">{item.description}</p>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
                   <NavigationMenuTrigger className="text-gray-700 hover:text-zenPink">Tracking</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {[
                         { title: "Mood Tracker", href: "/mood-tracker", description: "Monitor your emotional wellbeing" },
-                        { title: "Analysis", href: "/analysis", description: "Visualize your progress" }
+                        { title: "Analysis", href: "/analysis", description: "Visualize your progress" },
+                        { title: "Profile", href: "/profile", description: "Your personal dashboard" }
                       ].map((item) => (
                         <li key={item.title}>
                           <Link
@@ -197,10 +224,30 @@ export default function Header() {
               </div>
               
               <div className="mb-4">
+                <div className="text-sm font-semibold text-gray-500 mb-2 px-3">Connect</div>
+                {[
+                  { text: "Chat Room", path: "/chatroom" },
+                  { text: "Chat Bot", path: "/chatbot" },
+                  { text: "About Us", path: "/about" },
+                  { text: "Contact Us", path: "/contact" }
+                ].map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`block py-2 px-3 text-base ${pathname === link.path ? "text-zenPink" : "text-gray-700"}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.text}
+                  </Link>
+                ))}
+              </div>
+              
+              <div className="mb-4">
                 <div className="text-sm font-semibold text-gray-500 mb-2 px-3">Tracking</div>
                 {[
                   { text: "Mood Tracker", path: "/mood-tracker" },
-                  { text: "Analysis", path: "/analysis" }
+                  { text: "Analysis", path: "/analysis" },
+                  { text: "Profile", path: "/profile" }
                 ].map((link) => (
                   <Link
                     key={link.path}

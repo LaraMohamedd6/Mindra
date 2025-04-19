@@ -17,6 +17,13 @@ import Fitness from "./pages/Fitness";
 import Yoga from "./pages/Yoga";
 import Lifestyle from "./pages/Lifestyle";
 import StudyHelper from "./pages/StudyHelper";
+import ChatRoom from "./pages/ChatRoom";
+import ChatBot from "./pages/ChatBot";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import UserProfile from "./pages/UserProfile";
+import ContactUs from "./pages/ContactUs";
+import AboutUs from "./pages/AboutUs";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +46,13 @@ const App = () => (
             <Route path="/yoga" element={<Yoga />} />
             <Route path="/lifestyle" element={<Lifestyle />} />
             <Route path="/study-helper" element={<StudyHelper />} />
+            <Route path="/chatroom" element={<ChatRoom />} />
+            <Route path="/chatbot" element={<ChatBot />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/about" element={<AboutUs />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
