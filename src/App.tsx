@@ -7,6 +7,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Index from "./pages/Index";
 import Meditation from "./pages/Meditation";
+import Information from "./pages/Information";
+import Emergency from "./pages/Emergency";
+import MoodTracker from "./pages/MoodTracker";
+import Analysis from "./pages/Analysis";
 import K10Test from "./pages/K10Test";
 import NotFound from "./pages/NotFound";
 
@@ -22,6 +26,10 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/meditation" element={<Meditation />} />
+            <Route path="/information" element={<Information />} />
+            <Route path="/emergency" element={<Emergency />} />
+            <Route path="/mood-tracker" element={<MoodTracker />} />
+            <Route path="/analysis" element={<Analysis />} />
             <Route path="/k10test" element={<K10Test />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
