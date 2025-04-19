@@ -2,13 +2,13 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
-import { Menu, X, Brain, Heart, Activity } from "lucide-react";
+import { Menu, X, Brain, Heart } from "lucide-react";
 
 export default function Header() {
   const { pathname } = useLocation();
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
