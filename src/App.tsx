@@ -13,6 +13,10 @@ import MoodTracker from "./pages/MoodTracker";
 import Analysis from "./pages/Analysis";
 import K10Test from "./pages/K10Test";
 import NotFound from "./pages/NotFound";
+import Fitness from "./pages/Fitness";
+import Yoga from "./pages/Yoga";
+import Lifestyle from "./pages/Lifestyle";
+import StudyHelper from "./pages/StudyHelper";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +35,10 @@ const App = () => (
             <Route path="/mood-tracker" element={<MoodTracker />} />
             <Route path="/analysis" element={<Analysis />} />
             <Route path="/k10test" element={<K10Test />} />
+            <Route path="/fitness" element={<Fitness />} />
+            <Route path="/yoga" element={<Yoga />} />
+            <Route path="/lifestyle" element={<Lifestyle />} />
+            <Route path="/study-helper" element={<StudyHelper />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>

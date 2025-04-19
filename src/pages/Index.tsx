@@ -1,14 +1,16 @@
 
 import Layout from "@/components/layout/Layout";
-import Hero from "@/components/home/Hero";
+import EnhancedHero from "@/components/home/EnhancedHero";
 import Features from "@/components/home/Features";
 import QuoteSection from "@/components/home/QuoteSection";
 import CTA from "@/components/home/CTA";
-import { useEffect } from "react";
+import MotivationCarousel from "@/components/home/MotivationCarousel";
+import FeaturedTools from "@/components/home/FeaturedTools";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 const Index = () => {
   const controls = useAnimation();
@@ -31,8 +33,9 @@ const Index = () => {
 
   return (
     <Layout>
-      <Hero />
+      <EnhancedHero />
       <Features />
+      <FeaturedTools />
       
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
@@ -99,6 +102,7 @@ const Index = () => {
         </div>
       </section>
       
+      <MotivationCarousel />
       <QuoteSection />
       <CTA />
     </Layout>
