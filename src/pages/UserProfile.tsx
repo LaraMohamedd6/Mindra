@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { motion } from "framer-motion";
@@ -6,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar as CalendarIcon, Edit2, BookOpen, Trash2, Tag, Save, Upload, User as UserIcon, AreaChart } from "lucide-react";
+import { Calendar as CalendarIcon, Edit2, BookOpen, Trash2, Tag, Save, Upload, User as UserIcon, BarChart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -41,7 +40,6 @@ const avatarOptions = [
   "https://i.pravatar.cc/150?img=8",
 ];
 
-// Mock mood data
 const moodData = [
   { date: "2023-04-10", value: 5, mood: "😊" },
   { date: "2023-04-11", value: 4, mood: "😊" },
@@ -112,7 +110,6 @@ export default function UserProfile() {
   const handleMoodSelect = (mood: number) => {
     setSelectedMood(mood);
     
-    // Add mood to history
     if (selectedDate) {
       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
       const existingEntryIndex = moodHistory.findIndex(entry => entry.date === formattedDate);
@@ -197,7 +194,6 @@ export default function UserProfile() {
     <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          {/* Profile Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -338,7 +334,6 @@ export default function UserProfile() {
                 <TabsTrigger value="progress" className="flex-1">Progress</TabsTrigger>
               </TabsList>
               
-              {/* Overview Tab */}
               <TabsContent value="overview">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <motion.div
@@ -348,7 +343,7 @@ export default function UserProfile() {
                     <Card className="h-full">
                       <CardHeader>
                         <CardTitle className="flex items-center">
-                          <AreaChart className="h-5 w-5 mr-2" />
+                          <BarChart className="h-5 w-5 mr-2" />
                           Recent Mood Trends
                         </CardTitle>
                       </CardHeader>
@@ -474,7 +469,6 @@ export default function UserProfile() {
                 </div>
               </TabsContent>
               
-              {/* Mood Tracker Tab */}
               <TabsContent value="mood-tracker">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <motion.div
@@ -616,7 +610,6 @@ export default function UserProfile() {
                 </div>
               </TabsContent>
               
-              {/* Journal Tab */}
               <TabsContent value="journal">
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
@@ -730,7 +723,6 @@ export default function UserProfile() {
                 </div>
               </TabsContent>
               
-              {/* Progress Tab */}
               <TabsContent value="progress">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <motion.div
