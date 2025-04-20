@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 const reactions = [
   { emoji: "👍", label: "thumbs up" },
   { emoji: "❤️", label: "heart" },
+  { emoji: "😄", label: "smile" },
   { emoji: "😢", label: "sad" },
 ];
 
