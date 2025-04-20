@@ -48,8 +48,17 @@ const suggestedQuestions = [
   "What's the difference between anxiety and stress?",
 ];
 
+const initialBotMessage = {
+  id: 1,
+  type: "bot" as const,
+  content: "Hi there! Welcome to Zenith. I'm your mental wellness assistant. How can I help you today?",
+  timestamp: new Date().toISOString(),
+  liked: false,
+  disliked: false,
+};
+
 const ChatBot = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([initialBotMessage]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const token = localStorage.getItem("token");
@@ -67,7 +76,10 @@ const ChatBot = () => {
   // Fetch chat history when component mounts
   useEffect(() => {
     const fetchChatHistory = async () => {
-      if (!token) return;
+      if (!token) {
+        setMessages([initialBotMessage]);
+        return;
+      }
 
       try {
         const response = await fetch(
@@ -86,6 +98,11 @@ const ChatBot = () => {
 
         const history: ChatHistoryItem[] = await response.json();
 
+        if (history.length === 0) {
+          // No history found, keep the initial welcome message
+          return;
+        }
+
         // Transform history data to match our message format
         const formattedHistory: ChatMessage[] = [];
 
@@ -101,7 +118,7 @@ const ChatBot = () => {
               disliked: false,
             });
           }
-
+          
           // Add bot reply
           if (item.botReply) {
             formattedHistory.push({
@@ -115,36 +132,11 @@ const ChatBot = () => {
           }
         });
 
-        // If no history, add initial bot message
-        if (formattedHistory.length === 0) {
-          setMessages([
-            {
-              id: 1,
-              type: "bot",
-              content:
-                "Hi there! I'm Zenith, your mental wellness assistant. How can I help you today?",
-              timestamp: new Date().toISOString(),
-              liked: false,
-              disliked: false,
-            },
-          ]);
-        } else {
-          setMessages(formattedHistory);
-        }
+        setMessages(formattedHistory);
       } catch (error) {
         console.error("Error fetching chat history:", error);
-        // Fallback to initial message if history fails to load
-        setMessages([
-          {
-            id: 1,
-            type: "bot",
-            content:
-              "Hi there! I'm Zenith, your mental wellness assistant. How can I help you today?",
-            timestamp: new Date().toISOString(),
-            liked: false,
-            disliked: false,
-          },
-        ]);
+        // On error, still show the initial welcome message
+        setMessages([initialBotMessage]);
       }
     };
 
