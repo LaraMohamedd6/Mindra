@@ -4,16 +4,15 @@ import EnhancedHero from "@/components/home/EnhancedHero";
 import Features from "@/components/home/Features";
 import QuoteSection from "@/components/home/QuoteSection";
 import CTA from "@/components/home/CTA";
-import MotivationCarousel from "@/components/home/MotivationCarousel";
 import FeaturedTools from "@/components/home/FeaturedTools";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
-import ihImage from '../assets/images/ihs.jpg';
-import emImage from '../assets/images/em.jfif';
-import medImage from '../assets/images/med.webp';
+import ihImage from '../assets/images/ih.jpg';
+import emImage from '../assets/images/eme.avif';
+import medImage from '../assets/images/medi.avif';
 
 const Index = () => {
   const controls = useAnimation();
@@ -38,6 +37,7 @@ const Index = () => {
     <Layout>
       <EnhancedHero />
       <Features />
+      <CTA />
       <FeaturedTools />
       
       <section className="py-20 bg-white">
@@ -105,9 +105,7 @@ const Index = () => {
         </div>
       </section>
       
-      <MotivationCarousel />
       <QuoteSection />
-      <CTA />
     </Layout>
   );
 };
