@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { CreateRoomForm } from "@/components/chat/CreateRoomForm";
-import { ChatRoomList } from "@/components/chat/ChatRoomList";
+import { ChatRoomList, mentalHealthTopics } from "@/components/chat/ChatRoomList";
 import { MessageReaction } from "@/components/chat/MessageReaction";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { MediaAttachment } from "@/components/chat/MediaAttachment";
@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Smile, PlusCircle } from "lucide-react";
+import type { ChatRoom, ChatUser, ChatMessage } from "@/types/chat";
 
 // Mock data for demo purposes
 const mockUsers = [
@@ -26,11 +27,11 @@ const mockUsers = [
   { id: 5, name: "Riley Johnson", avatar: "https://i.pravatar.cc/150?img=5", online: false },
 ];
 
-const mockRooms = [
-  { id: 1, name: "General", description: "General discussion for everyone", members: 42 },
-  { id: 2, name: "Stress Management", description: "Tips and support for managing stress", members: 28 },
-  { id: 3, name: "Study Buddies", description: "Find study partners and share resources", members: 35 },
-  { id: 4, name: "Mindfulness", description: "Discuss mindfulness and meditation practices", members: 19 },
+const mockRooms: ChatRoom[] = [
+  { id: 1, name: "General", description: "General discussion for everyone", currentUsers: 42, maxCapacity: 100 },
+  { id: 2, name: "Stress Management", description: "Tips and support for managing stress", currentUsers: 28, maxCapacity: 50 },
+  { id: 3, name: "Study Buddies", description: "Find study partners and share resources", currentUsers: 35, maxCapacity: 75 },
+  { id: 4, name: "Mindfulness", description: "Discuss mindfulness and meditation practices", currentUsers: 19, maxCapacity: 40 },
 ];
 
 const mockMessages = [
@@ -182,7 +183,7 @@ export default function ChatRoom() {
                                   <p className="text-sm text-gray-500 mt-0.5">{room.description}</p>
                                 </div>
                                 <Badge variant="outline" className="text-xs">
-                                  {room.members}
+                                  {room.currentUsers}/{room.maxCapacity}
                                 </Badge>
                               </div>
                             </div>
@@ -227,7 +228,7 @@ export default function ChatRoom() {
                           {mockRooms.find(r => r.id === activeRoom)?.name}
                         </h2>
                         <Badge variant="outline" className="ml-2">
-                          {mockRooms.find(r => r.id === activeRoom)?.members} members
+                          {mockRooms.find(r => r.id === activeRoom)?.currentUsers}/{mockRooms.find(r => r.id === activeRoom)?.maxCapacity} members
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-500 mt-1">
