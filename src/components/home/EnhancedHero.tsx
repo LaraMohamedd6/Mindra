@@ -10,20 +10,23 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import first from "@/assets/images/first.avif";
+import second from "@/assets/images/second.avif"; 
+import third from "@/assets/images/third.avif";
 
 
-export default function EnhancedHero() {
+export default function EnhancedHero() { 
   const heroImages = [
     {
-      url: "https://img.freepik.com/free-photo/front-view-smiley-woman-outdoors_23-2149818214.jpg?t=st=1745166956~exp=1745170556~hmac=0a41571a5d61eab7d5a8d7dddb07363cbe3893a570a105dcb57ad6c06e7a0758&w=1800",
+      url: first,
       alt: "Students supporting each other"
     },
     {
-      url: "https://img.freepik.com/free-photo/female-meditating-indoor-portrait_23-2148835409.jpg?ga=GA1.1.545279301.1737311031&semt=ais_hybrid&w=740",
+      url: second,
       alt: "Students studying together"
     },
     {
-      url: "https://img.freepik.com/free-photo/athlete-playing-sport-with-hand-drawn-doodles_23-2150036341.jpg?t=st=1745166890~exp=1745170490~hmac=f68e4e37280de81a01753432e7ccfabb471f21ee3c5b75590c8ee0b607a67a39&w=1800",
+      url: third,
       alt: "Student practicing meditation"
     }
   ];
@@ -83,7 +86,7 @@ export default function EnhancedHero() {
                 variant="outline"
                 className="border-zenSage text-zenSage hover:bg-zenSage/10 rounded-full px-8 py-6"
               >
-                <Link to="/resources">Explore Resources</Link>
+                <Link to="/Information">Explore Resources</Link>
               </Button>
             </div>
             <div className="mt-6 flex items-center space-x-4 mb-12">

@@ -10,16 +10,16 @@ import { Play, Clock, Volume2 } from "lucide-react";
 const Meditation = () => {
   return (
     <Layout>
-      <section className="relative py-16 bg-gradient-to-br from-zenLightPink to-white overflow-hidden">
+      <section className="relative h-[400px] py-16 bg-gradient-to-br from-zenLightPink to-white overflow-hidden">
         {/* Semi-transparent Background Image */}
-        <div className="absolute inset-0 z-0 opacity-40"> {/* Adjust opacity here (0-100) */}
+        <div className="absolute inset-0 z-0 opacity-40 h-[450px] min-h-[300px]">
+          {/* Increased height with viewport units + minimum */}
           <img
-            src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+            src="https://img.freepik.com/free-photo/close-up-kid-meditating-mat_23-2149101612.jpg?t=st=1745170911~exp=1745174511~hmac=81c482c7a7bafb964e81c19e3bcd398003b245866dadcae5ead9746d0974be46&w=1800"
             alt="Meditation background"
             className="w-full h-full object-cover"
           />
-          {/* Optional: Very light overlay to soften the image */}
-          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute inset-0 bg-amber-100/5"></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -29,7 +29,7 @@ const Meditation = () => {
             transition={{ duration: 0.5 }}
             className="text-center max-w-3xl mx-auto"
           >
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4 text-gray-800">
+            <h1 className="text-4xl md:text-5xl mt-[100px] font-display font-bold mb-4 text-gray-800">
               Meditation & Mindfulness
             </h1>
             <p className="text-lg text-gray-700">

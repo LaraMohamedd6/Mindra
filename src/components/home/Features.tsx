@@ -66,8 +66,8 @@ export default function Features() {
           subtitle="Discover the tools and resources designed to help students thrive"
           centered
         />
-        
-        <motion.div 
+
+        <motion.div
           variants={container}
           initial="hidden"
           whileInView="show"
@@ -81,11 +81,13 @@ export default function Features() {
                 hidden: { opacity: 0, y: 20 },
                 show: { opacity: 1, y: 0 }
               }}
+              className="h-100 d-flex" // Added Bootstrap classes
             >
               <FeatureCard
                 title={feature.title}
                 description={feature.description}
                 icon={feature.icon}
+                className="h-100" // Pass this to FeatureCard
               />
             </motion.div>
           ))}
