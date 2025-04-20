@@ -1,29 +1,21 @@
-
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Hash } from "lucide-react";
+import type { ChatRoom } from "@/types/chat";
 
 const mentalHealthTopics = [
-  { id: 1, name: "Anxiety Support", description: "Share experiences and coping strategies" },
-  { id: 2, name: "Stress Management", description: "Discuss stress relief techniques" },
-  { id: 3, name: "Depression Support", description: "A safe space for supporting each other" },
-  { id: 4, name: "Mindfulness Practice", description: "Practice mindfulness together" },
-  { id: 5, name: "Study Anxiety", description: "Support for academic stress" },
-  { id: 6, name: "Social Connection", description: "Build meaningful connections" },
-  { id: 7, name: "Self-Care Circle", description: "Share self-care tips and experiences" },
-  { id: 8, name: "Sleep Support", description: "Discuss sleep hygiene and issues" },
-  { id: 9, name: "Positive Thinking", description: "Focus on optimistic perspectives" },
-  { id: 10, name: "General Support", description: "Open discussion for all topics" },
+  { id: 1, name: "Anxiety Support", description: "Share experiences and coping strategies", currentUsers: 0, maxCapacity: 20 },
+  { id: 2, name: "Stress Management", description: "Discuss stress relief techniques", currentUsers: 0, maxCapacity: 20 },
+  { id: 3, name: "Depression Support", description: "A safe space for supporting each other", currentUsers: 0, maxCapacity: 20 },
+  { id: 4, name: "Mindfulness Practice", description: "Practice mindfulness together", currentUsers: 0, maxCapacity: 20 },
+  { id: 5, name: "Study Anxiety", description: "Support for academic stress", currentUsers: 0, maxCapacity: 20 },
+  { id: 6, name: "Social Connection", description: "Build meaningful connections", currentUsers: 0, maxCapacity: 20 },
+  { id: 7, name: "Self-Care Circle", description: "Share self-care tips and experiences", currentUsers: 0, maxCapacity: 20 },
+  { id: 8, name: "Sleep Support", description: "Discuss sleep hygiene and issues", currentUsers: 0, maxCapacity: 20 },
+  { id: 9, name: "Positive Thinking", description: "Focus on optimistic perspectives", currentUsers: 0, maxCapacity: 20 },
+  { id: 10, name: "General Support", description: "Open discussion for all topics", currentUsers: 0, maxCapacity: 20 },
 ];
-
-interface ChatRoom {
-  id: number;
-  name: string;
-  description: string;
-  currentUsers: number;
-  maxCapacity: number;
-}
 
 interface ChatRoomListProps {
   rooms: ChatRoom[];

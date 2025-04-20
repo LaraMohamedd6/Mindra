@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import type { Reaction } from "@/types/chat";
 
 const reactions = [
   { emoji: "👍", label: "thumbs up" },
@@ -12,7 +13,7 @@ const reactions = [
 
 interface MessageReactionProps {
   onReact: (reaction: string) => void;
-  existingReactions?: { emoji: string; count: number }[];
+  existingReactions?: Reaction[];
 }
 
 export function MessageReaction({ onReact, existingReactions = [] }: MessageReactionProps) {

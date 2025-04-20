@@ -6,6 +6,10 @@ export interface ChatRoom {
   currentUsers: number;
   maxCapacity: number;
   adminId?: number;
+  topic?: string;
+  icon?: string;
+  users?: ChatUser[];
+  messages?: ChatMessage[];
 }
 
 export interface ChatMessage {
@@ -28,4 +32,10 @@ export interface ChatUser {
   avatar: string;
   online: boolean;
   isAdmin?: boolean;
+}
+
+export interface Reaction {
+  emoji: string;
+  count: number;
+  users: number[];
 }
