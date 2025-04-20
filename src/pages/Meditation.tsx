@@ -1,4 +1,3 @@
-
 import Layout from "@/components/layout/Layout";
 import SectionHeading from "@/components/common/SectionHeading";
 import BreatheAnimation from "@/components/meditation/BreatheAnimation";
@@ -6,8 +5,32 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { Play, Clock, Volume2 } from "lucide-react";
-
+import { useRef } from "react";
+ 
 const Meditation = () => {
+  // Audio refs for each meditation track
+  const audioRefs = useRef<{[key: string]: HTMLAudioElement | null}>({});
+  
+  // Function to play/pause audio
+  const toggleAudio = (audioId: string) => {
+    const audio = audioRefs.current[audioId];
+    if (audio) {
+      if (audio.paused) {
+        // Pause all other audio elements
+        Object.values(audioRefs.current).forEach(a => {
+          if (a && a.id !== audioId) {
+            a.pause();
+            a.currentTime = 0;
+          }
+        });
+        audio.play();
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }
+  };
+
   return (
     <Layout>
       <section className="relative h-[400px] py-16 bg-gradient-to-br from-zenLightPink to-white overflow-hidden">
@@ -76,19 +99,25 @@ const Meditation = () => {
                 <TabsContent value="stress" className="space-y-4">
                   {[
                     {
+                      id: "stress-1",
                       title: "Quick Stress Relief",
                       duration: "5 min",
-                      instructor: "Dr. Emma Wilson"
+                      instructor: "Dr. Emma Wilson",
+                      audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
                     },
                     {
+                      id: "stress-2",
                       title: "Exam Anxiety Meditation",
                       duration: "10 min",
-                      instructor: "Michael Chen"
+                      instructor: "Michael Chen",
+                      audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
                     },
                     {
+                      id: "stress-3",
                       title: "Release & Relax",
                       duration: "15 min",
-                      instructor: "Sarah Johnson"
+                      instructor: "Sarah Johnson",
+                      audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
                     }
                   ].map((meditation, index) => (
                     <div
@@ -103,10 +132,22 @@ const Meditation = () => {
                           <span>with {meditation.instructor}</span>
                         </div>
                       </div>
-                      <Button size="sm" className="bg-zenSage hover:bg-zenSage/90 text-white">
-                        <Play className="h-4 w-4 mr-2" />
-                        Play
-                      </Button>
+                      <div className="flex items-center">
+                        <audio
+                          ref={(el) => (audioRefs.current[meditation.id] = el)}
+                          id={meditation.id}
+                          src={meditation.audioSrc}
+                          preload="metadata"
+                        />
+                        <Button 
+                          size="sm" 
+                          className="bg-zenSage hover:bg-zenSage/90 text-white"
+                          onClick={() => toggleAudio(meditation.id)}
+                        >
+                          <Play className="h-4 w-4 mr-2" />
+                          Play
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </TabsContent>
@@ -114,19 +155,25 @@ const Meditation = () => {
                 <TabsContent value="focus" className="space-y-4">
                   {[
                     {
+                      id: "focus-1",
                       title: "Study Session Focus",
                       duration: "8 min",
-                      instructor: "Dr. Emma Wilson"
+                      instructor: "Dr. Emma Wilson",
+                      audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"
                     },
                     {
+                      id: "focus-2",
                       title: "Deep Concentration",
                       duration: "12 min",
-                      instructor: "Michael Chen"
+                      instructor: "Michael Chen",
+                      audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3"
                     },
                     {
+                      id: "focus-3",
                       title: "Mind Clearing",
                       duration: "10 min",
-                      instructor: "Sarah Johnson"
+                      instructor: "Sarah Johnson",
+                      audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"
                     }
                   ].map((meditation, index) => (
                     <div
@@ -141,10 +188,22 @@ const Meditation = () => {
                           <span>with {meditation.instructor}</span>
                         </div>
                       </div>
-                      <Button size="sm" className="bg-zenSage hover:bg-zenSage/90 text-white">
-                        <Play className="h-4 w-4 mr-2" />
-                        Play
-                      </Button>
+                      <div className="flex items-center">
+                        <audio
+                          ref={(el) => (audioRefs.current[meditation.id] = el)}
+                          id={meditation.id}
+                          src={meditation.audioSrc}
+                          preload="metadata"
+                        />
+                        <Button 
+                          size="sm" 
+                          className="bg-zenSage hover:bg-zenSage/90 text-white"
+                          onClick={() => toggleAudio(meditation.id)}
+                        >
+                          <Play className="h-4 w-4 mr-2" />
+                          Play
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </TabsContent>
@@ -152,19 +211,25 @@ const Meditation = () => {
                 <TabsContent value="sleep" className="space-y-4">
                   {[
                     {
+                      id: "sleep-1",
                       title: "Evening Wind Down",
                       duration: "20 min",
-                      instructor: "Sarah Johnson"
+                      instructor: "Sarah Johnson",
+                      audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3"
                     },
                     {
+                      id: "sleep-2",
                       title: "Pre-Sleep Relaxation",
                       duration: "15 min",
-                      instructor: "Dr. Emma Wilson"
+                      instructor: "Dr. Emma Wilson",
+                      audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
                     },
                     {
+                      id: "sleep-3",
                       title: "Deep Sleep Meditation",
                       duration: "30 min",
-                      instructor: "Michael Chen"
+                      instructor: "Michael Chen",
+                      audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3"
                     }
                   ].map((meditation, index) => (
                     <div
@@ -179,10 +244,22 @@ const Meditation = () => {
                           <span>with {meditation.instructor}</span>
                         </div>
                       </div>
-                      <Button size="sm" className="bg-zenSage hover:bg-zenSage/90 text-white">
-                        <Play className="h-4 w-4 mr-2" />
-                        Play
-                      </Button>
+                      <div className="flex items-center">
+                        <audio
+                          ref={(el) => (audioRefs.current[meditation.id] = el)}
+                          id={meditation.id}
+                          src={meditation.audioSrc}
+                          preload="metadata"
+                        />
+                        <Button 
+                          size="sm" 
+                          className="bg-zenSage hover:bg-zenSage/90 text-white"
+                          onClick={() => toggleAudio(meditation.id)}
+                        >
+                          <Play className="h-4 w-4 mr-2" />
+                          Play
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </TabsContent>
@@ -203,34 +280,46 @@ const Meditation = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {[
               {
+                id: "nature",
                 title: "Nature Sounds",
                 description: "Gentle forest, beach, and rainfall sounds",
-                icon: <Volume2 className="h-6 w-6" />
+                icon: <Volume2 className="h-6 w-6" />,
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
               },
               {
+                id: "body-scan",
                 title: "Body Scan",
                 description: "A relaxing full-body awareness practice",
-                icon: <Volume2 className="h-6 w-6" />
+                icon: <Volume2 className="h-6 w-6" />,
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3"
               },
               {
+                id: "loving-kindness",
                 title: "Loving-Kindness",
                 description: "Generate positive emotions and compassion",
-                icon: <Volume2 className="h-6 w-6" />
+                icon: <Volume2 className="h-6 w-6" />,
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3"
               },
               {
+                id: "walking",
                 title: "Mindful Walking",
                 description: "Practice mindfulness while in motion",
-                icon: <Volume2 className="h-6 w-6" />
+                icon: <Volume2 className="h-6 w-6" />,
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3"
               },
               {
+                id: "gratitude",
                 title: "Gratitude Practice",
                 description: "Cultivate appreciation and positivity",
-                icon: <Volume2 className="h-6 w-6" />
+                icon: <Volume2 className="h-6 w-6" />,
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3"
               },
               {
+                id: "study-break",
                 title: "Study Break Resets",
                 description: "Quick practices between study sessions",
-                icon: <Volume2 className="h-6 w-6" />
+                icon: <Volume2 className="h-6 w-6" />,
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"
               }
             ].map((item, index) => (
               <motion.div
@@ -249,10 +338,21 @@ const Meditation = () => {
                   </div>
                   <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
                   <p className="text-gray-600 mb-4">{item.description}</p>
-                  <Button className="w-full bg-zenSage hover:bg-zenSage/90 text-white">
-                    <Play className="h-4 w-4 mr-2" />
-                    Listen Now
-                  </Button>
+                  <div className="flex items-center">
+                    <audio
+                      ref={(el) => (audioRefs.current[item.id] = el)}
+                      id={item.id}
+                      src={item.audioSrc}
+                      preload="metadata"
+                    />
+                    <Button 
+                      className="w-full bg-zenSage hover:bg-zenSage/90 text-white"
+                      onClick={() => toggleAudio(item.id)}
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      Listen Now
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             ))}
