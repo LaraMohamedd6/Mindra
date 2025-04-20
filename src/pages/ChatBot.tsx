@@ -1,19 +1,36 @@
 import { useState, useEffect, useRef } from "react";
-import { Bot, Send, ThumbsUp, ThumbsDown, Loader2, AlertTriangle, InfoIcon, ShieldCheck } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Bot,
+  Send,
+  ThumbsUp,
+  ThumbsDown,
+  Loader2,
+  AlertTriangle,
+  InfoIcon,
+  ShieldCheck,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Header from "../components/layout/Header";
 import { toast } from "sonner";
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&display=swap" rel="stylesheet"></link>
+
 // Types for chat messages and history
 interface ChatMessage {
   id: number;
   type: "user" | "bot";
   content: string;
   timestamp: string;
+  liked?: boolean;
+  disliked?: boolean;
 }
 
 interface ChatHistoryItem {
@@ -28,7 +45,7 @@ const suggestedQuestions = [
   "I am feeling anxious lately",
   "What are the types of depression?",
   "I am feeling stressed lately",
-  "What's the difference between anxiety and stress?"
+  "What's the difference between anxiety and stress?",
 ];
 
 const ChatBot = () => {
@@ -51,87 +68,127 @@ const ChatBot = () => {
   useEffect(() => {
     const fetchChatHistory = async () => {
       if (!token) return;
-      
+
       try {
-        const response = await fetch(`https://localhost:7223/api/prediction/chat-history`, {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`
+        const response = await fetch(
+          `https://localhost:7223/api/prediction/chat-history`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
-    
+        );
+
         if (!response.ok) {
           throw new Error("Failed to fetch chat history");
         }
-    
+
         const history: ChatHistoryItem[] = await response.json();
-        
+
         // Transform history data to match our message format
         const formattedHistory: ChatMessage[] = [];
-        
-        history.forEach(item => {
+
+        history.forEach((item) => {
           // Add user message
           if (item.userMessage) {
             formattedHistory.push({
               id: formattedHistory.length + 1,
               type: "user",
               content: item.userMessage,
-              timestamp: item.timestamp
+              timestamp: item.timestamp,
+              liked: false,
+              disliked: false,
             });
           }
-          
+
           // Add bot reply
           if (item.botReply) {
             formattedHistory.push({
               id: formattedHistory.length + 1,
               type: "bot",
               content: item.botReply,
-              timestamp: item.timestamp
+              timestamp: item.timestamp,
+              liked: false,
+              disliked: false,
             });
           }
         });
-    
+
         // If no history, add initial bot message
         if (formattedHistory.length === 0) {
-          setMessages([{
-            id: 1,
-            type: "bot",
-            content: "Hi there! I'm Zenith, your mental wellness assistant. How can I help you today?",
-            timestamp: new Date().toISOString()
-          }]);
+          setMessages([
+            {
+              id: 1,
+              type: "bot",
+              content:
+                "Hi there! I'm Zenith, your mental wellness assistant. How can I help you today?",
+              timestamp: new Date().toISOString(),
+              liked: false,
+              disliked: false,
+            },
+          ]);
         } else {
           setMessages(formattedHistory);
         }
       } catch (error) {
         console.error("Error fetching chat history:", error);
         // Fallback to initial message if history fails to load
-        setMessages([{
-          id: 1,
-          type: "bot",
-          content: "Hi there! I'm Zenith, your mental wellness assistant. How can I help you today?",
-          timestamp: new Date().toISOString()
-        }]);
+        setMessages([
+          {
+            id: 1,
+            type: "bot",
+            content:
+              "Hi there! I'm Zenith, your mental wellness assistant. How can I help you today?",
+            timestamp: new Date().toISOString(),
+            liked: false,
+            disliked: false,
+          },
+        ]);
       }
     };
 
     fetchChatHistory();
   }, [token]);
 
-  const saveMessageToHistory = async (message: string, isUserMessage: boolean) => {
+  const handleLike = (messageId: number) => {
+    setMessages((prev) =>
+      prev.map((message) =>
+        message.id === messageId
+          ? { ...message, liked: !message.liked, disliked: false }
+          : message
+      )
+    );
+  };
+
+  const handleDislike = (messageId: number) => {
+    setMessages((prev) =>
+      prev.map((message) =>
+        message.id === messageId
+          ? { ...message, disliked: !message.disliked, liked: false }
+          : message
+      )
+    );
+  };
+
+  const saveMessageToHistory = async (
+    message: string,
+    isUserMessage: boolean
+  ) => {
     if (!token) return;
-    
+
     try {
       await fetch(`https://localhost:7223/api/ChatHistory`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           message,
           isUserMessage,
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       });
     } catch (error) {
       console.error("Error saving message to history:", error);
@@ -140,73 +197,85 @@ const ChatBot = () => {
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
-    
+
     const userMessage: ChatMessage = {
       id: messages.length + 1,
       type: "user",
       content: input,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      liked: false,
+      disliked: false,
     };
-    
-    setMessages(prev => [...prev, userMessage]);
+
+    setMessages((prev) => [...prev, userMessage]);
     await saveMessageToHistory(input, true);
     setInput("");
     setIsLoading(true);
-    
+
     try {
-      const response = await fetch(`https://localhost:7223/api/Prediction/chatbot`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          Message: input
-        })
-      });
+      const response = await fetch(
+        `https://localhost:7223/api/Prediction/chatbot`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            Message: input,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to get response from chatbot");
       }
 
       const botResponse = await response.text();
-      
+
       const botMessage: ChatMessage = {
         id: messages.length + 2,
         type: "bot",
         content: botResponse,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        liked: false,
+        disliked: false,
       };
-      
-      setMessages(prev => [...prev, botMessage]);
+
+      setMessages((prev) => [...prev, botMessage]);
       await saveMessageToHistory(botResponse, false);
     } catch (error) {
       console.error("Error calling chatbot API:", error);
       toast.error("Failed to get response from chatbot");
-      
+
       const errorMessage: ChatMessage = {
         id: messages.length + 2,
         type: "bot",
-        content: "I'm having trouble connecting right now. Please try again later.",
-        timestamp: new Date().toISOString()
+        content:
+          "I'm having trouble connecting right now. Please try again later.",
+        timestamp: new Date().toISOString(),
+        liked: false,
+        disliked: false,
       };
-      
-      setMessages(prev => [...prev, errorMessage]);
+
+      setMessages((prev) => [...prev, errorMessage]);
       await saveMessageToHistory(errorMessage.content, false);
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSendMessage();
     }
   };
 
   return (
     <>
-      <div><Header /></div>
+      <div>
+        <Header />
+      </div>
       <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Main Chat Section */}
         <div className="lg:col-span-8 space-y-6">
@@ -214,15 +283,21 @@ const ChatBot = () => {
             <CardHeader className="bg-[#EBFFF5] border-b border-[#CFECE0] py-3 px-4">
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12 border-2 border-[#7CAE9E]/20">
-                  <AvatarImage src="/placeholder.svg" />
+                  <AvatarImage
+                    src="/src/assets/images/bott.png"
+                    className="bg-[#EBFFF5]"
+                  />
                   <AvatarFallback className="bg-[#7CAE9E] text-white">
                     <Bot className="h-6 w-6" />
                   </AvatarFallback>
                 </Avatar>
+
                 <div>
                   <CardTitle className="flex items-center gap-2 text-[#7CAE9E]">
                     MindfulBot
-                    <Badge className="bg-[#E69EA2] text-white hover:bg-[#E69EA2]/90">AI Assistant</Badge>
+                    <Badge className="bg-[#E69EA2] text-white hover:bg-[#E69EA2]/90">
+                      AI Assistant
+                    </Badge>
                   </CardTitle>
                   <CardDescription className="text-[#7CAE9E]/80">
                     Your mental wellness companion
@@ -235,49 +310,79 @@ const ChatBot = () => {
               <div className="flex flex-col h-[572px]">
                 {/* Messages Section */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messages.map(message => (
+                  {messages.map((message) => (
                     <div
                       key={message.id}
-                      className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
+                      className={`flex ${
+                        message.type === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      } animate-fade-in`}
                     >
-                      <div className={`flex gap-3 max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse' : ''}`}>
-                        {message.type === 'bot' && (
+                      <div
+                        className={`flex gap-3 max-w-[80%] ${
+                          message.type === "user" ? "flex-row-reverse" : ""
+                        }`}
+                      >
+                        {message.type === "bot" && (
                           <Avatar className="h-8 w-8 mt-0.5">
-                            <AvatarImage src="/placeholder.svg" />
+                            <AvatarImage src="/src/assets/images/bott.png" />
                             <AvatarFallback className="bg-[#7CAE9E] text-white">
                               <Bot className="h-4 w-4" />
                             </AvatarFallback>
                           </Avatar>
                         )}
 
-                        <div className={`
+                        <div
+                          className={`
                           p-3 rounded-lg transition-all duration-300
-                          ${message.type === 'bot'
-                            ? 'bg-[#EBFFF5] border border-[#CFECE0] rounded-tl-none   text-[#525051] font-normal font-sans text-[12px] tracking-wide leading-relaxed'
-                            : 'bg-[#F8E8E9] border border-[#E69EA2] text-[#E69EA2] rounded-tr-none'}
-                        `}>
+                          ${
+                            message.type === "bot"
+                              ? "bg-[#EBFFF5] border border-[#CFECE0] rounded-tl-none text-[#525051] font-normal font-sans text-[12px] tracking-wide leading-relaxed"
+                              : "bg-[#F8E8E9] border border-[#E69EA2] text-[#E69EA2] rounded-tr-none"
+                          }
+                        `}
+                        >
                           <div
                             className="text-sm whitespace-pre-line"
                             dangerouslySetInnerHTML={{
-                              __html: message.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                            }} />
+                              __html: message.content.replace(
+                                /\*\*(.*?)\*\*/g,
+                                "<strong>$1</strong>"
+                              ),
+                            }}
+                          />
 
-                          {message.type === 'bot' && (
+                          {message.type === "bot" && (
                             <div className="flex items-center justify-end gap-2 mt-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 rounded-full hover:bg-[#CFECE0]"
+                              <button
+                                onClick={() => handleLike(message.id)}
+                                className={`h-6 w-6 rounded-full hover:bg-[#CFECE0] flex items-center justify-center ${
+                                  message.liked
+                                    ? "text-white bg-[#7CAE9E]"
+                                    : "text-[#7CAE9E]"
+                                }`}
                               >
-                                <ThumbsUp className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 rounded-full hover:bg-[#E69EA2]/10"
+                                <ThumbsUp
+                                  className={`h-4 w-4 ${
+                                    message.liked ? "font-bold" : ""
+                                  }`}
+                                />
+                              </button>
+                              <button
+                                onClick={() => handleDislike(message.id)}
+                                className={`h-6 w-6 rounded-full hover:bg-[#E69EA2]/10 flex items-center justify-center ${
+                                  message.disliked
+                                    ? "text-white bg-[#E69EA2]"
+                                    : "text-[#E69EA2]"
+                                }`}
                               >
-                                <ThumbsDown className="h-3 w-3" />
-                              </Button>
+                                <ThumbsDown
+                                  className={`h-4 w-4 ${
+                                    message.disliked ? "font-bold" : ""
+                                  }`}
+                                />
+                              </button>
                             </div>
                           )}
                         </div>
@@ -309,7 +414,7 @@ const ChatBot = () => {
                       <Input
                         id="chat-input"
                         placeholder="Type your message..."
-                        className="flex-1 border-[#CFECE0] focus-visible:ring-[#7CAE9E]"
+                        className="flex-1 border-[#CFECE0] focus-visible:ring-[#7CAE9E] text-[#525051] font-normal font-sans text-[12px] tracking-wide leading-relaxed"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyPress}
@@ -337,7 +442,7 @@ const ChatBot = () => {
                           key={index}
                           variant="outline"
                           size="sm"
-                          className="whitespace-nowrap border-[#CFECE0] hover:bg-[#EBFFF5] text-[#7CAE9E]"
+                          className="whitespace-nowrap border-[#CFECE0] hover:bg-[#EBFFF5] text-[#7CAE9E] hover:text-[#E69EA2] transition-colors"
                           onClick={() => setInput(question)}
                           disabled={isLoading}
                         >
@@ -355,7 +460,7 @@ const ChatBot = () => {
         {/* Information Sidebar */}
         <div className="lg:col-span-4 space-y-6">
           {/* Privacy Notice */}
-          <Card className="border-[#CFECE0]  shadow-md">
+          <Card className="border-[#CFECE0] shadow-md">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2 text-[#7CAE9E]">
                 <ShieldCheck className="h-5 w-5" />
@@ -364,16 +469,21 @@ const ChatBot = () => {
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
               <p className="mb-4 text-[#7E676B]">
-                Your conversations are private and not used to train our models. For serious mental health concerns, please contact a mental health professional or emergency services.
+                Your conversations are private and not used to train our models.
+                For serious mental health concerns, please contact a mental
+                health professional or emergency services.
               </p>
-              <Button variant="link" className="text-[#E69EA2] p-0 h-auto font-medium">
+              <Button
+                variant="link"
+                className="text-[#E69EA2] p-0 h-auto font-medium"
+              >
                 View Privacy Policy →
               </Button>
             </CardContent>
           </Card>
 
           {/* About MindfulBot */}
-          <Card className="border-[#CFECE0]  shadow-md">
+          <Card className="border-[#CFECE0] shadow-md">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2 text-[#7CAE9E]">
                 <InfoIcon className="h-5 w-5" />
@@ -382,7 +492,9 @@ const ChatBot = () => {
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
               <p className="text-[#7E676B]">
-                MindfulBot uses AI to provide supportive resources and techniques for managing stress, anxiety, and other common student concerns.
+                MindfulBot uses AI to provide supportive resources and
+                techniques for managing stress, anxiety, and other common
+                student concerns.
               </p>
             </CardContent>
           </Card>
@@ -397,9 +509,14 @@ const ChatBot = () => {
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
               <p className="mb-4 text-[#7E676B]">
-                MindfulBot is not a substitute for professional mental health support. Please visit our Emergency page if you need immediate assistance.
+                MindfulBot is not a substitute for professional mental health
+                support. Please visit our Emergency page if you need immediate
+                assistance.
               </p>
-              <Button variant="outline" className="w-full border-[#E69EA2] text-[#E69EA2] hover:bg-[#F8E8E9]">
+              <Button
+                variant="outline"
+                className="w-full border-[#E69EA2] text-[#E69EA2] hover:bg-[#F8E8E9]"
+              >
                 Visit Emergency Page
               </Button>
             </CardContent>
