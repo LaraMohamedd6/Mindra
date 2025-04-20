@@ -11,7 +11,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import first from "@/assets/images/first.avif";
-import second from "@/assets/images/second.jpg"; 
+import second from "@/assets/images/second.avif"; 
 import third from "@/assets/images/third.avif";
 
 
@@ -86,7 +86,7 @@ export default function EnhancedHero() {
                 variant="outline"
                 className="border-zenSage text-zenSage hover:bg-zenSage/10 rounded-full px-8 py-6"
               >
-                <Link to="/resources">Explore Resources</Link>
+                <Link to="/Information">Explore Resources</Link>
               </Button>
             </div>
             <div className="mt-6 flex items-center space-x-4 mb-12">
