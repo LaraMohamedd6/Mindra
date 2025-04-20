@@ -45,35 +45,12 @@ export default function FeaturedTools() {
         color: "bg-gradient-to-br from-blue-100 to-cyan-50 text-blue-600"
       }
     ],
-    academic: [
-      {
-        icon: <Timer className="h-7 w-7" />,
-        title: "Study Helper",
-        description: "Pomodoro timer, focus sounds, and task tracking",
-        link: "/study-helper",
-        color: "bg-gradient-to-br from-amber-100 to-yellow-50 text-amber-600"
-      },
-      {
-        icon: <PenLine className="h-7 w-7" />,
-        title: "Notes",
-        description: "Organize your thoughts and study materials",
-        link: "/notes",
-        color: "bg-gradient-to-br from-emerald-100 to-green-50 text-emerald-600"
-      },
-      {
-        icon: <Calendar className="h-7 w-7" />,
-        title: "Schedule",
-        description: "Balance study time, self-care, and social activities",
-        link: "/schedule",
-        color: "bg-gradient-to-br from-rose-100 to-red-50 text-rose-600"
-      }
-    ],
     social: [
       {
         icon: <MessageSquare className="h-7 w-7" />,
         title: "Peer Support",
         description: "Connect with others facing similar challenges",
-        link: "/peer-support",
+        link: "/ChatRoom",
         color: "bg-gradient-to-br from-teal-100 to-cyan-50 text-teal-600"
       },
       {
@@ -87,7 +64,7 @@ export default function FeaturedTools() {
         icon: <BookOpen className="h-7 w-7" />,
         title: "Journal",
         description: "Express and process your thoughts and feelings",
-        link: "/journal",
+        link: "/profile",
         color: "bg-gradient-to-br from-sky-100 to-blue-50 text-sky-600"
       }
     ]
@@ -107,7 +84,6 @@ export default function FeaturedTools() {
           <div className="inline-flex rounded-lg bg-white p-1 shadow-sm">
             {[
               { id: 'wellness', label: 'Wellness Tools' },
-              { id: 'academic', label: 'Academic Support' },
               { id: 'social', label: 'Social & Emotional' }
             ].map(tab => (
               <button

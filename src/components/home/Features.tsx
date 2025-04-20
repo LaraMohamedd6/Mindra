@@ -9,7 +9,7 @@ export default function Features() {
     {
       icon: <Brain className="h-6 w-6" />,
       title: "Mental Health Assessment",
-      description: "Take our K10 assessment to understand your current mental state and get personalized recommendations."
+      description: "Take our K10 assessment to understand your current mental state."
     },
     {
       icon: <HeartPulse className="h-6 w-6" />,
@@ -44,7 +44,7 @@ export default function Features() {
     {
       icon: <Clock className="h-6 w-6" />,
       title: "Study Helper Tools",
-      description: "Boost your productivity with pomodoro timers, study playlists, and academic planning tools."
+      description: "Boost your productivity with pomodoro timers and academic planning tools."
     }
   ];
 

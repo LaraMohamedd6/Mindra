@@ -10,15 +10,28 @@ import { Play, Clock, Volume2 } from "lucide-react";
 const Meditation = () => {
   return (
     <Layout>
-      <section className="bg-gradient-to-br from-zenLightPink to-white py-16">
-        <div className="container mx-auto px-4">
+      <section className="relative py-16 bg-gradient-to-br from-zenLightPink to-white overflow-hidden">
+        {/* Semi-transparent Background Image */}
+        <div className="absolute inset-0 z-0 opacity-40"> {/* Adjust opacity here (0-100) */}
+          <img
+            src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+            alt="Meditation background"
+            className="w-full h-full object-cover"
+          />
+          {/* Optional: Very light overlay to soften the image */}
+          <div className="absolute inset-0 bg-black/10"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="text-center max-w-3xl mx-auto"
           >
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Meditation & Mindfulness</h1>
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4 text-gray-800">
+              Meditation & Mindfulness
+            </h1>
             <p className="text-lg text-gray-700">
               Find your center with guided practices designed to help students reduce stress and improve focus
             </p>
@@ -52,14 +65,14 @@ const Meditation = () => {
               <p className="text-gray-700 mb-6">
                 Choose from our collection of guided meditations designed specifically for students.
               </p>
-              
+
               <Tabs defaultValue="stress">
                 <TabsList className="grid w-full grid-cols-3 mb-6">
                   <TabsTrigger value="stress">Stress Relief</TabsTrigger>
                   <TabsTrigger value="focus">Focus</TabsTrigger>
                   <TabsTrigger value="sleep">Sleep</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="stress" className="space-y-4">
                   {[
                     {
@@ -97,7 +110,7 @@ const Meditation = () => {
                     </div>
                   ))}
                 </TabsContent>
-                
+
                 <TabsContent value="focus" className="space-y-4">
                   {[
                     {
@@ -135,7 +148,7 @@ const Meditation = () => {
                     </div>
                   ))}
                 </TabsContent>
-                
+
                 <TabsContent value="sleep" className="space-y-4">
                   {[
                     {
@@ -186,7 +199,7 @@ const Meditation = () => {
             subtitle="Soothing sounds and guided practices to help you find your calm"
             centered
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {[
               {

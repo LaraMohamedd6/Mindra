@@ -11,6 +11,9 @@ import { useInView } from "react-intersection-observer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
+import ihImage from '../assets/images/ihs.jpg';
+import emImage from '../assets/images/em.jfif';
+import medImage from '../assets/images/med.webp';
 
 const Index = () => {
   const controls = useAnimation();
@@ -58,23 +61,23 @@ const Index = () => {
               {
                 title: "Mental Health Information",
                 description: "Evidence-based information on common mental health challenges faced by students",
-                image: "https://images.unsplash.com/photo-1593073862407-a3a71fed2e27?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1374&q=80",
+                image: ihImage,
                 link: "/information",
-                color: "from-zenPink to-zenPeach",
+                color: "from-zenSeafoam to-zenblack",
               },
               {
                 title: "Meditation & Mindfulness",
                 description: "Guided practices to help you stay grounded during academic stress",
-                image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
+                image: medImage,
                 link: "/meditation",
-                color: "from-zenSeafoam to-zenMint",
+                color: "from-zenSeafoam to-zenblack",
               },
               {
                 title: "Emergency Resources",
-                description: "Immediate help resources for crisis situations",
-                image: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
+                description: "Instant crisis assistance and emergency support resources",
+                image: emImage,
                 link: "/emergency",
-                color: "from-zenPeach to-zenLightPink",
+                color: "from-zenSeafoam to-zenblack",
               }
             ].map((card, i) => (
               <motion.div

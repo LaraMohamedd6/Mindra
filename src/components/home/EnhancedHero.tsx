@@ -11,18 +11,19 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
+
 export default function EnhancedHero() {
   const heroImages = [
     {
-      url: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
+      url: "https://img.freepik.com/free-photo/front-view-smiley-woman-outdoors_23-2149818214.jpg?t=st=1745166956~exp=1745170556~hmac=0a41571a5d61eab7d5a8d7dddb07363cbe3893a570a105dcb57ad6c06e7a0758&w=1800",
       alt: "Students supporting each other"
     },
     {
-      url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1471&q=80",
+      url: "https://img.freepik.com/free-photo/female-meditating-indoor-portrait_23-2148835409.jpg?ga=GA1.1.545279301.1737311031&semt=ais_hybrid&w=740",
       alt: "Students studying together"
     },
     {
-      url: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
+      url: "https://img.freepik.com/free-photo/athlete-playing-sport-with-hand-drawn-doodles_23-2150036341.jpg?t=st=1745166890~exp=1745170490~hmac=f68e4e37280de81a01753432e7ccfabb471f21ee3c5b75590c8ee0b607a67a39&w=1800",
       alt: "Student practicing meditation"
     }
   ];
@@ -35,7 +36,7 @@ export default function EnhancedHero() {
   ];
 
   return (
-    <section className="relative overflow-hidden pt-16 md:pt-20 lg:pt-28 bg-gradient-to-br from-zenLightPink to-white">
+    <section className="relative overflow-hidden pt-4 md:pt-6 lg:pt-10 bg-gradient-to-br from-zenLightPink to-white">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <motion.div
@@ -43,7 +44,7 @@ export default function EnhancedHero() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="bg-zenPink/10 rounded-lg px-3 py-1 inline-flex items-center mb-4">
+            <div className="bg-zenPink/10 rounded-lg px-3 py-1 inline-flex items-center mb-4 -mt-4"> {/* Added -mt-4 */}
               <Heart className="h-4 w-4 text-zenPink mr-2" />
               <span className="text-sm font-medium text-zenPink">Student Mental Health Support</span>
             </div>
@@ -54,7 +55,7 @@ export default function EnhancedHero() {
               ZenZone Connect helps students navigate mental health challenges with interactive tools, resources, and guidance for a balanced academic journey.
             </p>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
@@ -85,7 +86,7 @@ export default function EnhancedHero() {
                 <Link to="/resources">Explore Resources</Link>
               </Button>
             </div>
-            <div className="mt-8 flex items-center space-x-4">
+            <div className="mt-6 flex items-center space-x-4 mb-12">
               <div className="flex -space-x-2">
                 <div className="w-8 h-8 rounded-full bg-zenPeach flex items-center justify-center text-white">
                   <Brain className="h-4 w-4" />
@@ -125,7 +126,7 @@ export default function EnhancedHero() {
               <CarouselPrevious className="left-2" />
               <CarouselNext className="right-2" />
             </Carousel>
-            
+
             <div className="absolute -bottom-6 -right-6 transform translate-x-1/4 translate-y-1/4">
               <div className="animate-spin-slow">
                 <svg width="160" height="160" viewBox="0 0 160 160" fill="none">
@@ -133,7 +134,7 @@ export default function EnhancedHero() {
                 </svg>
               </div>
             </div>
-            
+
             <div className="absolute -top-4 -left-4 bg-white p-4 rounded-xl shadow-lg">
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-zenSeafoam flex items-center justify-center mr-3">
@@ -148,10 +149,10 @@ export default function EnhancedHero() {
           </motion.div>
         </div>
       </div>
-      
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-          <path fill="#ffffff" fillOpacity="1" d="M0,96L80,112C160,128,320,160,480,160C640,160,800,128,960,122.7C1120,117,1280,139,1360,149.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+
+      <div className="absolute bottom-0 left-0 right-0 h-24"> {/* Fixed height */}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" preserveAspectRatio="none"> {/* Reduced viewBox height */}
+          <path fill="#ffffff" fillOpacity="1" d="M0,64L80,74.7C160,85,320,107,480,106.7C640,107,800,85,960,74.7C1120,64,1280,64,1360,64L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"></path>
         </svg>
       </div>
     </section>
