@@ -17,13 +17,14 @@ import Fitness from "./pages/Fitness";
 import Yoga from "./pages/Yoga";
 import Lifestyle from "./pages/Lifestyle";
 import StudyHelper from "./pages/StudyHelper";
-import ChatRoom from "./pages/ChatRoom";
 import ChatBot from "./pages/ChatBot";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import UserProfile from "./pages/UserProfile";
 import ContactUs from "./pages/ContactUs";
 import AboutUs from "./pages/AboutUs";
+import ChatRoomsList from "./pages/ChatRoomsList";
+import ChatRoomView from "./pages/ChatRoomView";
 
 const queryClient = new QueryClient();
 
@@ -46,7 +47,8 @@ const App = () => (
             <Route path="/yoga" element={<Yoga />} />
             <Route path="/lifestyle" element={<Lifestyle />} />
             <Route path="/study-helper" element={<StudyHelper />} />
-            <Route path="/chatroom" element={<ChatRoom />} />
+            <Route path="/chatroom" element={<ChatRoomsList />} />
+            <Route path="/chat-room/:roomId" element={<ChatRoomView />} />
             <Route path="/chatbot" element={<ChatBot />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
