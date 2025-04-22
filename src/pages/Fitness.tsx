@@ -1,321 +1,998 @@
-
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Layout from "@/components/layout/Layout";
-import { motion } from "framer-motion";
-import SectionHeading from "@/components/common/SectionHeading";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dumbbell, Calendar, Target, Trophy, BarChart3 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dumbbell,
+  Clock,
+  Flame,
+  Check,
+  FilterX,
+  Timer,
+  Heart,
+  Play,
+  X,
+  CheckCircle,
+  RotateCcw,
+  Activity,
+  ChevronRight,
+  Quote
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import fitnessbanner from "@/assets/images/fitness.png";
 
-export default function Fitness() {
-  const fitnessRoutines = [
+const colors = {
+  lightPink: "#F8E8E9",
+  coral: "#E69EA2",
+  peach: "#FEC0B3",
+  mint: "#CFECE0",
+  teal: "#7CAE9E",
+  lightGreen: "#EBFFF5",
+  deepTeal: "#2D7D7D",
+  slate: "#4A5568",
+  darkSlate: "#2D3748"
+};
+
+interface WorkoutCardProps {
+  title: string;
+  level: string;
+  duration: string;
+  calories: string;
+  equipment: string[];
+  image: string;
+  benefits: string[];
+  videoId?: string;
+}
+
+const WorkoutCard = ({ title, level, duration, calories, equipment, image, benefits, videoId }: WorkoutCardProps) => {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <>
+      <motion.div
+        whileHover={{ y: -5 }}
+        className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all h-full flex flex-col border border-[#F8E8E9]"
+        onClick={() => setShowModal(true)}
+      >
+        <div className="relative">
+          <AspectRatio ratio={16 / 9}>
+            <img src={image} alt={title} className="object-cover w-full h-full" />
+            <div className="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+              <div className="rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white p-3">
+                <Play size={24} className="fill-white" />
+              </div>
+            </div>
+          </AspectRatio>
+          <Badge
+            variant="outline"
+            className={`absolute top-2 left-2 ${level === "Beginner" ? "border-[#7CAE9E] text-[#7CAE9E]" :
+                level === "Intermediate" ? "border-[#FEC0B3] text-[#FEC0B3]" :
+                  "border-[#E69EA2] text-[#E69EA2]"
+              }`}
+          >
+            {level}
+          </Badge>
+        </div>
+        <div className="p-6 flex-grow">
+          <h3 className="text-xl font-semibold mb-3 text-gray-800">{title}</h3>
+          <div className="flex items-center text-gray-500 text-sm gap-4 mb-4">
+            <div className="flex items-center">
+              <Clock size={14} className="mr-1" />
+              <span>{duration}</span>
+            </div>
+            <div className="flex items-center">
+              <Flame size={14} className="mr-1" />
+              <span>{calories}</span>
+            </div>
+          </div>
+          <div className="mb-4">
+            <p className="text-xs text-gray-500 mb-2">EQUIPMENT NEEDED:</p>
+            <div className="flex flex-wrap gap-1">
+              {equipment.map((item, index) => (
+                <Badge key={index} variant="secondary" className="bg-[#F8E8E9] text-gray-700">
+                  {item}
+                </Badge>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-2">BENEFITS:</p>
+            <ul className="text-sm text-gray-700 space-y-1">
+              {benefits.slice(0, 3).map((benefit, index) => (
+                <li key={index} className="flex items-start">
+                  <Check size={14} className="text-[#7CAE9E] mr-2 mt-0.5 flex-shrink-0" />
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div className="px-6 pb-6">
+          <Button className="w-full bg-[#E69EA2] hover:bg-[#E69EA2]/90 text-white">
+            Start Workout
+          </Button>
+        </div>
+      </motion.div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+          >
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-xl font-semibold">{title}</h3>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="flex-grow overflow-auto">
+              <AspectRatio ratio={16 / 9}>
+                {videoId ? (
+                  <iframe
+                    className="w-full h-full"
+                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                    title={title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                ) : (
+                  <img src={image} alt={title} className="object-cover w-full h-full" />
+                )}
+              </AspectRatio>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-2">
+                    <h4 className="font-medium mb-2">Workout Details</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Duration:</p>
+                        <p>{duration}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Calories Burned:</p>
+                        <p>{calories}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Level:</p>
+                        <Badge variant="outline" className={
+                          level === "Beginner" ? "border-[#7CAE9E] text-[#7CAE9E]" :
+                            level === "Intermediate" ? "border-[#FEC0B3] text-[#FEC0B3]" :
+                              "border-[#E69EA2] text-[#E69EA2]"
+                        }>
+                          {level}
+                        </Badge>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Equipment Needed:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {equipment.map((item, index) => (
+                            <Badge key={index} variant="secondary" className="bg-[#F8E8E9] text-gray-700">
+                              {item}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">Benefits</h4>
+                    <ul className="space-y-2">
+                      {benefits.map((benefit, index) => (
+                        <li key={index} className="flex items-start">
+                          <Check size={14} className="text-[#7CAE9E] mr-2 mt-0.5 flex-shrink-0" />
+                          <span>{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border-t flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowModal(false)}>
+                Close
+              </Button>
+              <Button className="bg-[#E69EA2] hover:bg-[#E69EA2]/90 text-white">
+                Start Workout
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </>
+  );
+};
+
+const Fitness = () => {
+  const [selectedTab, setSelectedTab] = useState("all");
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [selectedDay, setSelectedDay] = useState("");
+  const [showStressReliefModal, setShowStressReliefModal] = useState(false);
+  const [workoutSchedule, setWorkoutSchedule] = useState<Record<string, any>>({});
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [showQuotesModal, setShowQuotesModal] = useState(false);
+
+  const motivationalQuotes = [
     {
-      id: 1,
-      title: "Quick Morning Energizer",
-      duration: "15 mins",
-      level: "Beginner",
-      description: "Start your day with this quick, energizing routine perfect for busy mornings before class.",
-      videoId: "UBMk30rjy0o",
-      exercises: [
-        { name: "Jumping Jacks", duration: "1 min" },
-        { name: "Push-ups", duration: "30 secs" },
-        { name: "Mountain Climbers", duration: "1 min" },
-        { name: "Squats", duration: "1 min" },
-        { name: "Plank", duration: "30 secs" }
-      ]
+      text: "The only bad workout is the one that didn't happen.",
+      author: "Unknown"
     },
     {
-      id: 2,
-      title: "Study Break Stretches",
-      duration: "10 mins",
-      level: "All Levels",
-      description: "Perfect stretching routine to do between study sessions to reduce tension and improve focus.",
-      videoId: "sTANio_2E0Q",
-      exercises: [
-        { name: "Neck Rolls", duration: "30 secs" },
-        { name: "Shoulder Stretches", duration: "1 min" },
-        { name: "Wrist Stretches", duration: "30 secs" },
-        { name: "Standing Side Stretch", duration: "1 min" },
-        { name: "Hip Flexor Stretch", duration: "1 min" }
-      ]
+      text: "Success starts with self-discipline.",
+      author: "Unknown"
     },
     {
-      id: 3,
-      title: "Dorm Room Strength",
-      duration: "20 mins",
-      level: "Intermediate",
-      description: "Build strength with this minimal space, no-equipment workout perfect for small dorm rooms.",
-      videoId: "6eiQiIogJUQ",
-      exercises: [
-        { name: "Chair Dips", duration: "45 secs" },
-        { name: "Wall Sits", duration: "45 secs" },
-        { name: "Desk Push-ups", duration: "45 secs" },
-        { name: "Lunges", duration: "45 secs" },
-        { name: "Glute Bridges", duration: "45 secs" }
-      ]
+      text: "You don't have to be extreme, just consistent.",
+      author: "Unknown"
     },
+    {
+      text: "The secret of getting ahead is getting started.",
+      author: "Mark Twain"
+    },
+    {
+      text: "Discipline is choosing between what you want now and what you want most.",
+      author: "Abraham Lincoln"
+    },
+    {
+      text: "Every workout is a step closer to your goal.",
+      author: "Unknown"
+    },
+    {
+      text: "Your body hears everything your mind says. Stay positive!",
+      author: "Unknown"
+    }
+  ];
+
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const workoutTypes = ["Rest", "Cardio", "Strength", "Flexibility", "HIIT"];
+
+  useEffect(() => {
+    const savedSchedule = localStorage.getItem("workoutSchedule");
+    if (savedSchedule) {
+      setWorkoutSchedule(JSON.parse(savedSchedule));
+    }
+  }, []);
+
+  useEffect(() => {
+    const quoteInterval = setInterval(() => {
+      setCurrentQuoteIndex((prev) => 
+        prev === motivationalQuotes.length - 1 ? 0 : prev + 1
+      );
+    }, 8000); // Change quote every 8 seconds
+
+    return () => clearInterval(quoteInterval);
+  }, []);
+
+  const saveSchedule = () => {
+    localStorage.setItem("workoutSchedule", JSON.stringify(workoutSchedule));
+    setShowScheduleModal(false);
+  };
+
+  const resetSchedule = () => {
+    setWorkoutSchedule({});
+    localStorage.removeItem("workoutSchedule");
+  };
+
+  const handleDayClick = (day: string) => {
+    setSelectedDay(day);
+    setShowScheduleModal(true);
+  };
+
+  const handleScheduleChange = (field: string, value: string | boolean) => {
+    setWorkoutSchedule(prev => ({
+      ...prev,
+      [selectedDay]: {
+        ...prev[selectedDay],
+        [field]: value
+      }
+    }));
+  };
+
+  const toggleWorkoutComplete = (day: string) => {
+    setWorkoutSchedule(prev => ({
+      ...prev,
+      [day]: {
+        ...prev[day],
+        completed: !prev[day]?.completed
+      }
+    }));
+  };
+
+  const scrollToSchedule = () => {
+    const scheduleSection = document.getElementById("workout-schedule");
+    if (scheduleSection) {
+      scheduleSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const workouts = {
+    all: [
+      {
+        title: "Full Body HIIT",
+        level: "Intermediate",
+        duration: "30 min",
+        calories: "300-400 cal",
+        equipment: ["None", "Mat"],
+        image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8aGlpdCUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Total body workout", "Improves cardiovascular health", "Burns calories efficiently"],
+        videoId: "UBMk30rjy0o"
+      },
+      {
+        title: "Home Strength",
+        level: "Beginner",
+        duration: "20 min",
+        calories: "150-200 cal",
+        equipment: ["Resistance Band", "Chair"],
+        image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8d29ya291dCUyMGRvcm18ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["No special equipment needed", "Perfect for limited space", "Builds basic strength"],
+        videoId: "6eiQiIogJUQ"
+      },
+      {
+        title: "Study Break Stretches",
+        level: "Beginner",
+        duration: "10 min",
+        calories: "50-80 cal",
+        equipment: ["None", "Mat (optional)"],
+        image: "https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3RyZXRjaGluZ3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Relieves tension from sitting", "Improves flexibility", "Enhances focus for studying"],
+        videoId: "sTANio_2E0Q"
+      },
+      {
+        title: "Bodyweight Strength",
+        level: "Intermediate",
+        duration: "45 min",
+        calories: "350-450 cal",
+        equipment: ["Pull-up Bar", "Mat"],
+        image: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9keXdlaWdodCUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Builds functional strength", "Improves posture", "Increases muscle endurance"],
+        videoId: "jHyybVrnq7I"
+      },
+      {
+        title: "Stress Relief Cardio",
+        level: "All Levels",
+        duration: "25 min",
+        calories: "200-300 cal",
+        equipment: ["None"],
+        image: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8Y2FyZGlvJTIwd29ya291dHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Releases endorphins", "Reduces stress hormones", "Improves mood and energy"],
+        videoId: "ml6cT4AZdqI"
+      },
+      {
+        title: "Morning Energy Boost",
+        level: "Beginner",
+        duration: "15 min",
+        calories: "100-150 cal",
+        equipment: ["None"],
+        image: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9ybmluZyUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Wakes up the body", "Boosts metabolism", "Improves focus for morning classes"],
+        videoId: "Ao9dYr1jf8A"
+      }
+    ],
+    cardio: [
+      {
+        title: "Stress Relief Cardio",
+        level: "All Levels",
+        duration: "25 min",
+        calories: "200-300 cal",
+        equipment: ["None"],
+        image: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8Y2FyZGlvJTIwd29ya291dHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Releases endorphins", "Reduces stress hormones", "Improves mood and energy"],
+        videoId: "ml6cT4AZdqI"
+      },
+      {
+        title: "Morning Energy Boost",
+        level: "Beginner",
+        duration: "15 min",
+        calories: "100-150 cal",
+        equipment: ["None"],
+        image: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9ybmluZyUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Wakes up the body", "Boosts metabolism", "Improves focus for morning classes"],
+        videoId: "Ao9dYr1jf8A"
+      },
+      {
+        title: "Full Body HIIT",
+        level: "Intermediate",
+        duration: "30 min",
+        calories: "300-400 cal",
+        equipment: ["None", "Mat"],
+        image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8aGlpdCUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Total body workout", "Improves cardiovascular health", "Burns calories efficiently"],
+        videoId: "UBMk30rjy0o"
+      }
+    ],
+    strength: [
+      {
+        title: "Home Strength",
+        level: "Beginner",
+        duration: "20 min",
+        calories: "150-200 cal",
+        equipment: ["Resistance Band", "Chair"],
+        image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8d29ya291dCUyMGRvcm18ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["No special equipment needed", "Perfect for limited space", "Builds basic strength"],
+        videoId: "6eiQiIogJUQ"
+      },
+      {
+        title: "Bodyweight Strength",
+        level: "Intermediate",
+        duration: "45 min",
+        calories: "350-450 cal",
+        equipment: ["Pull-up Bar", "Mat"],
+        image: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9keXdlaWdodCUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Builds functional strength", "Improves posture", "Increases muscle endurance"],
+        videoId: "jHyybVrnq7I"
+      },
+      {
+        title: "Upper Body Strength",
+        level: "Intermediate",
+        duration: "25 min",
+        calories: "200-300 cal",
+        equipment: ["Dumbbells", "Mat"],
+        image: "https://images.unsplash.com/photo-1571019614243-cf8a803d947c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8dXBwZXIlMjBib2R5JTIwd29ya291dHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Builds arm and shoulder strength", "Improves posture", "Enhances upper body endurance"],
+        videoId: "3p8ebBZqM_0"
+      }
+    ],
+    flexibility: [
+      {
+        title: "Study Break Stretches",
+        level: "Beginner",
+        duration: "10 min",
+        calories: "50-80 cal",
+        equipment: ["None", "Mat (optional)"],
+        image: "https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3RyZXRjaGluZ3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Relieves tension from sitting", "Improves flexibility", "Enhances focus for studying"],
+        videoId: "sTANio_2E0Q"
+      },
+      {
+        title: "Full Body Stretch",
+        level: "Beginner",
+        duration: "15 min",
+        calories: "60-100 cal",
+        equipment: ["Mat"],
+        image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3RyZXRjaGluZyUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Improves overall flexibility", "Reduces muscle tension", "Enhances mobility"],
+        videoId: "g_tea8ZNk5A"
+      },
+      {
+        title: "Yoga for Flexibility",
+        level: "Intermediate",
+        duration: "30 min",
+        calories: "150-200 cal",
+        equipment: ["Yoga Mat"],
+        image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8eW9nYSUyMHN0cmV0Y2h8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        benefits: ["Deep stretches for all muscle groups", "Improves balance and posture", "Reduces stress"],
+        videoId: "Eml2xnoLpYE"
+      }
+    ]
+  };
+
+  const stressReliefExercises = [
+    {
+      title: "Desk Stretches",
+      description: "Release tension without leaving your workspace with these simple stretches.",
+      duration: "5 min",
+      steps: [
+        "Neck rolls: Slowly roll your head in circles",
+        "Shoulder shrugs: Lift shoulders up and down",
+        "Seated twist: Gently twist your torso while seated",
+        "Wrist stretches: Extend and flex your wrists"
+      ],
+      icon: <Activity className="h-8 w-8 text-[#7CAE9E]" />,
+      color: colors.teal
+    },
+    {
+      title: "Breathing Exercises",
+      description: "Calm your nervous system with these breathing techniques.",
+      duration: "3-5 min",
+      steps: [
+        "4-7-8 breathing: Inhale for 4, hold for 7, exhale for 8",
+        "Box breathing: Equal inhale, hold, exhale, pause",
+        "Diaphragmatic breathing: Deep belly breaths"
+      ],
+      icon: <Heart className="h-8 w-8 text-[#E69EA2]" />,
+      color: colors.coral
+    },
+    {
+      title: "Mindful Walking",
+      description: "Refresh your mind with this walking meditation.",
+      duration: "5 min",
+      steps: [
+        "Walk slowly and focus on each step",
+        "Pay attention to your surroundings",
+        "Breathe deeply as you walk",
+        "Let go of distracting thoughts"
+      ],
+      icon: <Dumbbell className="h-8 w-8 text-[#FEC0B3]" />,
+      color: colors.peach
+    }
   ];
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative py-16 md:py-24 bg-gradient-to-br from-zenSeafoam/30 via-zenMint/20 to-white overflow-hidden">
+      {/* Fixed Quotes Bubble in Top Left Corner */}
+      <div className="fixed top-40 left-4 z-40">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="container mx-auto px-4 relative z-10"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          className="cursor-pointer"
+          onClick={() => setShowQuotesModal(true)}
+          style={{
+            width: "60px",
+            height: "60px",
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #E69EA2 0%, #7CAE9E 100%)",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+          }}
         >
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4 text-gray-800">
-              Student Fitness Hub
-            </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-8">
-              Quick, effective workouts designed specifically for busy student schedules and limited space.
-            </p>
-            <Button className="bg-zenSage hover:bg-zenSage/90 text-white">
-              Track Your Progress
-            </Button>
-          </div>
+          <Quote className="h-6 w-6" />
         </motion.div>
-        
-        {/* Abstract shape decoration */}
-        <div className="absolute right-0 top-1/4 transform translate-x-1/3 -translate-y-1/4 opacity-20">
-          <svg width="500" height="500" viewBox="0 0 500 500" fill="none">
-            <circle cx="250" cy="250" r="250" fill="#7CAE9E" />
-          </svg>
-        </div>
-      </section>
+      </div>
 
-      {/* Progress Section */}
-      <section className="py-14 bg-white">
-        <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="Your Fitness Journey" 
-            subtitle="Track your progress and stay motivated"
+      {/* Quotes Modal - Positioned relative to the bubble */}
+      <AnimatePresence>
+        {showQuotesModal && (
+          <>
+            {/* Overlay that allows clicking through to the page */}
+            <div 
+              className="fixed inset-0 z-40"
+              onClick={() => setShowQuotesModal(false)}
+              style={{ pointerEvents: 'auto' }}
+            />
+            
+            {/* Actual modal positioned near the bubble */}
+            <motion.div
+              initial={{ 
+                opacity: 0,
+                scale: 0.8,
+                x: 20,
+                y: 20
+              }}
+              animate={{ 
+                opacity: 1,
+                scale: 1,
+                x: 80,
+                y: 0
+              }}
+              exit={{ 
+                opacity: 0,
+                scale: 0.8,
+                x: 20,
+                y: 20
+              }}
+              transition={{ 
+                type: "spring", 
+                damping: 25, 
+                stiffness: 300 
+              }}
+              className="fixed top-4 left-4 z-50 w-80 bg-white rounded-xl shadow-2xl overflow-hidden"
+              style={{
+                background: "linear-gradient(to bottom right, #F8E8E9, #CFECE0)"
+              }}
+            >
+              <button
+                onClick={() => setShowQuotesModal(false)}
+                className="absolute top-3 right-3 z-10 p-1 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors shadow-sm"
+              >
+                <X size={18} className="text-gray-600" />
+              </button>
+
+              <div className="relative p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-md">
+                    <Quote className="h-5 w-5 text-[#7CAE9E]" />
+                  </div>
+                </div>
+                
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentQuoteIndex}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="min-h-32 flex flex-col justify-center"
+                  >
+                    <p className="text-center text-lg font-medium text-gray-800 mb-4 leading-relaxed">
+                      "{motivationalQuotes[currentQuoteIndex].text}"
+                    </p>
+                    <p className="text-center text-gray-600">
+                      — {motivationalQuotes[currentQuoteIndex].author}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+
+                <div className="flex justify-center mt-6 space-x-2">
+                  {motivationalQuotes.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentQuoteIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        index === currentQuoteIndex ? 'bg-[#7CAE9E] scale-125' : 'bg-gray-300'
+                      }`}
+                      aria-label={`Go to quote ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Banner with Image */}
+      <div className="relative h-[500px] md:h-[900px] overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src={fitnessbanner}
+            alt="Fitness Banner"
+            className="w-full h-full object-cover"
           />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30"></div>
+        </div>
+        <div className="relative z-10 h-full flex items-center">
+          <div className="container mx-auto px-6 md:px-12 lg:px-24">
+            <div className="max-w-2xl">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">
+                Fitness & Wellbeing
+              </h1>
+              <p className="text-lg md:text-xl text-white/90 mb-8 max-w-lg">
+                Optimize your health with personalized workouts designed for your busy schedule
+              </p>
+              <Button 
+                className="bg-[#7CAE9E] hover:bg-[#6B9D8D] text-white px-8 py-6 text-lg"
+                onClick={scrollToSchedule}
+              >
+                Get Started <ChevronRight size={20} className="ml-2" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            {[
-              { icon: <Dumbbell className="h-5 w-5 text-zenPink" />, title: "Workouts", value: "6", label: "This Week" },
-              { icon: <Calendar className="h-5 w-5 text-zenSage" />, title: "Active Days", value: "12", label: "This Month" },
-              { icon: <Target className="h-5 w-5 text-zenPeach" />, title: "Goal Progress", value: "65%", label: "Monthly Goal" },
-              { icon: <Trophy className="h-5 w-5 text-yellow-500" />, title: "Achievements", value: "4", label: "Unlocked" }
-            ].map((stat, index) => (
+      <div className="px-6 md:px-12 lg:px-24 py-12 max-w-auto mx-auto">
+        {/* Workout Schedule Section */}
+        <div className="mb-16" id="workout-schedule">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-[#2D7D7D]">Your Weekly Plan</h2>
+            <div className="flex gap-3">
+              <Button
+                className="bg-[#7CAE9E] hover:bg-[#6B9D8D] text-white"
+                onClick={() => setShowScheduleModal(true)}
+              >
+                Edit Schedule
+              </Button>
+              <Button
+                variant="outline"
+                className="border-[#7CAE9E] text-[#7CAE9E] hover:bg-[#EBFFF5]"
+                onClick={resetSchedule}
+              >
+                <RotateCcw size={18} className="mr-2" />
+                Reset
+              </Button>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <div className="grid grid-cols-7 gap-0.5 bg-gray-100">
+              {days.map((day, i) => {
+                const schedule = workoutSchedule[day];
+                const isCompleted = schedule?.completed;
+                return (
+                  <div
+                    key={i}
+                    className={`p-4 text-center ${isCompleted ? "bg-[#EBFFF5]" : "bg-white"} transition-all`}
+                    onClick={() => handleDayClick(day)}
+                  >
+                    <div className="flex flex-col items-center h-full">
+                      <span className="text-sm font-medium text-[#4A5568] mb-2">{day}</span>
+                      <div className={`rounded-full h-12 w-12 flex items-center justify-center mb-3 ${
+                        schedule?.type === "Cardio" ? "bg-[#E69EA2] text-white" :
+                        schedule?.type === "Strength" ? "bg-[#FEC0B3] text-white" :
+                        schedule?.type === "Flexibility" ? "bg-[#7CAE9E] text-white" :
+                        schedule?.type === "HIIT" ? "bg-[#2D7D7D] text-white" :
+                        "bg-gray-200 text-gray-500"
+                      }`}>
+                        {schedule?.type === "Cardio" ? <Heart size={20} /> :
+                          schedule?.type === "Strength" ? <Dumbbell size={20} /> :
+                            schedule?.type === "Flexibility" ? <Activity size={20} /> :
+                              schedule?.type === "HIIT" ? <Timer size={20} /> :
+                                <FilterX size={20} />}
+                      </div>
+                      <span className={`text-sm font-medium ${
+                        isCompleted ? "text-[#7CAE9E]" : "text-[#4A5568]"
+                      }`}>
+                        {schedule?.type || 'Rest'}
+                      </span>
+                      <div className="mt-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleWorkoutComplete(day);
+                          }}
+                          className={`p-2 rounded-full ${isCompleted ? "bg-[#7CAE9E] text-white" : "bg-gray-100 text-gray-400"}`}
+                        >
+                          <CheckCircle size={18} className={isCompleted ? "fill-white" : ''} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+       
+        {/* Schedule Workout Modal */}
+        {showScheduleModal && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white rounded-lg w-full max-w-md p-6"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-[#7CAE9E]">
+                  Schedule for {selectedDay}
+                </h3>
+                <button
+                  onClick={() => setShowScheduleModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Workout Type</label>
+                  <select
+                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-[#7CAE9E] focus:border-[#7CAE9E]"
+                    value={workoutSchedule[selectedDay]?.type || ""}
+                    onChange={(e) => handleScheduleChange("type", e.target.value)}
+                  >
+                    <option value="">Rest Day</option>
+                    {workoutTypes.filter(t => t !== "Rest").map((type, i) => (
+                      <option key={i} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {workoutSchedule[selectedDay]?.type && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                      <input
+                        type="time"
+                        className="w-full border border-gray-300 rounded-md p-2 focus:ring-[#7CAE9E] focus:border-[#7CAE9E]"
+                        value={workoutSchedule[selectedDay]?.time || ""}
+                        onChange={(e) => handleScheduleChange("time", e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Workout</label>
+                      <select
+                        className="w-full border border-gray-300 rounded-md p-2 focus:ring-[#7CAE9E] focus:border-[#7CAE9E]"
+                        value={workoutSchedule[selectedDay]?.workout || ""}
+                        onChange={(e) => handleScheduleChange("workout", e.target.value)}
+                      >
+                        <option value="">Select workout</option>
+                        {workouts.all.map((workout, index) => (
+                          <option key={index} value={workout.title}>{workout.title}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="completed"
+                        checked={workoutSchedule[selectedDay]?.completed || false}
+                        onChange={(e) => handleScheduleChange("completed", e.target.checked)}
+                        className="mr-2 h-4 w-4 text-[#7CAE9E] focus:ring-[#7CAE9E] border-gray-300 rounded"
+                      />
+                      <label htmlFor="completed" className="text-sm text-gray-700">
+                        Mark as completed
+                      </label>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="mt-6 flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  className="border-[#7CAE9E] text-[#7CAE9E] hover:bg-[#EBFFF5]"
+                  onClick={() => setShowScheduleModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-[#E69EA2] hover:bg-[#E69EA2]/90 text-white"
+                  onClick={saveSchedule}
+                >
+                  Save
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Explore Workouts Section */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-[#7CAE9E]">Explore Workouts</h2>
+          </div>
+
+          <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedTab}>
+            <TabsList className="mb-6 bg-[#F8E8E9]">
+              <TabsTrigger value="all" className="data-[state=active]:bg-[#7CAE9E] data-[state=active]:text-white">All Workouts</TabsTrigger>
+              <TabsTrigger value="cardio" className="data-[state=active]:bg-[#7CAE9E] data-[state=active]:text-white">Cardio</TabsTrigger>
+              <TabsTrigger value="strength" className="data-[state=active]:bg-[#7CAE9E] data-[state=active]:text-white">Strength</TabsTrigger>
+              <TabsTrigger value="flexibility" className="data-[state=active]:bg-[#7CAE9E] data-[state=active]:text-white">Flexibility</TabsTrigger>
+            </TabsList>
+
+            {Object.keys(workouts).map((category) => (
+              <TabsContent key={category} value={category} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {workouts[category as keyof typeof workouts].map((workout, index) => (
+                    <WorkoutCard key={index} {...workout} />
+                  ))}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+
+        {/* Quick Stress Relief Section */}
+        <section className="mb-12">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold mb-2 text-[#7CAE9E]">Quick Stress Relief</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Short, effective exercises to help you decompress during busy days.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {stressReliefExercises.map((exercise, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all"
+                whileHover={{ scale: 1.03 }}
+                className="relative overflow-hidden rounded-xl shadow-lg bg-white border border-[#F8E8E9]"
               >
-                <div className="flex items-center mb-3">
-                  <div className="p-2 rounded-full bg-gray-50 mr-3">
-                    {stat.icon}
+                <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full opacity-20"
+                  style={{ backgroundColor: exercise.color }}></div>
+                <div className="p-6 relative z-10">
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
+                    style={{ backgroundColor: exercise.color, color: 'white' }}>
+                    {exercise.icon}
                   </div>
-                  <h3 className="font-semibold text-gray-700">{stat.title}</h3>
-                </div>
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-gray-900">{stat.value}</span>
-                  <span className="ml-2 text-sm text-gray-500">{stat.label}</span>
+                  <h3 className="text-xl font-semibold mb-2" style={{ color: exercise.color }}>
+                    {exercise.title}
+                  </h3>
+                  <p className="text-gray-700 mb-4">{exercise.description}</p>
+                  <div className="flex items-center text-sm text-gray-600 mb-4">
+                    <Clock size={14} className="mr-1" />
+                    <span>{exercise.duration}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full border-[#7CAE9E] text-[#7CAE9E] hover:bg-[#EBFFF5]"
+                    onClick={() => {
+                      setShowStressReliefModal(true);
+                      setSelectedDay(exercise.title);
+                    }}
+                  >
+                    Try It
+                  </Button>
                 </div>
               </motion.div>
             ))}
           </div>
+        </section>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Weekly Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+        {/* Stress Relief Modal */}
+        {showStressReliefModal && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white rounded-lg w-full max-w-md p-6"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold" style={{
+                  color: stressReliefExercises.find(e => e.title === selectedDay)?.color
+                }}>
+                  {stressReliefExercises.find(e => e.title === selectedDay)?.title}
+                </h3>
+                <button
+                  onClick={() => setShowStressReliefModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="mb-4">
+                <p className="text-gray-600">
+                  {stressReliefExercises.find(e => e.title === selectedDay)?.description}
+                </p>
+              </div>
+              <div className="space-y-3">
+                <h4 className="font-medium" style={{
+                  color: stressReliefExercises.find(e => e.title === selectedDay)?.color
+                }}>
+                  Steps:
+                </h4>
+                <ol className="list-decimal pl-5 space-y-2 text-gray-700">
+                  {stressReliefExercises.find(e => e.title === selectedDay)?.steps.map((step, i) => (
+                    <li key={i}>{step}</li>
+                  ))}
+                </ol>
+              </div>
+              <div className="mt-6 flex justify-end">
+                <Button
+                  className="bg-[#E69EA2] hover:bg-[#E69EA2]/90 text-white"
+                  onClick={() => setShowStressReliefModal(false)}
+                >
+                  Got It
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Student-Specific Section */}
+        <section className="bg-[#F8E8E9] rounded-xl p-8 border border-[#CFECE0]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 text-[#7CAE9E]">Fitness for Busy Students</h2>
+              <p className="text-gray-700 mb-6">
+                Specialized workouts designed to fit into packed academic schedules, with routines that can be done in small spaces.
+              </p>
+              <div className="space-y-3">
                 {[
-                  { day: "Monday", completed: true, type: "Morning Energizer", progress: 100 },
-                  { day: "Tuesday", completed: true, type: "Study Break Stretches", progress: 100 },
-                  { day: "Wednesday", completed: false, type: "Rest Day", progress: 0 },
-                  { day: "Thursday", completed: true, type: "Dorm Room Strength", progress: 100 },
-                  { day: "Friday", completed: true, type: "Morning Energizer", progress: 100 },
-                  { day: "Saturday", completed: true, type: "Study Break Stretches", progress: 100 },
-                  { day: "Sunday", completed: false, type: "Planned: Dorm Room Strength", progress: 0 },
-                ].map((day, index) => (
-                  <div key={index} className="flex items-center">
-                    <div className="w-20 text-sm font-medium text-gray-900">{day.day}</div>
-                    <div className="flex-1 ml-4">
-                      <Progress value={day.progress} className="h-2" />
-                    </div>
-                    <div className="ml-4 w-32 text-sm text-right">
-                      <div className={`font-medium ${day.completed ? "text-zenSage" : "text-gray-500"}`}>
-                        {day.type}
-                      </div>
-                    </div>
+                  "Quick 10-20 minute workouts",
+                  "No equipment needed options",
+                  "Study break routines",
+                  "Stress-relief exercises",
+                  "Energy-boosting morning sessions"
+                ].map((item, index) => (
+                  <div key={index} className="flex items-start">
+                    <Check className="h-5 w-5 mr-2 mt-0.5 text-[#7CAE9E]" />
+                    <span>{item}</span>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Workout Library Section */}
-      <section className="py-14 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="Student Workout Library" 
-            subtitle="Quick, effective routines designed for busy schedules and small spaces"
-          />
-          
-          <Tabs defaultValue="videos" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-              <TabsTrigger value="videos">Video Workouts</TabsTrigger>
-              <TabsTrigger value="routines">Written Routines</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="videos" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {fitnessRoutines.map((routine, index) => (
-                  <motion.div
-                    key={routine.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all"
-                  >
-                    <div className="aspect-video relative">
-                      <iframe
-                        className="absolute inset-0 w-full h-full"
-                        src={`https://www.youtube.com/embed/${routine.videoId}`}
-                        title={routine.title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
-                    <div className="p-6">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="bg-zenMint text-zenSage text-xs px-2 py-1 rounded-full">{routine.duration}</span>
-                        <span className="text-xs text-gray-500">{routine.level}</span>
-                      </div>
-                      <h3 className="font-semibold text-lg mb-2">{routine.title}</h3>
-                      <p className="text-sm text-gray-600 mb-4">{routine.description}</p>
-                      <Button variant="outline" size="sm" className="w-full border-zenSage text-zenSage hover:bg-zenSage/10">
-                        Add to Calendar
-                      </Button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="routines">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {fitnessRoutines.map((routine, index) => (
-                  <Card key={routine.id} className="overflow-hidden">
-                    <CardHeader className="bg-zenMint/20">
-                      <div className="flex justify-between items-center">
-                        <CardTitle>{routine.title}</CardTitle>
-                        <div className="flex items-center space-x-2">
-                          <span className="bg-white text-zenSage text-xs px-2 py-1 rounded-full">{routine.duration}</span>
-                          <span className="bg-white text-gray-600 text-xs px-2 py-1 rounded-full">{routine.level}</span>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                      <p className="text-sm text-gray-600 mb-4">{routine.description}</p>
-                      <div className="border-t pt-4 mt-4">
-                        <h4 className="text-sm font-semibold mb-2 flex items-center">
-                          <Dumbbell className="h-4 w-4 mr-2 text-zenPink" /> Exercise List
-                        </h4>
-                        <ul className="space-y-2">
-                          {routine.exercises.map((exercise, i) => (
-                            <li key={i} className="text-sm flex justify-between">
-                              <span>{exercise.name}</span>
-                              <span className="text-gray-500">{exercise.duration}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </section>
-
-      {/* Monthly Calendar Section */}
-      <section className="py-14 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-            <SectionHeading 
-              title="Your Fitness Calendar" 
-              subtitle="Plan your workouts for better consistency"
-              className="mb-0"
-            />
-            <div className="flex space-x-2 mt-4 md:mt-0">
-              <Button variant="outline" size="sm" className="text-sm">
-                <Calendar className="h-4 w-4 mr-2" /> April 2025
-              </Button>
-              <Button variant="outline" size="sm" className="text-sm">
-                <BarChart3 className="h-4 w-4 mr-2" /> View Stats
-              </Button>
+            </div>
+            <div className="bg-white rounded-lg overflow-hidden shadow-md border border-[#CFECE0]">
+              <AspectRatio ratio={16 / 9}>
+                <img
+                  src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9ybmluZyUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60"
+                  alt="Student workout"
+                  className="object-cover w-full h-full"
+                />
+              </AspectRatio>
             </div>
           </div>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-7 gap-4">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                  <div key={day} className="text-center font-medium text-sm text-gray-500">
-                    {day}
-                  </div>
-                ))}
-                {Array.from({ length: 30 }, (_, i) => i + 1).map((date) => {
-                  const hasWorkout = [3, 5, 7, 10, 12, 15, 17, 19, 22, 24, 26, 28].includes(date);
-                  const isToday = date === 19; // Assuming current date is 19th
-                  
-                  return (
-                    <div 
-                      key={date} 
-                      className={`
-                        aspect-square rounded-md flex flex-col items-center justify-center p-1 cursor-pointer
-                        ${isToday ? 'border-2 border-zenSage' : 'border border-gray-100'}
-                        ${hasWorkout ? 'bg-zenMint/20 hover:bg-zenMint/40' : 'hover:bg-gray-50'}
-                      `}
-                    >
-                      <span className={`text-sm ${isToday ? 'font-medium text-zenSage' : ''}`}>{date}</span>
-                      {hasWorkout && (
-                        <div className="w-1.5 h-1.5 bg-zenSage rounded-full mt-1"></div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-14 bg-gradient-to-br from-zenPeach/20 via-zenLightPink/20 to-white">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-display font-semibold mb-4">Ready to boost your wellbeing?</h2>
-            <p className="text-gray-600 mb-8">
-              Regular activity improves focus, mood, and academic performance. Start your fitness journey today!
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button className="bg-zenSage hover:bg-zenSage/90 text-white">
-                <Dumbbell className="h-4 w-4 mr-2" /> Start Today's Workout
-              </Button>
-              <Button variant="outline" className="border-zenSage text-zenSage hover:bg-zenSage/10">
-                <Calendar className="h-4 w-4 mr-2" /> Create Custom Plan
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </Layout>
   );
-}
+};
+
+export default Fitness;
