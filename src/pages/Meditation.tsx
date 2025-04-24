@@ -6,13 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { Clock, Heart, Play, ChevronDown, Pause, Leaf, Moon, Sun, Activity, Brain, Smile, Zap } from "lucide-react";
-import StressReleif from '@/assets/audios/StressReleif.mp3';
+/* import StressReleif from '@/assets/audios/StressReleif.mp3';
 import MuscleRelaxation from '@/assets/audios/MuscleRelaxation.mp3';
 import ForestVisualisation from '@/assets/audios/ForestVisualisation.mp3';   
 import QuietNight from '@/assets/audios/QuietNight.mp3';   
 import QuietTime from '@/assets/audios/QuietTime.mp3';   
 import PentatonicWaves from '@/assets/audios/PentatonicWaves.mp3';   
-import bannermed from '@/assets/images/bannermed.jpg';
+import bannermed from '@/assets/images/bannermed.jpg'; */
 
 const Meditation = () => {
   const audioRefs = useRef<{ [key: string]: HTMLAudioElement | null }>({});
