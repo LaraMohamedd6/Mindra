@@ -30,6 +30,7 @@ import Header from "../components/layout/Header";
 import { SectionHeader } from "@/components/ui/section-header";
 import { AlertCircle, X, Ban } from "lucide-react";
 import { motion } from "framer-motion";
+
 // Types
 type JwtPayload = {
   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": string;
@@ -60,6 +61,7 @@ type Message = {
   timestamp: string;
   reactions: Reaction[];
   roomId?: number;
+  isSystemMessage?: boolean;
 };
 
 type ChatRoom = {
@@ -174,6 +176,16 @@ const mentalHealthTopics: Topic[] = [
   },
 ];
 
+const KICK_REASONS = [
+  "Inappropriate behavior",
+  "Spamming messages",
+  "Harassment",
+  "Violating community guidelines",
+  "Sharing harmful content",
+  "Hate speech or discrimination",
+  "Other"
+];
+
 // Utility function to get user from token
 const getUserFromToken = (): ChatUser | null => {
   const token = localStorage.getItem("token");
@@ -218,6 +230,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     },
     [message.reactions, currentUser.id]
   );
+
+  if (message.isSystemMessage) {
+    return (
+      <div className="flex justify-center my-2">
+        <div className="bg-gray-100 px-3 py-1 rounded-full text-xs text-gray-600">
+          {message.content}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -414,6 +436,9 @@ export default function ChatRoomView() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [kickPopup, setKickPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
+  const [showKickModal, setShowKickModal] = useState(false);
+  const [selectedReason, setSelectedReason] = useState("");
+  const [userToKick, setUserToKick] = useState("");
 
   // Initialize SignalR connection
   useEffect(() => {
@@ -607,9 +632,9 @@ export default function ChatRoomView() {
           setKickPopup(true);
         });
 
-        connection.on("Kicked", () => {
+        connection.on("Kicked", (reason: string) => {
           setPopupMessage(
-            "The room moderator has removed you from this chat."
+            `The room moderator has removed you from this chat ${reason === "Other" ? "" : `due to ${reason}`}`,
           );
           setKickPopup(true);
         });
@@ -692,13 +717,11 @@ export default function ChatRoomView() {
     try {
       await connection.invoke("MakeAdmin", parseInt(roomId), userId);
 
-/*       toast({
+      toast({
         title: "Success",
         description: "User has been promoted to admin",
         variant: "default",
-      }); */
-
-
+      });
     } catch (error) {
       console.error("Failed to promote user:", error);
       toast({
@@ -709,31 +732,37 @@ export default function ChatRoomView() {
     }
   };
 
-  const handleKickUser = async (userId: string) => {
-    if (!connection || !roomId || !isAdmin) return;
+  const handleKickUser = (userId: string) => {
+    setUserToKick(userId);
+    setShowKickModal(true);
+  };
+
+  const confirmKickUser = async () => {
+    if (!connection || !roomId || !isAdmin || !selectedReason) return;
 
     try {
-      const isCreator = room?.creator === userId;
-      if (!isCreator) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now(), // Temporary ID
-            user: {
-              id: "system",
-              name: "System",
-              username: "system",
-              avatar: "",
-            },
-            content: `${currentUser.username} has removed ${userId} from the room`,
-            timestamp: new Date().toISOString(),
-            reactions: [],
-            isSystemMessage: true,
+      await connection.invoke("KickUser", parseInt(roomId), userToKick, selectedReason);
+      
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          user: {
+            id: "system",
+            name: "System",
+            username: "system",
+            avatar: "",
           },
-        ]);
-      }
-      await connection.invoke("KickUser", parseInt(roomId), userId);
-
+          content: `To maintain a safe space, ${currentUser?.username} has removed ${userToKick}${selectedReason === "Other" ? "" : ` due to ${selectedReason}`}`,          
+          timestamp: new Date().toISOString(),
+          reactions: [],
+          isSystemMessage: true,
+        },
+      ]);
+      
+      setShowKickModal(false);
+      setSelectedReason("");
+      setUserToKick("");
     } catch (error) {
       console.error("Failed to kick user:", error);
       toast({
@@ -746,7 +775,7 @@ export default function ChatRoomView() {
 
   const handleClosePopup = () => {
     setKickPopup(false);
-    if (popupMessage.includes("You were kicked")) {
+    if (popupMessage.includes("removed you")) {
       navigate("/chatroom");
     }
   };
@@ -914,6 +943,70 @@ export default function ChatRoomView() {
           </Card>
         </div>
 
+        {/* Kick Reason Modal */}
+        {showKickModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 400,
+                mass: 0.5,
+              }}
+              className="w-full max-w-md"
+            >
+              <Card className="bg-white shadow-2xl overflow-hidden border-0 relative">
+                <CardHeader className="bg-gradient-to-r from-[#E69EA2] to-[#f8b3b8] p-4">
+                  <CardTitle className="text-white">Select Kick Reason</CardTitle>
+                </CardHeader>
+                
+                <CardContent className="p-6 space-y-4">
+                  {KICK_REASONS.map((reason) => (
+                    <div 
+                      key={reason} 
+                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                        selectedReason === reason 
+                          ? "bg-[#EBFFF5] border border-[#7CAE9E]" 
+                          : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                      onClick={() => setSelectedReason(reason)}
+                    >
+                      <p className="text-sm">{reason}</p>
+                    </div>
+                  ))}
+                </CardContent>
+                
+                <CardFooter className="bg-gray-50/70 px-6 py-4 flex justify-end gap-2 border-t">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowKickModal(false);
+                      setSelectedReason("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={confirmKickUser}
+                    disabled={!selectedReason}
+                    className="bg-[#E69EA2] hover:bg-[#E69EA2]/90 text-white"
+                  >
+                    Confirm Kick
+                  </Button>
+                </CardFooter>
+              </Card>
+            </motion.div>
+          </motion.div>
+        )}
+
         {/* Kick Popup */}
         {kickPopup && (
           <motion.div
@@ -1007,12 +1100,7 @@ export default function ChatRoomView() {
                     transition={{ delay: 0.5 }}
                   >
                     <Button
-                      onClick={() => {
-                        setKickPopup(false);
-                        if (popupMessage.includes("removed you")) {
-                          navigate("/chatroom");
-                        }
-                      }}
+                      onClick={handleClosePopup}
                       className="bg-[#E69EA2] hover:bg-[#E69EA2]/90 text-white shadow-sm px-6 py-2 rounded-full"
                     >
                       <span>Understand</span>
