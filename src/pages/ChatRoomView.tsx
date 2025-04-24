@@ -28,7 +28,8 @@ import * as signalR from "@microsoft/signalr";
 import { jwtDecode } from "jwt-decode";
 import Header from "../components/layout/Header";
 import { SectionHeader } from "@/components/ui/section-header";
-
+import { AlertCircle, X, Ban } from "lucide-react";
+import { motion } from "framer-motion";
 // Types
 type JwtPayload = {
   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": string;
@@ -103,6 +104,11 @@ type ReactionResponse = {
   reactionType: string;
   user: string;
   reactedAt: string;
+};
+
+type KickResponse = {
+  success: boolean;
+  message?: string;
 };
 
 const mentalHealthTopics: Topic[] = [
@@ -316,6 +322,7 @@ interface UserListProps {
   currentUser: ChatUser;
   onPromoteUser: (userId: string) => void;
   onKickUser: (userId: string) => void;
+  isAdmin: boolean;
 }
 
 const UserList: React.FC<UserListProps> = ({
@@ -323,15 +330,13 @@ const UserList: React.FC<UserListProps> = ({
   currentUser,
   onPromoteUser,
   onKickUser,
+  isAdmin,
 }) => {
-  const isCurrentUserAdmin = currentUser.isAdmin;
-
   return (
     <div className="space-y-3">
       {users.map((user) => {
         const isCurrentUserItem = user.id === currentUser.id;
-        const canManageUser =
-          isCurrentUserAdmin && !isCurrentUserItem && !user.isAdmin;
+        const canManageUser = isAdmin && !isCurrentUserItem;
 
         return (
           <div
@@ -366,25 +371,22 @@ const UserList: React.FC<UserListProps> = ({
             </div>
 
             {canManageUser && (
-              <div className="flex">
+              <div className="flex gap-1">
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-[#7CAE9E] hover:bg-[#EBFFF5] hover:text-[#7CAE9E]"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs bg-[#EBFFF5] text-[#7CAE9E] hover:bg-[#EBFFF5]/80 hover:text-[#7CAE9E] border-[#CFECE0]"
                   onClick={() => onPromoteUser(user.id)}
-                  title="Make Admin"
                 >
-                  <Settings className="h-3.5 w-3.5" />
+                  Make Admin
                 </Button>
-
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-[#E69EA2] hover:bg-[#F8E8E9] hover:text-[#E69EA2]"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs bg-[#F8E8E9] text-[#E69EA2] hover:bg-[#F8E8E9]/80 hover:text-[#E69EA2] border-[#FEC0B3]"
                   onClick={() => onKickUser(user.id)}
-                  title="Remove User"
                 >
-                  <UserMinus className="h-3.5 w-3.5" />
+                  Kick
                 </Button>
               </div>
             )}
@@ -409,6 +411,9 @@ export default function ChatRoomView() {
     null
   );
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [kickPopup, setKickPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
 
   // Initialize SignalR connection
   useEffect(() => {
@@ -423,9 +428,9 @@ export default function ChatRoomView() {
       .withUrl("https://localhost:7223/chatHub", {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
+        accessTokenFactory: () => localStorage.getItem("token") || "",
       })
       .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Information)
       .build();
 
     setConnection(newConnection);
@@ -448,22 +453,6 @@ export default function ChatRoomView() {
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No authentication token found");
-
-        // Check if user is kicked from this room
-        const isKickedResponse = await axios.get<{ isKicked: boolean }>(
-          `https://localhost:7223/api/ChatRoom/checkKicked/${roomId}/${currentUser.username}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        if (isKickedResponse.data.isKicked) {
-          toast({
-            title: "Access Denied",
-            description: "You have been kicked from this room",
-            variant: "destructive",
-          });
-          navigate("/chat-room");
-          return;
-        }
 
         // Fetch room info
         const roomResponse = await axios.get<ApiRoom>(
@@ -548,7 +537,7 @@ export default function ChatRoomView() {
                   avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${user}`,
                 },
                 content: message,
-                timestamp: timestamp,
+                timestamp: new Date().toISOString(),
                 reactions: [],
               },
             ]);
@@ -558,15 +547,21 @@ export default function ChatRoomView() {
         connection.on(
           "UpdateUserList",
           (userList: string[], adminUsername: string) => {
-            setUsers(
-              userList.map((username) => ({
-                id: username,
-                name: username,
-                username: username,
-                avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${username}`,
-                isAdmin: username === adminUsername,
-              }))
+            const updatedUsers = userList.map((username) => ({
+              id: username,
+              name: username,
+              username: username,
+              avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${username}`,
+              isAdmin: username === adminUsername,
+            }));
+
+            setUsers(updatedUsers);
+
+            // Check if current user is admin
+            const currentUserIsAdmin = updatedUsers.some(
+              (user) => user.id === currentUser.username && user.isAdmin
             );
+            setIsAdmin(currentUserIsAdmin);
           }
         );
 
@@ -604,21 +599,19 @@ export default function ChatRoomView() {
           }
         );
 
-        connection.on("Kicked", () => {
-          toast({
-            title: "You've been kicked",
-            description: "You have been removed from this room by an admin",
-            variant: "destructive",
-          });
-          navigate("/chat-room");
+        // Kick-related listeners
+        connection.on("CannotKickCreator", () => {
+          setPopupMessage(
+            "You cannot remove room creators from their own chats."
+          );
+          setKickPopup(true);
         });
 
-        connection.on("CannotKickCreator", (message: string) => {
-          toast({
-            title: "Action Denied",
-            description: message,
-            variant: "destructive",
-          });
+        connection.on("Kicked", () => {
+          setPopupMessage(
+            "The room moderator has removed you from this chat."
+          );
+          setKickPopup(true);
         });
 
         // Join the room
@@ -642,8 +635,8 @@ export default function ChatRoomView() {
         connection.off("ReceiveMessage");
         connection.off("UpdateUserList");
         connection.off("ReceiveReaction");
-        connection.off("Kicked");
         connection.off("CannotKickCreator");
+        connection.off("Kicked");
       }
     };
   }, [connection, roomId, currentUser, navigate, toast]);
@@ -694,10 +687,18 @@ export default function ChatRoomView() {
   };
 
   const handlePromoteToAdmin = async (userId: string) => {
-    if (!connection || !roomId || !currentUser?.isAdmin) return;
+    if (!connection || !roomId || !isAdmin) return;
 
     try {
       await connection.invoke("MakeAdmin", parseInt(roomId), userId);
+
+/*       toast({
+        title: "Success",
+        description: "User has been promoted to admin",
+        variant: "default",
+      }); */
+
+
     } catch (error) {
       console.error("Failed to promote user:", error);
       toast({
@@ -709,10 +710,30 @@ export default function ChatRoomView() {
   };
 
   const handleKickUser = async (userId: string) => {
-    if (!connection || !roomId || !currentUser?.isAdmin) return;
+    if (!connection || !roomId || !isAdmin) return;
 
     try {
+      const isCreator = room?.creator === userId;
+      if (!isCreator) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(), // Temporary ID
+            user: {
+              id: "system",
+              name: "System",
+              username: "system",
+              avatar: "",
+            },
+            content: `${currentUser.username} has removed ${userId} from the room`,
+            timestamp: new Date().toISOString(),
+            reactions: [],
+            isSystemMessage: true,
+          },
+        ]);
+      }
       await connection.invoke("KickUser", parseInt(roomId), userId);
+
     } catch (error) {
       console.error("Failed to kick user:", error);
       toast({
@@ -720,6 +741,13 @@ export default function ChatRoomView() {
         description: "Failed to kick user",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleClosePopup = () => {
+    setKickPopup(false);
+    if (popupMessage.includes("You were kicked")) {
+      navigate("/chatroom");
     }
   };
 
@@ -777,6 +805,7 @@ export default function ChatRoomView() {
                 currentUser={currentUser}
                 onPromoteUser={handlePromoteToAdmin}
                 onKickUser={handleKickUser}
+                isAdmin={isAdmin}
               />
             </CardContent>
           </Card>
@@ -884,6 +913,116 @@ export default function ChatRoomView() {
             </CardFooter>
           </Card>
         </div>
+
+        {/* Kick Popup */}
+        {kickPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 400,
+                mass: 0.5,
+              }}
+              className="w-full max-w-md"
+            >
+              <Card className="bg-white shadow-2xl overflow-hidden border-0 relative">
+                {/* Animated status bar */}
+                <motion.div
+                  className="absolute top-0 left-0 h-1 bg-[#E69EA2]"
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 3, ease: "linear" }}
+                />
+
+                <CardHeader className="bg-gradient-to-r from-[#E69EA2] to-[#f8b3b8] p-4">
+                  <motion.div
+                    initial={{ x: -10, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="flex items-center justify-between"
+                  >
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <motion.div
+                        animate={{
+                          rotate: [0, 10, -10, 0],
+                          scale: [1, 1.1, 1],
+                        }}
+                        transition={{ delay: 0.3, duration: 0.5 }}
+                      ></motion.div>
+                      <span>ChatRoom Notification</span>
+                    </CardTitle>
+                  </motion.div>
+                </CardHeader>
+
+                <CardContent className="p-6">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-start gap-4"
+                  >
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.05, 1],
+                        transition: { delay: 0.4 },
+                      }}
+                      className="flex-shrink-0"
+                    >
+                      <Ban className="h-8 w-8 text-[#E69EA2]" />
+                    </motion.div>
+                    <div>
+                      <motion.p
+                        className="text-gray-700 leading-relaxed"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        {popupMessage}
+                      </motion.p>
+                      <motion.p
+                        className="text-sm text-muted-foreground mt-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        Feel free to explore other rooms or create your own safe space where you'll feel most comfortable.
+                      </motion.p>
+                    </div>
+                  </motion.div>
+                </CardContent>
+
+                <CardFooter className="bg-gray-50/70 px-6 py-4 flex justify-end border-t">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <Button
+                      onClick={() => {
+                        setKickPopup(false);
+                        if (popupMessage.includes("removed you")) {
+                          navigate("/chatroom");
+                        }
+                      }}
+                      className="bg-[#E69EA2] hover:bg-[#E69EA2]/90 text-white shadow-sm px-6 py-2 rounded-full"
+                    >
+                      <span>Understand</span>
+                    </Button>
+                  </motion.div>
+                </CardFooter>
+              </Card>
+            </motion.div>
+          </motion.div>
+        )}
       </div>
     </>
   );

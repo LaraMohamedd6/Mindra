@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Search, Users } from "lucide-react";
+import { Search, Users, Ban, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { jwtDecode } from "jwt-decode";
 import Header from "../components/layout/Header";
 import { SectionHeader } from "@/components/ui/section-header";
+import { motion } from "framer-motion";
 
 // Types
 type JwtPayload = {
@@ -154,7 +155,7 @@ const getUserFromToken = (): ChatUser | null => {
 
 interface ChatRoomListProps {
   rooms: ChatRoom[];
-  onJoinRoom: (room: ChatRoom) => void;
+  onJoinRoom: (room: ChatRoom) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -431,6 +432,8 @@ const ChatRoomsList: React.FC = () => {
   const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<ChatUser | null>(null);
+  const [kickPopup, setKickPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
 
   useEffect(() => {
     const user = getUserFromToken();
@@ -507,8 +510,42 @@ const ChatRoomsList: React.FC = () => {
     fetchRooms();
   }, []);
 
-  const handleJoinRoom = (room: ChatRoom) => {
-    navigate(`/chat-room/${room.id}`);
+  const handleJoinRoom = async (room: ChatRoom) => {
+    if (!currentUser) {
+      toast.error("You must be logged in to join a room");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // Check if user is kicked from this room
+      const isKickedResponse = await axios.get<{ isKicked: boolean }>(
+        `https://localhost:7223/api/ChatRoom/checkKicked/${room.id}/${currentUser.username}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (isKickedResponse.data.isKicked) {
+        setPopupMessage(
+          "You cannot enter this chat because The room moderator has removed you."
+        );
+        setKickPopup(true);
+        return;
+      }
+
+      // If not kicked, proceed to join the room
+      navigate(`/chat-room/${room.id}`);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      toast.error(`Failed to join room: ${axiosError.message}`);
+      console.error('Failed to join room:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleCreateRoom = async (roomData: Omit<ChatRoom, "id" | "users" | "unread" | "messages">) => {
@@ -566,52 +603,163 @@ const ChatRoomsList: React.FC = () => {
   };
   
   return (
-    <><div><Header /></div>
-
-    <div className="container py-8 animate-fade-in">
-
-    <SectionHeader
-        title="Peer Support Chat Rooms"
-        description="Connect with others facing similar challenges in a safe, moderated environment"
-        className="text-center"
-        titleClassName="text-3xl md:text-4xl text-[#E69EA2]"
-      />
-      {view === 'list' && (
-        <div className="grid gap-8">
-          <div className="flex justify-end">
-            <Button
-              onClick={() => setView('create')}
-              className="bg-[#7CAE9E] hover:bg-[#7CAE9E]/90"
-              disabled={isLoading || !currentUser}
-            >
-              Create New Room
-            </Button>
-          </div>
-
-          <ChatRoomList
-            rooms={rooms}
-            onJoinRoom={handleJoinRoom}
-            isLoading={isLoading} />
-        </div>
-      )}
-
-      {view === 'create' && (
-        <div className="animate-fade-in">
-          <Button
-            onClick={() => setView('list')}
-            variant="outline"
-            className="mb-6 border-[#CFECE0] text-[#7CAE9E] hover:bg-[#EBFFF5] hover:text-[#7CAE9E]"
+    
+    <>
+            {/* Kick Popup */}
+            {kickPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           >
-            Back to Rooms
-          </Button>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 400,
+                mass: 0.5,
+              }}
+              className="w-full max-w-md"
+            >
+              <Card className="bg-white shadow-2xl overflow-hidden border-0 relative">
+                {/* Animated status bar */}
+                <motion.div
+                  className="absolute top-0 left-0 h-1 bg-[#E69EA2]"
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 3, ease: "linear" }}
+                />
 
-          <CreateRoomForm
-            topics={mentalHealthTopics}
-            onCreateRoom={handleCreateRoom}
-            isLoading={isCreating} />
-        </div>
-      )}
-    </div></>
+                <CardHeader className="bg-gradient-to-r from-[#E69EA2] to-[#f8b3b8] p-4">
+                  <motion.div
+                    initial={{ x: -10, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="flex items-center justify-between"
+                  >
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <motion.div
+                        animate={{
+                          rotate: [0, 10, -10, 0],
+                          scale: [1, 1.1, 1],
+                        }}
+                        transition={{ delay: 0.3, duration: 0.5 }}
+                      >
+                      </motion.div>
+                      <span>ChatRoom Notification</span>
+                    </CardTitle>
+                  </motion.div>
+                </CardHeader>
+
+                <CardContent className="p-6">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-start gap-4"
+                  >
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.05, 1],
+                        transition: { delay: 0.4 },
+                      }}
+                      className="flex-shrink-0"
+                    >
+                      <Ban className="h-8 w-8 text-[#E69EA2]" />
+                    </motion.div>
+                    <div>
+                      <motion.p
+                        className="text-gray-700 leading-relaxed"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        {popupMessage}
+                      </motion.p>
+                      <motion.p
+                        className="text-sm text-muted-foreground mt-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        Feel free to explore other rooms or create your own safe space where you'll feel most comfortable.
+                      </motion.p>
+                    </div>
+                  </motion.div>
+                </CardContent>
+
+                <CardFooter className="bg-gray-50/70 px-6 py-4 flex justify-end border-t">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <Button
+                      onClick={() => {
+                        setKickPopup(false);
+                      }}
+                      className="bg-[#E69EA2] hover:bg-[#E69EA2]/90 text-white shadow-sm px-6 py-2 rounded-full"
+                    >
+                      <span>Understand</span>
+                    </Button>
+                  </motion.div>
+                </CardFooter>
+              </Card>
+            </motion.div>
+          </motion.div>
+        )}
+      <div><Header /></div>
+      <div className="container py-8 animate-fade-in">
+        <SectionHeader
+          title="Peer Support Chat Rooms"
+          description="Connect with others facing similar challenges in a safe, moderated environment"
+          className="text-center"
+          titleClassName="text-3xl md:text-4xl text-[#E69EA2]"
+        />
+
+
+
+        {view === 'list' && (
+          <div className="grid gap-8">
+            <div className="flex justify-end">
+              <Button
+                onClick={() => setView('create')}
+                className="bg-[#7CAE9E] hover:bg-[#7CAE9E]/90"
+                disabled={isLoading || !currentUser}
+              >
+                Create New Room
+              </Button>
+            </div>
+
+            <ChatRoomList
+              rooms={rooms}
+              onJoinRoom={handleJoinRoom}
+              isLoading={isLoading} />
+          </div>
+        )}
+
+        {view === 'create' && (
+          <div className="animate-fade-in">
+            <Button
+              onClick={() => setView('list')}
+              variant="outline"
+              className="mb-6 border-[#CFECE0] text-[#7CAE9E] hover:bg-[#EBFFF5] hover:text-[#7CAE9E]"
+            >
+              Back to Rooms
+            </Button>
+
+            <CreateRoomForm
+              topics={mentalHealthTopics}
+              onCreateRoom={handleCreateRoom}
+              isLoading={isCreating} />
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
