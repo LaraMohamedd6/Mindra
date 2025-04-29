@@ -355,7 +355,14 @@ export default function StudyHelper() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, isPaused, mode, timerSettings, completedSessions, breakReminder]);
+  }, [
+    isActive,
+    isPaused,
+    mode,
+    timerSettings,
+    completedSessions,
+    breakReminder,
+  ]);
 
   const handleTimerCompletion = () => {
     setIsPaused(true);
@@ -1144,7 +1151,9 @@ export default function StudyHelper() {
                   <Button
                     className="w-full"
                     onClick={() => {
-                      setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
+                      setCurrentQuoteIndex(
+                        (prev) => (prev + 1) % quotes.length
+                      );
                     }}
                   >
                     <Zap className="h-4 w-4 mr-2" />
