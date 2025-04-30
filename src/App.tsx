@@ -25,6 +25,8 @@ import ContactUs from "./pages/ContactUs";
 import AboutUs from "./pages/AboutUs";
 import ChatRoomsList from "./pages/ChatRoomsList";
 import ChatRoomView from "./pages/ChatRoomView";
+import { VerificationStep } from "./pages/VerificationStep";
+import { VerifyEmailPage } from "./pages/VerifyEmailPage";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +57,7 @@ const App = () => (
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/about" element={<AboutUs />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>

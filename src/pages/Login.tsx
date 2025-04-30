@@ -5,12 +5,10 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { LogIn, Key, AtSign, AlertCircle, ChevronRight, Eye, EyeOff, User, Calendar, Hash, CheckCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { LogIn, Key, AtSign, AlertCircle, ChevronRight, Eye, EyeOff, CheckCircle, Mail } from "lucide-react";
 import axios from "axios";
 
 export default function Login() {
-  // Form state
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -22,11 +20,10 @@ export default function Login() {
     password?: string;
     general?: string;
   }>({});
+  const [showVerificationPrompt, setShowVerificationPrompt] = useState(false);
   
-  const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Password requirements
   const passwordRequirements = [
     { id: 1, text: "Minimum 8 characters", validator: (pass: string) => pass.length >= 8 },
     { id: 2, text: "At least one uppercase letter", validator: (pass: string) => /[A-Z]/.test(pass) },
@@ -35,23 +32,19 @@ export default function Login() {
     { id: 5, text: "At least one special character", validator: (pass: string) => /[^A-Za-z0-9]/.test(pass) }
   ];
 
-  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
-    // Clear error when user types
     if (errors[name as keyof typeof errors]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
     }
   };
 
-  // Validate form
   const validateForm = () => {
     const newErrors: typeof errors = {};
     let isValid = true;
 
-    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
       isValid = false;
@@ -60,7 +53,6 @@ export default function Login() {
       isValid = false;
     }
 
-    // Password validation
     const passwordErrors = passwordRequirements
       .filter(req => !req.validator(formData.password))
       .map(req => req.text);
@@ -74,67 +66,90 @@ export default function Login() {
     return isValid;
   };
 
-  // Handle form submission
+  const handleResendVerification = async () => {
+    try {
+      setIsLoading(true);
+      await axios.post('https://localhost:7223/api/Account/resend-verification', {
+        email: formData.email
+      });
+      
+
+      
+      // Redirect to verification page
+      navigate('/verify-email', { state: { email: formData.email } });
+      
+    }  finally {
+      setIsLoading(false);
+      setShowVerificationPrompt(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) return;
-
+  
     setIsLoading(true);
     setErrors({});
-
+    setShowVerificationPrompt(false);
+  
     try {
       const response = await axios.post('https://localhost:7223/api/Account/login', {
         email: formData.email,
         password: formData.password
       });
-
-      // Store the authentication token
+  
       localStorage.setItem('token', response.data.token);
-      
-      // Show success message
-      toast({
-        title: "Login Successful",
-        description: "Welcome back to ZenZone Connect!",
-        variant: "default",
-      });
-
-      // Redirect to dashboard or home page
       navigate('/');
-
+  
     } catch (error) {
       let errorMessage = "Login failed. Please try again.";
+      let showVerificationOption = false;
       
       if (axios.isAxiosError(error)) {
-        errorMessage = error.response?.data?.message || errorMessage;
-        
-        // Handle specific error cases
-        if (error.response?.status === 401) {
-          errorMessage = "Invalid email or password";
-        } else if (error.response?.status === 400) {
-          errorMessage = "Please check your input and try again";
+        const status = error.response?.status;
+        const responseData = error.response?.data;
+
+        switch (status) {
+          case 401: // Unauthorized - Invalid credentials
+            errorMessage = "Invalid email or password. Please try again.";
+            break;
+            
+          case 403: // Forbidden - Account not verified
+            errorMessage = "Account not verified. Please check your email for verification instructions.";
+            showVerificationOption = true;
+            break;
+            
+          case 500: // Server Error
+            errorMessage = "Server error. Please try again later.";
+            break;
+            
+          default:
+            // Handle other status codes or use the message from response if available
+            if (typeof responseData === 'string') {
+              errorMessage = responseData;
+            } else if (responseData?.message) {
+              errorMessage = responseData.message;
+            }
+            break;
         }
       }
-
-      setErrors({
-        general: errorMessage
-      });
-
-      toast({
-        title: "Login Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-
+  
+      setErrors({ general: errorMessage });
+      
+      if (showVerificationOption) {
+        setShowVerificationPrompt(true);
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+};
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-zenLightPink to-white p-4">
       <div className="w-full max-w-md">
-        {/* Logo and Branding */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -153,7 +168,6 @@ export default function Login() {
           </Link>
         </motion.div>
 
-        {/* Login Card */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -171,20 +185,60 @@ export default function Login() {
             </CardHeader>
 
             <CardContent>
-              {/* Error message for general errors */}
               {errors.general && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-4 p-3 bg-red-50 text-red-600 rounded-md flex items-center"
+                  className="mb-4 p-3 bg-red-50 text-red-600 rounded-md flex flex-col"
                 >
-                  <AlertCircle className="h-5 w-5 mr-2" />
-                  {errors.general}
+                  <div className="flex items-center">
+                    <AlertCircle className="h-5 w-5 mr-2" />
+                    <span>{errors.general}</span>
+                  </div>
+                  
+                  {showVerificationPrompt && (
+                    <div className="mt-3 p-3 bg-blue-50 rounded-md">
+                      <div className="flex items-start mb-2">
+                        <Mail className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-blue-800">
+                          Didn't receive a verification email? We can send you a new one.
+                        </p>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          onClick={handleResendVerification}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                          disabled={isLoading}
+                          size="sm"
+                        >
+                          {isLoading ? (
+                            <div className="flex items-center">
+                              <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                className="h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"
+                              />
+                              Sending...
+                            </div>
+                          ) : (
+                            'Send New Code'
+                          )}
+                        </Button>
+                        <Button
+                          onClick={() => setShowVerificationPrompt(false)}
+                          variant="outline"
+                          size="sm"
+                          disabled={isLoading}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email Field */}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-gray-700">Email Address</Label>
                   <div className="relative">
@@ -211,7 +265,6 @@ export default function Login() {
                   )}
                 </div>
 
-                {/* Password Field */}
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-gray-700">Password</Label>
                   <div className="relative">
@@ -235,7 +288,6 @@ export default function Login() {
                     </button>
                   </div>
                   
-                  {/* Password Requirements */}
                   <div className="mt-2 space-y-1">
                     {passwordRequirements.map(req => (
                       <div key={req.id} className="flex items-center">
@@ -263,7 +315,6 @@ export default function Login() {
                   )}
                 </div>
 
-                {/* Forgot Password Link */}
                 <div className="text-right">
                   <Link 
                     to="/forgot-password" 
@@ -273,7 +324,6 @@ export default function Login() {
                   </Link>
                 </div>
 
-                {/* Submit Button */}
                 <Button 
                   type="submit" 
                   className="w-full bg-zenSage hover:bg-zenSage/90 h-11 transition-colors duration-200"
@@ -295,7 +345,6 @@ export default function Login() {
               </form>
             </CardContent>
 
-            {/* Footer with Sign Up and Social Options */}
             <CardFooter className="justify-center flex-col space-y-4 pb-6">
               <div className="text-sm text-gray-500">
                 Don't have an account?{" "}
@@ -316,13 +365,7 @@ export default function Login() {
                 <Button 
                   variant="outline" 
                   className="flex items-center justify-center gap-2"
-                  onClick={() => {
-                    // Implement Google OAuth here
-                    toast({
-                      title: "Coming Soon",
-                      description: "Google login will be available soon",
-                    });
-                  }}
+  
                 >
                   <svg className="h-5 w-5 text-[#4285F4]" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
@@ -332,13 +375,7 @@ export default function Login() {
                 <Button 
                   variant="outline" 
                   className="flex items-center justify-center gap-2"
-                  onClick={() => {
-                    // Implement Facebook OAuth here
-                    toast({
-                      title: "Coming Soon",
-                      description: "Facebook login will be available soon",
-                    });
-                  }}
+              
                 >
                   <svg className="h-5 w-5 text-[#1877F2]" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62,13.56 9.39,13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10.04,10.04 0 0,0 22,12.06C22,6.53 17.5,2.04 12,2.04Z"/>
@@ -350,7 +387,6 @@ export default function Login() {
           </Card>
         </motion.div>
         
-        {/* Home Link */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
