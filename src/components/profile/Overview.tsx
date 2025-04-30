@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { motion } from "framer-motion";
 import {
   Card,
@@ -53,6 +55,29 @@ export default function Overview({
   activityData,
   journalData,
 }: OverviewProps) {
+  const [weeklyMeditation, setWeeklyMeditation] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchWeeklyMeditation = async () => {
+      try {
+        const response = await axios.get('https://localhost:7223/api/TimeTracking/user-time-summary', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        setWeeklyMeditation(response.data.weeklyTotalHours);
+        setLoading(false);
+      } catch (err) {
+        setError(err.response?.data?.message || err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchWeeklyMeditation();
+  }, []);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <motion.div
@@ -152,9 +177,15 @@ export default function Overview({
                 <h3 className="text-sm font-semibold text-gray-500">
                   Weekly Meditation
                 </h3>
-                <div className="text-3xl font-bold text-zenSage mt-1">
-                  3.5 hrs
-                </div>
+                {loading ? (
+                  <div className="text-3xl font-bold text-zenSage mt-1">...</div>
+                ) : error ? (
+                  <div className="text-red-500 text-sm mt-1">Error loading data</div>
+                ) : (
+                  <div className="text-3xl font-bold text-zenSage mt-1">
+                    {weeklyMeditation?.toFixed(1) || 0} hrs
+                  </div>
+                )}
               </Card>
               <Card className="p-4">
                 <h3 className="text-sm font-semibold text-gray-500">
@@ -184,9 +215,14 @@ export default function Overview({
                 <span className="text-gray-600">
                   Meditation Goal (5 hours/week)
                 </span>
-                <span className="font-medium">70%</span>
+                <span className="font-medium">
+                  {weeklyMeditation ? `${Math.min(Math.round((weeklyMeditation / 5) * 100), 100)}%` : '0%'}
+                </span>
               </div>
-              <Progress value={70} className="h-2" />
+              <Progress 
+                value={weeklyMeditation ? Math.min(Math.round((weeklyMeditation / 5) * 100), 100) : 0} 
+                className="h-2" 
+              />
             </div>
             <div>
               <div className="flex justify-between mb-2">
@@ -209,9 +245,14 @@ export default function Overview({
                 <span className="text-gray-600">
                   Journaling (5 entries/week)
                 </span>
-                <span className="font-medium">80%</span>
+                <span className="font-medium">
+                  {Math.min(Math.round((journalData.length / 5) * 100), 100)}%
+                </span>
               </div>
-              <Progress value={80} className="h-2" />
+              <Progress 
+                value={Math.min(Math.round((journalData.length / 5) * 100), 100)} 
+                className="h-2" 
+              />
             </div>
           </CardContent>
         </Card>
