@@ -90,7 +90,7 @@ export default function Login() {
       });
 
       // Store the authentication token
-      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('token', response.data.token);
       
       // Show success message
       toast({

@@ -18,7 +18,6 @@ export default function K10Question({
   const options = [
     { value: 1, label: "None of the time" },
     { value: 2, label: "A little of the time" },
-    { value: 3, label: "Some of the time" },
     { value: 4, label: "Most of the time" },
     { value: 5, label: "All of the time" },
   ];
