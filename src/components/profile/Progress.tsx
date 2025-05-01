@@ -38,6 +38,12 @@ interface UserTimeSummaryDto {
   dailyBreakdown: DailyTimeDto[];
 }
 
+interface JournalStatsDto {
+  userId: string;
+  totalEntries: number;
+  lastWeekEntries: number;
+}
+
 interface ProgressProps {
   journalData: JournalEntry[];
 }
@@ -56,21 +62,27 @@ const api = axios.create({
 
 export default function Progress({ journalData }: ProgressProps) {
   const [timeData, setTimeData] = useState<UserTimeSummaryDto | null>(null);
+  const [journalStats, setJournalStats] = useState<JournalStatsDto | null>(null);
   const [loading, setLoading] = useState(true);
+  const [journalLoading, setJournalLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [journalError, setJournalError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTimeData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
+        setJournalLoading(true);
         setError(null);
+        setJournalError(null);
         
         const token = localStorage.getItem('token');
         if (!token) {
           throw new Error('No authentication token found');
         }
 
-        const response = await api.get<UserTimeSummaryDto>(
+        // Fetch meditation data
+        const timeResponse = await api.get<UserTimeSummaryDto>(
           '/api/TimeTracking/user-time-summary',
           {
             headers: {
@@ -80,34 +92,57 @@ export default function Progress({ journalData }: ProgressProps) {
           }
         );
         
-        if (!response.data) {
-          throw new Error('No data received from server');
+        if (!timeResponse.data) {
+          throw new Error('No meditation data received from server');
         }
         
-        setTimeData(response.data);
+        setTimeData(timeResponse.data);
+
+        // Fetch journal stats
+        const journalResponse = await api.get<JournalStatsDto>(
+          '/api/journal/stats',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+          }
+        );
+
+        if (!journalResponse.data) {
+          throw new Error('No journal stats received from server');
+        }
+
+        setJournalStats(journalResponse.data);
       } catch (err) {
-        let errorMessage = 'Failed to fetch meditation data';
         if (axios.isAxiosError(err)) {
-          if (err.code === 'ECONNABORTED') {
-            errorMessage = 'Request timeout - server took too long to respond';
-          } else if (err.response?.status === 401) {
-            errorMessage = 'Unauthorized - please login again';
-          } else {
-            errorMessage = err.response?.data?.message || 
-                         err.message || 
-                         'Network error occurred';
+          if (err.response?.config.url?.includes('TimeTracking')) {
+            const errorMessage = err.code === 'ECONNABORTED' 
+              ? 'Request timeout - server took too long to respond' 
+              : err.response?.status === 401 
+                ? 'Unauthorized - please login again' 
+                : err.response?.data?.message || err.message || 'Network error occurred';
+            setError(errorMessage);
+          } else if (err.response?.config.url?.includes('journal')) {
+            const errorMessage = err.code === 'ECONNABORTED' 
+              ? 'Request timeout - server took too long to respond' 
+              : err.response?.status === 401 
+                ? 'Unauthorized - please login again' 
+                : err.response?.data?.message || err.message || 'Network error occurred';
+            setJournalError(errorMessage);
           }
         } else if (err instanceof Error) {
-          errorMessage = err.message;
+          setError(err.message);
+          setJournalError(err.message);
         }
-        setError(errorMessage);
         console.error("API Error:", err);
       } finally {
         setLoading(false);
+        setJournalLoading(false);
       }
     };
 
-    fetchTimeData();
+    fetchData();
   }, []);
 
   // Prepare meditation data for the chart (last 30 days)
@@ -126,14 +161,8 @@ export default function Progress({ journalData }: ProgressProps) {
   const weeklyMeditationProgress = timeData ? 
     Math.min(Math.round((timeData.weeklyTotalHours / 5) * 100), 100) : 0;
   
-  const weeklyJournalProgress = Math.min(
-    Math.round(
-      (journalData.filter(entry => 
-        new Date(entry.date) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-      ).length / 5) * 100
-    ), 
-    100
-  );
+  const weeklyJournalProgress = journalStats ? 
+    Math.min(Math.round((journalStats.lastWeekEntries / 5) * 100), 100) : 0;
 
   const ErrorDisplay = ({ message }: { message: string }) => (
     <div className="p-4 bg-red-50 rounded-lg border border-red-200">
@@ -162,6 +191,7 @@ export default function Progress({ journalData }: ProgressProps) {
           </CardHeader>
           <CardContent>
             {error && <ErrorDisplay message={error} />}
+            {journalError && <ErrorDisplay message={journalError} />}
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               <Card className="p-4">
@@ -192,10 +222,16 @@ export default function Progress({ journalData }: ProgressProps) {
                 <div className="text-sm font-semibold text-gray-500 mb-1">
                   Journal Entries
                 </div>
-                <div className="text-3xl font-bold text-zenPeach">
-                  {journalData.length}
-                </div>
-                <div className="text-xs text-gray-500 mt-1">Total</div>
+                {journalLoading ? (
+                  <LoadingSkeleton />
+                ) : (
+                  <>
+                    <div className="text-3xl font-bold text-zenPeach">
+                      {journalStats?.totalEntries || 0}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">Total</div>
+                  </>
+                )}
               </Card>
 
               <Card className="p-4">
@@ -239,9 +275,14 @@ export default function Progress({ journalData }: ProgressProps) {
                   <span className="text-gray-600">
                     Weekly Journal Entries (5 entries)
                   </span>
-                  <span className="font-medium">{weeklyJournalProgress}%</span>
+                  <span className="font-medium">
+                    {journalLoading ? '...' : `${weeklyJournalProgress}%`}
+                  </span>
                 </div>
-                <UiProgress value={weeklyJournalProgress} className="h-3" />
+                <UiProgress 
+                  value={journalLoading ? 0 : weeklyJournalProgress} 
+                  className="h-3" 
+                />
               </div>
             </div>
           </CardContent>

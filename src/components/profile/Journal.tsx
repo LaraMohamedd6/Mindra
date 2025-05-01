@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { BookOpen, Tag, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 interface JournalEntry {
   id: number;
@@ -23,58 +25,101 @@ interface JournalEntry {
   tags: string[];
 }
 
-interface JournalProps {
-  journalData: JournalEntry[];
-  setJournalData: React.Dispatch<React.SetStateAction<JournalEntry[]>>;
-  newJournal: { title: string; content: string; tags: string };
-  setNewJournal: React.Dispatch<
-    React.SetStateAction<{ title: string; content: string; tags: string }>
-  >;
-  isAddingJournal: boolean;
-  setIsAddingJournal: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export default function Journal({
-  journalData,
-  setJournalData,
-  newJournal,
-  setNewJournal,
-  isAddingJournal,
-  setIsAddingJournal,
-}: JournalProps) {
+export default function Journal() {
   const { toast } = useToast();
+  const [journalData, setJournalData] = useState<JournalEntry[]>([]);
+  const [isAddingJournal, setIsAddingJournal] = useState(false);
+  const [newJournal, setNewJournal] = useState({
+    title: "",
+    content: "",
+    tags: ""
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleAddJournal = () => {
-    if (!newJournal.title || !newJournal.content) return;
-
-    const newEntry = {
-      id: journalData.length + 1,
-      date: format(new Date(), "yyyy-MM-dd"),
-      title: newJournal.title,
-      content: newJournal.content,
-      tags: newJournal.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter((tag) => tag),
+  // Fetch journal entries from API
+  useEffect(() => {
+    const fetchJournalEntries = async () => {
+      try {
+        const response = await axios.get('https://localhost:7223/api/journal', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        setJournalData(response.data);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch journal entries",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    setJournalData([newEntry, ...journalData]);
-    setNewJournal({ title: "", content: "", tags: "" });
-    setIsAddingJournal(false);
+    fetchJournalEntries();
+  }, []);
 
-    toast({
-      title: "Journal entry added",
-      description: "Your new journal entry has been saved.",
-    });
+  const handleAddJournal = async () => {
+    if (!newJournal.title || !newJournal.content) return;
+
+    try {
+      const response = await axios.post('https://localhost:7223/api/journal', {
+        title: newJournal.title,
+        content: newJournal.content,
+        tags: newJournal.tags
+      }, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      setJournalData([response.data, ...journalData]);
+      setNewJournal({ title: "", content: "", tags: "" });
+      setIsAddingJournal(false);
+
+      toast({
+        title: "Journal entry added",
+        description: "Your new journal entry has been saved.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add journal entry",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleDeleteJournal = (id: number) => {
-    setJournalData(journalData.filter((entry) => entry.id !== id));
-    toast({
-      title: "Journal entry deleted",
-      description: "Your journal entry has been removed.",
-    });
+  const handleDeleteJournal = async (id: number) => {
+    try {
+      await axios.delete(`https://localhost:7223/api/journal/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      setJournalData(journalData.filter((entry) => entry.id !== id));
+      toast({
+        title: "Journal entry deleted",
+        description: "Your journal entry has been removed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete journal entry",
+        variant: "destructive"
+      });
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zenSage"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

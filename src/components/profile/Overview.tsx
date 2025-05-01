@@ -41,6 +41,12 @@ interface JournalEntry {
   tags: string[];
 }
 
+interface JournalStatsDto {
+  userId: string;
+  totalEntries: number;
+  lastWeekEntries: number;
+}
+
 interface OverviewProps {
   moodHistory: MoodData[];
   activityData: ActivityData[];
@@ -56,27 +62,67 @@ export default function Overview({
   journalData,
 }: OverviewProps) {
   const [weeklyMeditation, setWeeklyMeditation] = useState<number | null>(null);
+  const [journalStats, setJournalStats] = useState<JournalStatsDto | null>(null);
   const [loading, setLoading] = useState(true);
+  const [journalLoading, setJournalLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [journalError, setJournalError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchWeeklyMeditation = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get('https://localhost:7223/api/TimeTracking/user-time-summary', {
+        setLoading(true);
+        setJournalLoading(true);
+        setError(null);
+        setJournalError(null);
+        
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        // Fetch meditation data
+        const meditationResponse = await axios.get('https://localhost:7223/api/TimeTracking/user-time-summary', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${token}`
           }
         });
-        setWeeklyMeditation(response.data.weeklyTotalHours);
-        setLoading(false);
+        setWeeklyMeditation(meditationResponse.data.weeklyTotalHours);
+
+        // Fetch journal stats
+        const journalResponse = await axios.get<JournalStatsDto>(
+          'https://localhost:7223/api/journal/stats',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        setJournalStats(journalResponse.data);
+
       } catch (err) {
-        setError(err.response?.data?.message || err.message);
+        if (axios.isAxiosError(err)) {
+          if (err.response?.config.url?.includes('TimeTracking')) {
+            setError(err.response?.data?.message || err.message);
+          } else if (err.response?.config.url?.includes('journal')) {
+            setJournalError(err.response?.data?.message || err.message);
+          }
+        } else if (err instanceof Error) {
+          setError(err.message);
+          setJournalError(err.message);
+        }
+      } finally {
         setLoading(false);
+        setJournalLoading(false);
       }
     };
 
-    fetchWeeklyMeditation();
+    fetchData();
   }, []);
+
+  // Calculate weekly journal progress
+  const weeklyJournalProgress = journalStats ? 
+    Math.min(Math.round((journalStats.lastWeekEntries / 5) * 100), 100) : 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -191,9 +237,15 @@ export default function Overview({
                 <h3 className="text-sm font-semibold text-gray-500">
                   Journal Entries
                 </h3>
-                <div className="text-3xl font-bold text-zenPink mt-1">
-                  {journalData.length}
-                </div>
+                {journalLoading ? (
+                  <div className="text-3xl font-bold text-zenPink mt-1">...</div>
+                ) : journalError ? (
+                  <div className="text-red-500 text-sm mt-1">Error loading data</div>
+                ) : (
+                  <div className="text-3xl font-bold text-zenPink mt-1">
+                    {journalStats?.totalEntries || 0}
+                  </div>
+                )}
               </Card>
             </div>
           </CardContent>
@@ -246,11 +298,11 @@ export default function Overview({
                   Journaling (5 entries/week)
                 </span>
                 <span className="font-medium">
-                  {Math.min(Math.round((journalData.length / 5) * 100), 100)}%
+                  {journalLoading ? '...' : `${weeklyJournalProgress}%`}
                 </span>
               </div>
               <Progress 
-                value={Math.min(Math.round((journalData.length / 5) * 100), 100)} 
+                value={journalLoading ? 0 : weeklyJournalProgress} 
                 className="h-2" 
               />
             </div>
