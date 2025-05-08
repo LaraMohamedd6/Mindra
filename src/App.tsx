@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +26,9 @@ import ChatRoomsList from "./pages/ChatRoomsList";
 import ChatRoomView from "./pages/ChatRoomView";
 import { VerificationStep } from "./pages/VerificationStep";
 import { VerifyEmailPage } from "./pages/VerifyEmailPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { VerifyResetCodePage } from "./pages/VerifyResetCodePage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +60,12 @@ const App = () => (
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route
+              path="/verify-reset-code"
+              element={<VerifyResetCodePage />}
+            />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
