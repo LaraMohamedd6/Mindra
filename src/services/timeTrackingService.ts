@@ -1,4 +1,3 @@
-// src/services/timeTrackingService.ts
 import axios from 'axios';
 
 const API_BASE_URL = 'https://localhost:7223/api';
@@ -30,7 +29,7 @@ export const trackTime = async (
     }
 
     const response = await axios.post(
-      `${API_BASE_URL}/timetracking/update`,
+      `${API_BASE_URL}/TimeTracking/update`,
       {
         contentId,
         contentType,
@@ -64,14 +63,15 @@ export const trackTime = async (
   }
 };
 
-export const getTimeSummary = async (): Promise<TimeSummary> => {
+export const getTimeSummary = async (contentType?: string): Promise<TimeSummary> => {
   try {
     const token = localStorage.getItem('token');
     if (!token) {
       throw new Error('No authentication token found');
     }
 
-    const response = await axios.get(`${API_BASE_URL}/timetracking/summary`, {
+    const response = await axios.get(`${API_BASE_URL}/TimeTracking/summary`, {
+      params: { contentType }, // Add contentType as a query parameter
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -96,7 +96,7 @@ export const validateYouTubeVideo = async (videoId: string): Promise<boolean> =>
     }
 
     const response = await axios.get(
-      `${API_BASE_URL}/timetracking/validate-youtube?videoId=${videoId}`,
+      `${API_BASE_URL}/TimeTracking/validate-youtube?videoId=${videoId}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -104,7 +104,7 @@ export const validateYouTubeVideo = async (videoId: string): Promise<boolean> =>
       }
     );
 
-    return response.data.isValid as boolean;
+    return response.data as boolean; // Adjust based on actual backend response
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error('Axios error validating YouTube video:', error.response?.data || error.message);
