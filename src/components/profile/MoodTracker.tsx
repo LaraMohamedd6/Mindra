@@ -60,6 +60,7 @@ export default function MoodTracker() {
     return {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     };
   };
@@ -77,7 +78,7 @@ export default function MoodTracker() {
   // Get mood entries for a specific date
   const getMoodEntriesByDate = async (date: Date) => {
     try {
-      const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      const formattedDate = format(date, "yyyy-MM-dd");
       const response = await axios.get(
         `https://localhost:7223/api/MoodEntries/date/${formattedDate}/all`,
         getAuthHeader()
@@ -95,31 +96,35 @@ export default function MoodTracker() {
   const saveMoodEntry = async (date: Date, moodValue: number, notes: string = "") => {
     try {
       const moodEmoji = MOOD_EMOJIS[moodValue - 1];
-      const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-      
-      console.log("Saving mood for date:", formattedDate);
-      
+      const urlDate = format(date, "yyyy-MM-dd");
+      const isoDate = format(date, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // ISO 8601 format
+
+      const userId = localStorage.getItem("userId") || "123"; // Replace with actual user ID
+      if (!userId) throw new Error("User ID is required");
+
+      const entry = {
+        id: 0, // 0 for new or update (backend will handle)
+        userId,
+        date: isoDate,
+        moodValue,
+        moodEmoji,
+        notes,
+      };
+
+      console.log("Saving mood entry:", { urlDate, entry });
+
       try {
         const response = await axios.put(
-          `https://localhost:7223/api/MoodEntries/date/${formattedDate}`,
-          {
-            moodValue,
-            moodEmoji,
-            notes,
-          },
+          `https://localhost:7223/api/MoodEntries/date/${urlDate}`,
+          entry,
           getAuthHeader()
         );
         return response.data;
       } catch (updateError) {
-        if (updateError.response?.status === 404) {
+        if (axios.isAxiosError(updateError) && updateError.response?.status === 404) {
           const response = await axios.post(
             "https://localhost:7223/api/MoodEntries",
-            {
-              date: formattedDate,
-              moodValue,
-              moodEmoji,
-              notes,
-            },
+            entry,
             getAuthHeader()
           );
           return response.data;
@@ -127,7 +132,13 @@ export default function MoodTracker() {
         throw updateError;
       }
     } catch (error) {
-      console.error("Failed to save mood entry:", error);
+      console.error("Failed to save mood entry:", {
+        message: error.message,
+        ...(axios.isAxiosError(error) && {
+          status: error.response?.status,
+          response: error.response?.data,
+        }),
+      });
       throw new Error("Failed to save mood entry");
     }
   };
@@ -445,7 +456,7 @@ export default function MoodTracker() {
                 .sort((a, b) => {
                   const dateA = new Date(a.date);
                   const dateB = new Date(b.date);
-                  return dateB.getTime() - dateB.getTime();
+                  return dateB.getTime() - dateA.getTime();
                 })
                 .slice(0, 5)
                 .map((entry, idx) => (
