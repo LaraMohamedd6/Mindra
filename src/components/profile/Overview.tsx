@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { format, subDays, isWithinInterval } from "date-fns";
 import axios from "axios";
 import { motion } from "framer-motion";
 import {
@@ -47,8 +48,16 @@ interface JournalStatsDto {
   lastWeekEntries: number;
 }
 
+interface MoodEntry {
+  id: number;
+  userId: string;
+  date: string;
+  moodValue: number;
+  moodEmoji: string;
+  notes?: string;
+}
+
 interface OverviewProps {
-  moodHistory: MoodData[];
   activityData: ActivityData[];
   journalData: JournalEntry[];
 }
@@ -56,73 +65,137 @@ interface OverviewProps {
 const COLORS = ["#7CAE9E", "#E69EA2", "#FEC0B3", "#CFECE0"];
 const MOOD_EMOJIS = ["😔", "😟", "😐", "🙂", "😊"];
 
-export default function Overview({
-  moodHistory,
-  activityData,
-  journalData,
-}: OverviewProps) {
+export default function Overview({ activityData, journalData }: OverviewProps) {
   const [weeklyMeditation, setWeeklyMeditation] = useState<number | null>(null);
   const [journalStats, setJournalStats] = useState<JournalStatsDto | null>(null);
+  const [moodHistory, setMoodHistory] = useState<MoodData[]>([]);
   const [loading, setLoading] = useState(true);
   const [journalLoading, setJournalLoading] = useState(true);
+  const [moodLoading, setMoodLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [journalError, setJournalError] = useState<string | null>(null);
+  const [moodError, setMoodError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setJournalLoading(true);
+        setMoodLoading(true);
         setError(null);
         setJournalError(null);
-        
-        const token = localStorage.getItem('token');
+        setMoodError(null);
+
+        const token = localStorage.getItem("token");
         if (!token) {
-          throw new Error('No authentication token found');
+          throw new Error("No authentication token found");
         }
 
-        // Fetch meditation data
-        const meditationResponse = await axios.get('https://localhost:7223/api/TimeTracking/user-time-summary', {
+        const authHeader = {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        // Fetch mood history
+        const moodResponse = await axios.get<MoodEntry[]>(
+          "https://localhost:7223/api/MoodEntries",
+          authHeader
+        );
+        const moodData = moodResponse.data.map((entry) => ({
+          date: entry.date,
+          value: entry.moodValue,
+          mood: entry.moodEmoji,
+        }));
+        setMoodHistory(moodData);
+
+        // Fetch meditation data
+        const meditationResponse = await axios.get(
+          "https://localhost:7223/api/TimeTracking/user-time-summary",
+          authHeader
+        );
         setWeeklyMeditation(meditationResponse.data.weeklyTotalHours);
 
         // Fetch journal stats
         const journalResponse = await axios.get<JournalStatsDto>(
-          'https://localhost:7223/api/journal/stats',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          "https://localhost:7223/api/journal/stats",
+          authHeader
         );
         setJournalStats(journalResponse.data);
-
       } catch (err) {
         if (axios.isAxiosError(err)) {
-          if (err.response?.config.url?.includes('TimeTracking')) {
+          if (err.response?.config.url?.includes("TimeTracking")) {
             setError(err.response?.data?.message || err.message);
-          } else if (err.response?.config.url?.includes('journal')) {
+          } else if (err.response?.config.url?.includes("journal")) {
             setJournalError(err.response?.data?.message || err.message);
+          } else if (err.response?.config.url?.includes("MoodEntries")) {
+            setMoodError(err.response?.data?.message || err.message);
           }
         } else if (err instanceof Error) {
           setError(err.message);
           setJournalError(err.message);
+          setMoodError(err.message);
         }
       } finally {
         setLoading(false);
         setJournalLoading(false);
+        setMoodLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
+  // Calculate mood improvement for the last 30 days up to current date
+  const currentDate = new Date(); // May 11, 2025
+  const last30Days = subDays(currentDate, 30); // April 12, 2025
+  const midPoint = subDays(currentDate, 15); // April 27, 2025
+  const earlyMoods = moodHistory.filter((entry) =>
+    isWithinInterval(new Date(entry.date), { start: last30Days, end: midPoint })
+  );
+  const laterMoods = moodHistory.filter((entry) =>
+    isWithinInterval(new Date(entry.date), { start: midPoint, end: currentDate })
+  );
+  const earlyAverage =
+    earlyMoods.length > 0
+      ? earlyMoods.reduce((sum, entry) => sum + entry.value, 0) / earlyMoods.length
+      : 0;
+  const laterAverage =
+    laterMoods.length > 0
+      ? laterMoods.reduce((sum, entry) => sum + entry.value, 0) / laterMoods.length
+      : 0;
+  let moodImprovement =
+    earlyAverage > 0 && laterAverage > earlyAverage
+      ? Math.min(
+          Math.round(((laterAverage - earlyAverage) / earlyAverage) * 100),
+          100
+        )
+      : 0;
+
+  // Fallback: If no improvement, use average mood relative to max mood (5)
+  const overallAverage =
+    moodHistory.length > 0
+      ? moodHistory.reduce((sum, entry) => sum + entry.value, 0) / moodHistory.length
+      : 0;
+  if (moodImprovement === 0 && overallAverage > 0) {
+    moodImprovement = Math.round(((overallAverage - 1) / (5 - 1)) * 100);
+  }
+
+  // Debugging logs
+  console.log("moodHistory:", moodHistory);
+  console.log("earlyMoods:", earlyMoods);
+  console.log("laterMoods:", laterMoods);
+  console.log("earlyAverage:", earlyAverage);
+  console.log("laterAverage:", laterAverage);
+  console.log("moodImprovement:", moodImprovement);
+  console.log("overallAverage:", overallAverage);
+  console.log("weeklyMeditation:", weeklyMeditation);
+  console.log("journalStats:", journalStats);
+
   // Calculate weekly journal progress
-  const weeklyJournalProgress = journalStats ? 
-    Math.min(Math.round((journalStats.lastWeekEntries / 5) * 100), 100) : 0;
+  const weeklyJournalProgress = journalStats
+    ? Math.min(Math.round((journalStats.lastWeekEntries / 5) * 100), 100)
+    : 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -134,50 +207,55 @@ export default function Overview({
           <CardHeader>
             <CardTitle className="flex items-center">
               <BarChart className="h-5 w-5 mr-2" />
-              Recent Mood Trends
+              Mood History
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={moodHistory.slice(-7)}
-                  margin={{
-                    top: 10,
-                    right: 10,
-                    left: -20,
-                    bottom: 0,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="date"
-                    tickFormatter={(date) =>
-                      new Date(date).toLocaleDateString(undefined, {
-                        weekday: "short",
-                      })
-                    }
-                  />
-                  <YAxis domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} />
-                  <RechartsTooltip
-                    formatter={(value) => [
-                      `${MOOD_EMOJIS[Number(value) - 1]} (${value}/5)`,
-                      "Mood",
-                    ]}
-                    labelFormatter={(date) =>
-                      new Date(date).toLocaleDateString()
-                    }
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#7CAE9E"
-                    fill="#CFECE0"
-                    activeDot={{ r: 8 }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+            {moodLoading ? (
+              <div className="flex justify-center items-center h-64">
+                Loading mood data...
+              </div>
+            ) : moodError ? (
+              <div className="flex justify-center items-center h-64 text-red-500">
+                Error loading mood data: {moodError}
+              </div>
+            ) : (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={moodHistory.map((entry) => ({
+                      date: format(new Date(entry.date), "MMM dd"),
+                      value: entry.value,
+                      mood: entry.mood,
+                    }))}
+                    margin={{
+                      top: 10,
+                      right: 10,
+                      left: -20,
+                      bottom: 0,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} />
+                    <RechartsTooltip
+                      formatter={(value) => [
+                        `${MOOD_EMOJIS[Number(value) - 1]} (${value}/5)`,
+                        "Mood",
+                      ]}
+                      labelFormatter={(label) => label}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#7CAE9E"
+                      fill="#CFECE0"
+                      activeDot={{ r: 8 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>
@@ -226,7 +304,9 @@ export default function Overview({
                 {loading ? (
                   <div className="text-3xl font-bold text-zenSage mt-1">...</div>
                 ) : error ? (
-                  <div className="text-red-500 text-sm mt-1">Error loading data</div>
+                  <div className="text-red-500 text-sm mt-1">
+                    Error loading data
+                  </div>
                 ) : (
                   <div className="text-3xl font-bold text-zenSage mt-1">
                     {weeklyMeditation?.toFixed(1) || 0} hrs
@@ -240,7 +320,9 @@ export default function Overview({
                 {journalLoading ? (
                   <div className="text-3xl font-bold text-zenPink mt-1">...</div>
                 ) : journalError ? (
-                  <div className="text-red-500 text-sm mt-1">Error loading data</div>
+                  <div className="text-red-500 text-sm mt-1">
+                    Error loading data
+                  </div>
                 ) : (
                   <div className="text-3xl font-bold text-zenPink mt-1">
                     {journalStats?.totalEntries || 0}
@@ -268,12 +350,21 @@ export default function Overview({
                   Meditation Goal (5 hours/week)
                 </span>
                 <span className="font-medium">
-                  {weeklyMeditation ? `${Math.min(Math.round((weeklyMeditation / 5) * 100), 100)}%` : '0%'}
+                  {weeklyMeditation
+                    ? `${Math.min(
+                        Math.round((weeklyMeditation / 5) * 100),
+                        100
+                      )}%`
+                    : "0%"}
                 </span>
               </div>
-              <Progress 
-                value={weeklyMeditation ? Math.min(Math.round((weeklyMeditation / 5) * 100), 100) : 0} 
-                className="h-2" 
+              <Progress
+                value={
+                  weeklyMeditation
+                    ? Math.min(Math.round((weeklyMeditation / 5) * 100), 100)
+                    : 0
+                }
+                className="h-2"
               />
             </div>
             <div>
@@ -288,9 +379,14 @@ export default function Overview({
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-gray-600">Mood Improvement</span>
-                <span className="font-medium">60%</span>
+                <span className="font-medium">
+                  {moodLoading ? "..." : `${moodImprovement}%`}
+                </span>
               </div>
-              <Progress value={60} className="h-2" />
+              <Progress
+                value={moodLoading ? 0 : moodImprovement}
+                className="h-2"
+              />
             </div>
             <div>
               <div className="flex justify-between mb-2">
@@ -298,12 +394,12 @@ export default function Overview({
                   Journaling (5 entries/week)
                 </span>
                 <span className="font-medium">
-                  {journalLoading ? '...' : `${weeklyJournalProgress}%`}
+                  {journalLoading ? "..." : `${weeklyJournalProgress}%`}
                 </span>
               </div>
-              <Progress 
-                value={journalLoading ? 0 : weeklyJournalProgress} 
-                className="h-2" 
+              <Progress
+                value={journalLoading ? 0 : weeklyJournalProgress}
+                className="h-2"
               />
             </div>
           </CardContent>

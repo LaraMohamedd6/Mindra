@@ -77,8 +77,9 @@ export default function MoodTracker() {
   // Get mood entries for a specific date
   const getMoodEntriesByDate = async (date: Date) => {
     try {
+      const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       const response = await axios.get(
-        `https://localhost:7223/api/MoodEntries/date/${format(date, "yyyy-MM-dd")}/all`,
+        `https://localhost:7223/api/MoodEntries/date/${formattedDate}/all`,
         getAuthHeader()
       );
       return response.data;
@@ -93,30 +94,30 @@ export default function MoodTracker() {
   // Create or update mood entry
   const saveMoodEntry = async (date: Date, moodValue: number, notes: string = "") => {
     try {
-      const moodEmoji = MOOD_EMOJIS[moodValue - 1]; // Get the correct emoji
-      const formattedDate = date.toISOString().split('T')[0];
+      const moodEmoji = MOOD_EMOJIS[moodValue - 1];
+      const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       
-      // Try to update first
+      console.log("Saving mood for date:", formattedDate);
+      
       try {
         const response = await axios.put(
           `https://localhost:7223/api/MoodEntries/date/${formattedDate}`,
           {
             moodValue,
-            moodEmoji, // Include emoji in update
+            moodEmoji,
             notes,
           },
           getAuthHeader()
         );
         return response.data;
       } catch (updateError) {
-        // If not found, create new entry
         if (updateError.response?.status === 404) {
           const response = await axios.post(
             "https://localhost:7223/api/MoodEntries",
             {
-              date: date.toISOString(),
+              date: formattedDate,
               moodValue,
-              moodEmoji, // Include emoji in creation
+              moodEmoji,
               notes,
             },
             getAuthHeader()
@@ -144,6 +145,9 @@ export default function MoodTracker() {
           if (entries.length > 0) {
             setSelectedMood(entries[0].moodValue);
             setNotes(entries[0].notes || "");
+          } else {
+            setSelectedMood(null);
+            setNotes("");
           }
         }
       } catch (error) {
@@ -158,15 +162,16 @@ export default function MoodTracker() {
     };
 
     loadData();
-  }, []);
+  }, [selectedDate]);
 
-  // Handle date selection from date picker
+  // Handle date selection from calendar
   const handleDateSelect = async (date: Date | undefined) => {
     if (!date) return;
     
-    setSelectedDate(date);
+    const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    setSelectedDate(normalizedDate);
     try {
-      const entries = await getMoodEntriesByDate(date);
+      const entries = await getMoodEntriesByDate(normalizedDate);
       if (entries.length > 0) {
         setSelectedMood(entries[0].moodValue);
         setNotes(entries[0].notes || "");
@@ -190,16 +195,9 @@ export default function MoodTracker() {
     try {
       const savedEntry = await saveMoodEntry(selectedDate, moodValue, notes);
       
-      // Update local state
-      setMoodHistory(prev => {
-        const existingIndex = prev.findIndex(e => e.id === savedEntry.id);
-        if (existingIndex >= 0) {
-          const updated = [...prev];
-          updated[existingIndex] = savedEntry;
-          return updated;
-        }
-        return [...prev, savedEntry];
-      });
+      // Re-fetch mood history to ensure consistency
+      const updatedHistory = await fetchMoodHistory();
+      setMoodHistory(updatedHistory);
 
       setSelectedMood(moodValue);
       toast({
@@ -246,7 +244,7 @@ export default function MoodTracker() {
     const daysInMonth = lastDay.getDate();
     const startingDay = firstDay.getDay();
 
-    const days = [];
+    const days: (Date | null)[] = [];
     
     // Previous month's days
     for (let i = 0; i < startingDay; i++) {
@@ -276,7 +274,6 @@ export default function MoodTracker() {
             <CardTitle>Track Your Mood</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            
             <div>
               <p className="mb-4 font-medium">How are you feeling today?</p>
               <div className="flex justify-between">
@@ -376,14 +373,7 @@ export default function MoodTracker() {
                       ${entry ? MOOD_COLORS[entry.moodValue - 1] : "hover:bg-muted"}
                     `}
                     onClick={() => {
-                      setSelectedDate(date);
-                      if (entry) {
-                        setSelectedMood(entry.moodValue);
-                        setNotes(entry.notes || "");
-                      } else {
-                        setSelectedMood(null);
-                        setNotes("");
-                      }
+                      handleDateSelect(date);
                     }}
                   >
                     <div className="text-sm">{date.getDate()}</div>
@@ -452,7 +442,11 @@ export default function MoodTracker() {
             <h3 className="font-medium">Recent entries:</h3>
             <div className="max-h-40 overflow-y-auto space-y-2">
               {[...moodHistory]
-                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .sort((a, b) => {
+                  const dateA = new Date(a.date);
+                  const dateB = new Date(b.date);
+                  return dateB.getTime() - dateB.getTime();
+                })
                 .slice(0, 5)
                 .map((entry, idx) => (
                   <div
