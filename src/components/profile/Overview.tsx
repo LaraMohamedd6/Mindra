@@ -57,6 +57,12 @@ interface MoodEntry {
   notes?: string;
 }
 
+interface YogaTimeDto {
+  dailyTotalHours: number;
+  weeklyTotalHours: number;
+  monthlyTotalHours: number;
+}
+
 interface OverviewProps {
   activityData: ActivityData[];
   journalData: JournalEntry[];
@@ -67,6 +73,7 @@ const MOOD_EMOJIS = ["😔", "😟", "😐", "🙂", "😊"];
 
 export default function Overview({ activityData, journalData }: OverviewProps) {
   const [weeklyMeditation, setWeeklyMeditation] = useState<number | null>(null);
+  const [weeklyYoga, setWeeklyYoga] = useState<number | null>(null);
   const [journalStats, setJournalStats] = useState<JournalStatsDto | null>(null);
   const [moodHistory, setMoodHistory] = useState<MoodData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,6 +82,7 @@ export default function Overview({ activityData, journalData }: OverviewProps) {
   const [error, setError] = useState<string | null>(null);
   const [journalError, setJournalError] = useState<string | null>(null);
   const [moodError, setMoodError] = useState<string | null>(null);
+  const [yogaError, setYogaError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,6 +93,7 @@ export default function Overview({ activityData, journalData }: OverviewProps) {
         setError(null);
         setJournalError(null);
         setMoodError(null);
+        setYogaError(null);
 
         const token = localStorage.getItem("token");
         if (!token) {
@@ -116,6 +125,13 @@ export default function Overview({ activityData, journalData }: OverviewProps) {
         );
         setWeeklyMeditation(meditationResponse.data.weeklyTotalHours);
 
+        // Fetch yoga data
+        const yogaResponse = await axios.get<YogaTimeDto>(
+          "https://localhost:7223/api/YogaVideo/totals",
+          authHeader
+        );
+        setWeeklyYoga(yogaResponse.data.weeklyTotalHours);
+
         // Fetch journal stats
         const journalResponse = await axios.get<JournalStatsDto>(
           "https://localhost:7223/api/journal/stats",
@@ -124,17 +140,21 @@ export default function Overview({ activityData, journalData }: OverviewProps) {
         setJournalStats(journalResponse.data);
       } catch (err) {
         if (axios.isAxiosError(err)) {
+          const errorMessage = err.response?.data?.message || err.message;
           if (err.response?.config.url?.includes("TimeTracking")) {
-            setError(err.response?.data?.message || err.message);
+            setError(errorMessage);
           } else if (err.response?.config.url?.includes("journal")) {
-            setJournalError(err.response?.data?.message || err.message);
+            setJournalError(errorMessage);
           } else if (err.response?.config.url?.includes("MoodEntries")) {
-            setMoodError(err.response?.data?.message || err.message);
+            setMoodError(errorMessage);
+          } else if (err.response?.config.url?.includes("YogaVideo")) {
+            setYogaError(errorMessage);
           }
         } else if (err instanceof Error) {
           setError(err.message);
           setJournalError(err.message);
           setMoodError(err.message);
+          setYogaError(err.message);
         }
       } finally {
         setLoading(false);
@@ -147,9 +167,9 @@ export default function Overview({ activityData, journalData }: OverviewProps) {
   }, []);
 
   // Calculate mood improvement for the last 30 days up to current date
-  const currentDate = new Date(); // May 11, 2025
-  const last30Days = subDays(currentDate, 30); // April 12, 2025
-  const midPoint = subDays(currentDate, 15); // April 27, 2025
+  const currentDate = new Date();
+  const last30Days = subDays(currentDate, 30);
+  const midPoint = subDays(currentDate, 15);
   const earlyMoods = moodHistory.filter((entry) =>
     isWithinInterval(new Date(entry.date), { start: last30Days, end: midPoint })
   );
@@ -191,10 +211,16 @@ export default function Overview({ activityData, journalData }: OverviewProps) {
   console.log("overallAverage:", overallAverage);
   console.log("weeklyMeditation:", weeklyMeditation);
   console.log("journalStats:", journalStats);
+  console.log("weeklyYoga:", weeklyYoga);
 
   // Calculate weekly journal progress
   const weeklyJournalProgress = journalStats
     ? Math.min(Math.round((journalStats.lastWeekEntries / 5) * 100), 100)
+    : 0;
+
+  // Calculate weekly yoga progress (3 hours goal)
+  const weeklyYogaProgress = weeklyYoga
+    ? Math.min(Math.round((weeklyYoga / 3) * 100), 100)
     : 0;
 
   return (
@@ -370,11 +396,16 @@ export default function Overview({ activityData, journalData }: OverviewProps) {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-gray-600">
-                  Yoga Practice (3 sessions/week)
+                  Yoga Practice (3 hours/week)
                 </span>
-                <span className="font-medium">45%</span>
+                <span className="font-medium">
+                  {loading || yogaError ? "..." : `${weeklyYogaProgress}%`}
+                </span>
               </div>
-              <Progress value={45} className="h-2" />
+              <Progress
+                value={loading || yogaError ? 0 : weeklyYogaProgress}
+                className="h-2"
+              />
             </div>
             <div>
               <div className="flex justify-between mb-2">

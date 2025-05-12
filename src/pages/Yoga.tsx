@@ -4,7 +4,7 @@ import SectionHeading from "@/components/common/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Heart, UserCheck, Wind, Moon, Sun, Flame, Calendar, BookOpen, Zap, ArrowRight, ChevronDown, Leaf, Activity, Eye, Brain, RotateCw, X, Clock3 } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import yogaBanner from "@/assets/images/yoga-banner.png";
 
@@ -73,12 +73,189 @@ const YogaTipModal = ({ tip, onClose }: { tip: any, onClose: () => void }) => {
   );
 };
 
+// Tracking Panel Component
+const TrackingPanel = ({ totals, isLoading }: { totals: { daily: number, weekly: number, monthly: number } | null, isLoading: boolean }) => {
+  return (
+    <section className="py-14 bg-gray-50">
+      <div className="container mx-auto px-4">
+        <SectionHeading
+          title="Your Yoga Progress"
+          subtitle="Track your daily, weekly, and monthly practice time"
+        />
+        <Card className="border-none shadow-sm">
+          <CardContent className="pt-6">
+            {isLoading ? (
+              <div className="text-center py-4">
+                <p className="text-gray-500">Loading your progress...</p>
+              </div>
+            ) : totals ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center">
+                  <h4 className="text-lg font-semibold text-gray-800">Daily</h4>
+                  <p className="text-2xl font-bold text-zenPink">{totals.daily.toFixed(2)} hours</p>
+                </div>
+                <div className="text-center">
+                  <h4 className="text-lg font-semibold text-gray-800">Weekly</h4>
+                  <p className="text-2xl font-bold text-zenPink">{totals.weekly.toFixed(2)} hours</p>
+                </div>
+                <div className="text-center">
+                  <h4 className="text-lg font-semibold text-gray-800">Monthly</h4>
+                  <p className="text-2xl font-bold text-zenPink">{totals.monthly.toFixed(2)} hours</p>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-gray-500">No progress data available. Start practicing to track your time!</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
+};
+
 export default function Yoga() {
   const [savedClasses, setSavedClasses] = useState<number[]>([]);
   const [selectedPose, setSelectedPose] = useState<any>(null);
   const [showMoreContent, setShowMoreContent] = useState(false);
   const [selectedTip, setSelectedTip] = useState<any>(null);
+  const [totals, setTotals] = useState<{ daily: number, weekly: number, monthly: number } | null>(null);
+  const [isLoadingTotals, setIsLoadingTotals] = useState(false);
   const powerSectionRef = useRef<HTMLDivElement>(null);
+  const playerRefs = useRef<{ [key: string]: any }>({});
+  const watchTimeRefs = useRef<{ [key: string]: { startTime: number, totalSeconds: number } }>({});
+
+  const API_BASE_URL = "https://localhost:7223"; // Adjust based on your backend URL
+
+  // Load YouTube Iframe API
+  useEffect(() => {
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName("script")[0];
+    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+
+    window.onYouTubeIframeAPIReady = () => {
+      console.log("YouTube Iframe API Ready");
+    };
+
+    return () => {
+      delete window.onYouTubeIframeAPIReady;
+    };
+  }, []);
+
+  // Fetch initial totals on component mount
+  useEffect(() => {
+    fetchTotals();
+  }, []);
+
+  // Initialize player for selected pose
+  useEffect(() => {
+    if (selectedPose && selectedPose.videoId) {
+      initializePlayer(selectedPose.videoId, `pose-${selectedPose.id}`);
+    }
+  }, [selectedPose]);
+
+  const fetchTotals = async () => {
+    setIsLoadingTotals(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to view your progress.");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/YogaVideo/totals`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch totals: ${response.status} ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log("GET /api/YogaVideo/totals response:", data);
+      setTotals({
+        daily: data.dailyTotalHours,
+        weekly: data.weeklyTotalHours,
+        monthly: data.monthlyTotalHours,
+      });
+    } catch (error: any) {
+      console.error("Error fetching totals:", error);
+      toast.error(`Failed to load progress data: ${error.message}`);
+    } finally {
+      setIsLoadingTotals(false);
+    }
+  };
+
+  const sendWatchTime = async (videoId: string, totalSeconds: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to track your progress.");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/YogaVideo/watch`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          videoId,
+          totalSeconds,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to record watch time");
+      }
+
+      toast.success("Watch time recorded!");
+      await fetchTotals(); // Refresh totals after recording watch time
+    } catch (error: any) {
+      console.error("Error sending watch time:", error);
+      toast.error("Failed to record watch time.");
+    }
+  };
+
+  const initializePlayer = (videoId: string, playerId: string) => {
+    if (!window.YT) {
+      console.error("YouTube API not loaded");
+      return;
+    }
+
+    playerRefs.current[playerId] = new window.YT.Player(`youtube-player-${playerId}`, {
+      events: {
+        onReady: (event: any) => {
+          console.log(`Player for video ${videoId} ready`);
+        },
+        onStateChange: (event: any) => {
+          const player = event.target;
+          if (event.data === window.YT.PlayerState.PLAYING) {
+            watchTimeRefs.current[playerId] = {
+              startTime: Date.now(),
+              totalSeconds: watchTimeRefs.current[playerId]?.totalSeconds || 0,
+            };
+          } else if (event.data === window.YT.PlayerState.PAUSED) {
+            if (watchTimeRefs.current[playerId]) {
+              const elapsed = (Date.now() - watchTimeRefs.current[playerId].startTime) / 1000;
+              watchTimeRefs.current[playerId].totalSeconds += elapsed;
+              sendWatchTime(videoId, Math.round(watchTimeRefs.current[playerId].totalSeconds));
+              watchTimeRefs.current[playerId].totalSeconds = 0; // Reset after sending
+            }
+          }
+        },
+      },
+    });
+  };
 
   const toggleSaveClass = (id: number) => {
     if (savedClasses.includes(id)) {
@@ -396,7 +573,7 @@ export default function Yoga() {
       <div className="relative h-[500px] md:h-[800px] overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src= {yogaBanner}
+            src={yogaBanner}
             alt="Woman doing yoga outdoors"
             className="w-full h-full object-cover"
             loading="eager"
@@ -433,6 +610,9 @@ export default function Yoga() {
 
       {/* Scroll target div */}
       <div ref={powerSectionRef} className="scroll-mt-20"></div>
+
+      {/* Tracking Panel */}
+      <TrackingPanel totals={totals} isLoading={isLoadingTotals} />
 
       {/* Expanded Content Section */}
       {showMoreContent && (
@@ -521,12 +701,14 @@ export default function Yoga() {
                 <div className="aspect-video relative bg-gray-100">
                   {yogaClass.videoId ? (
                     <iframe
+                      id={`youtube-player-${yogaClass.id}`}
                       className="absolute inset-0 w-full h-full"
-                      src={`https://www.youtube.com/embed/${yogaClass.videoId}?rel=0&modestbranding=1`}
+                      src={`https://www.youtube.com/embed/${yogaClass.videoId}?rel=0&modestbranding=1&enablejsapi=1`}
                       title={yogaClass.title}
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
+                      onLoad={() => initializePlayer(yogaClass.videoId, yogaClass.id.toString())}
                     ></iframe>
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
@@ -601,8 +783,9 @@ export default function Yoga() {
 
                     <div className="aspect-video bg-gray-100 rounded-lg mb-4 overflow-hidden">
                       <iframe
+                        id={`youtube-player-pose-${selectedPose.id}`}
                         className="w-full h-full"
-                        src={`https://www.youtube.com/embed/${selectedPose.videoId}?rel=0&modestbranding=1`}
+                        src={`https://www.youtube.com/embed/${selectedPose.videoId}?rel=0&modestbranding=1&enablejsapi=1`}
                         title={selectedPose.name}
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
