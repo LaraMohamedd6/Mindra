@@ -68,65 +68,69 @@ export default function Login() {
   ];
 
   const handleGoogleLogin = () => {
-    window.location.href = 'https://localhost:7223/api/account/google-login';
+    window.location.href = "https://localhost:7223/api/account/google-login";
   };
-  
+
   // Add this useEffect to handle the callback
   useEffect(() => {
     // Check for token in URL after Google auth redirect
     const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    
+    const token = params.get("token");
+
     if (token) {
       // Store token and redirect to home
-      localStorage.setItem('token', token);
-      navigate('/');
+      localStorage.setItem("token", token);
+      navigate("/");
     }
   }, [navigate]);
 
   useEffect(() => {
     // Check for token in URL after Google auth redirect
     const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    const email = params.get('email');
-  
+    const token = params.get("token");
+    const email = params.get("email");
+
     if (token && email) {
       // Store token and redirect to complete profile
-      localStorage.setItem('tempToken', token);
-      navigate('/complete-profile', { state: { email } });
+      localStorage.setItem("tempToken", token);
+      navigate("/complete-profile", { state: { email } });
     } else if (token) {
       // Profile is complete, store token and redirect to home
-      localStorage.setItem('token', token);
-      navigate('/');
+      localStorage.setItem("token", token);
+      navigate("/");
     }
   }, [navigate]);
-  
+
   const checkGoogleAuthStatus = async () => {
     try {
-      const response = await axios.get('https://localhost:7223/api/account/google-response');
-      
+      const response = await axios.get(
+        "https://localhost:7223/api/account/google-response"
+      );
+
       if (response.data.needsProfileCompletion) {
         // Redirect to complete profile page
-        navigate('/complete-profile', { state: { fromGoogle: true } });
+        navigate("/complete-profile", { state: { fromGoogle: true } });
       } else {
         // If profile is already complete (shouldn't happen with this flow)
         const tokenResponse = await axios.post(
-          'https://localhost:7223/api/account/complete-profile',
+          "https://localhost:7223/api/account/complete-profile",
           {}, // Empty body since profile is complete
-          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
-        
-        localStorage.setItem('token', tokenResponse.data.token);
-        navigate('/');
+
+        localStorage.setItem("token", tokenResponse.data.token);
+        navigate("/");
       }
     } catch (error) {
-      console.error('Authentication check failed:', error);
+      console.error("Authentication check failed:", error);
       // Handle error
     }
   };
 
-
-  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -495,10 +499,10 @@ export default function Login() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 w-full">
+              <div className="flex justify-center w-full">
                 <Button
                   variant="outline"
-                  className="flex items-center justify-center gap-2"
+                  className="flex items-center justify-center w-64" // Fixed width (16rem = 256px)
                   onClick={handleGoogleLogin}
                   disabled={isLoading}
                 >
@@ -508,19 +512,7 @@ export default function Login() {
                       d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
                     />
                   </svg>
-                  Google
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex items-center justify-center gap-2"
-                >
-                  <svg className="h-5 w-5 text-[#1877F2]" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62,13.56 9.39,13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10.04,10.04 0 0,0 22,12.06C22,6.53 17.5,2.04 12,2.04Z"
-                    />
-                  </svg>
-                  Facebook
+                  <span className="ml-2">Google</span>
                 </Button>
               </div>
             </CardFooter>

@@ -71,7 +71,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
             <Route path="/complete-profile" element={<CompleteProfile />} />
             <Route path="/auth-callback" element={<AuthCallback />} />
-
+           
           </Routes>
         </AnimatePresence>
       </BrowserRouter>
