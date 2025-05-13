@@ -74,7 +74,7 @@ const YogaTipModal = ({ tip, onClose }: { tip: any, onClose: () => void }) => {
 };
 
 // Tracking Panel Component
-const TrackingPanel = ({ totals, isLoading }: { totals: { daily: number, weekly: number, monthly: number } | null, isLoading: boolean }) => {
+const TrackingPanel = ({ totals, isLoading, error }: { totals: { daily: number, weekly: number, monthly: number } | null, isLoading: boolean, error: string | null }) => {
   return (
     <section className="py-14 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -84,7 +84,12 @@ const TrackingPanel = ({ totals, isLoading }: { totals: { daily: number, weekly:
         />
         <Card className="border-none shadow-sm">
           <CardContent className="pt-6">
-            {isLoading ? (
+            {error ? (
+              <div className="text-center py-4">
+                <p className="text-red-500">Error: {error}</p>
+                <p className="text-gray-500 text-sm mt-2">Please try again or contact support.</p>
+              </div>
+            ) : isLoading ? (
               <div className="text-center py-4">
                 <p className="text-gray-500">Loading your progress...</p>
               </div>
@@ -122,11 +127,12 @@ export default function Yoga() {
   const [selectedTip, setSelectedTip] = useState<any>(null);
   const [totals, setTotals] = useState<{ daily: number, weekly: number, monthly: number } | null>(null);
   const [isLoadingTotals, setIsLoadingTotals] = useState(false);
+  const [totalsError, setTotalsError] = useState<string | null>(null);
   const powerSectionRef = useRef<HTMLDivElement>(null);
   const playerRefs = useRef<{ [key: string]: any }>({});
   const watchTimeRefs = useRef<{ [key: string]: { startTime: number, totalSeconds: number } }>({});
 
-  const API_BASE_URL = "https://localhost:7223"; // Adjust based on your backend URL
+  const API_BASE_URL = "https://localhost:7223";
 
   // Load YouTube Iframe API
   useEffect(() => {
@@ -158,11 +164,11 @@ export default function Yoga() {
 
   const fetchTotals = async () => {
     setIsLoadingTotals(true);
+    setTotalsError(null);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("Please log in to view your progress.");
-        return;
+        throw new Error("Please log in to view your progress");
       }
 
       const response = await fetch(`${API_BASE_URL}/api/YogaVideo/totals`, {
@@ -180,7 +186,10 @@ export default function Yoga() {
       }
 
       const data = await response.json();
-      console.log("GET /api/YogaVideo/totals response:", data);
+      console.log("GET /api/YogaVideo/totals response:", data); // Debug: Log API response
+      if (!data || typeof data.dailyTotalHours !== 'number' || typeof data.weeklyTotalHours !== 'number' || typeof data.monthlyTotalHours !== 'number') {
+        throw new Error("Invalid totals data received from server");
+      }
       setTotals({
         daily: data.dailyTotalHours,
         weekly: data.weeklyTotalHours,
@@ -188,6 +197,7 @@ export default function Yoga() {
       });
     } catch (error: any) {
       console.error("Error fetching totals:", error);
+      setTotalsError(error.message);
       toast.error(`Failed to load progress data: ${error.message}`);
     } finally {
       setIsLoadingTotals(false);
@@ -198,8 +208,7 @@ export default function Yoga() {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("Please log in to track your progress.");
-        return;
+        throw new Error("Please log in to track your progress");
       }
 
       const response = await fetch(`${API_BASE_URL}/api/YogaVideo/watch`, {
@@ -218,6 +227,7 @@ export default function Yoga() {
         throw new Error("Failed to record watch time");
       }
 
+      console.log(`Sent watch time: ${videoId}, ${totalSeconds}s`); // Debug: Log sent data
       toast.success("Watch time recorded!");
       await fetchTotals(); // Refresh totals after recording watch time
     } catch (error: any) {
@@ -612,7 +622,7 @@ export default function Yoga() {
       <div ref={powerSectionRef} className="scroll-mt-20"></div>
 
       {/* Tracking Panel */}
-      <TrackingPanel totals={totals} isLoading={isLoadingTotals} />
+      <TrackingPanel totals={totals} isLoading={isLoadingTotals} error={totalsError} />
 
       {/* Expanded Content Section */}
       {showMoreContent && (

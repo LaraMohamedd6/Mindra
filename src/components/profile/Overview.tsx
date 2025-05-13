@@ -223,6 +223,11 @@ export default function Overview({ activityData, journalData }: OverviewProps) {
     ? Math.min(Math.round((weeklyYoga / 3) * 100), 100)
     : 0;
 
+  // Sort moodHistory for chart (oldest to newest)
+  const sortedMoodHistory = [...moodHistory].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <motion.div
@@ -249,7 +254,7 @@ export default function Overview({ activityData, journalData }: OverviewProps) {
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
-                    data={moodHistory.map((entry) => ({
+                    data={sortedMoodHistory.map((entry) => ({
                       date: format(new Date(entry.date), "MMM dd"),
                       value: entry.value,
                       mood: entry.mood,
