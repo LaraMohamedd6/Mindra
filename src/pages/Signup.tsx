@@ -175,8 +175,8 @@ export default function Signup() {
       newErrors.age = "Age is required";
     } else if (isNaN(Number(formData.age))) {
       newErrors.age = "Age must be a number";
-    } else if (Number(formData.age) < 10) {
-      newErrors.age = "You must be at least 10 years old";
+    } else if (Number(formData.age) < 13) {
+      newErrors.age = "You must be at least 13 years old";
     } else if (Number(formData.age) > 120) {
       newErrors.age = "Please enter a valid age";
     }
@@ -403,6 +403,11 @@ export default function Signup() {
     </div>
   );
 
+
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'https://localhost:7223/api/account/google-login';
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-zenMint/10 to-white p-4">
       <div className="w-full max-w-md">
@@ -528,7 +533,7 @@ export default function Signup() {
                           }));
                           if (errors.age) setErrors((prev) => ({ ...prev, age: "" }));
                         }}
-                        min="10"
+                        min="13"
                         className={`pl-10 ${
                           errors.age ? "border-red-500" : "border-gray-300"
                         }`}
@@ -786,6 +791,8 @@ export default function Signup() {
                       <Button
                         variant="outline"
                         className="flex items-center justify-center gap-2"
+                        onClick={handleGoogleLogin}
+                        disabled={isLoading}
                       >
                         <svg
                           className="h-5 w-5 text-[#4285F4]"

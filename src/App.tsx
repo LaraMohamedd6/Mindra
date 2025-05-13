@@ -29,6 +29,8 @@ import { VerifyEmailPage } from "./pages/VerifyEmailPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { VerifyResetCodePage } from "./pages/VerifyResetCodePage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
+import CompleteProfile from "./pages/CompleteProfile";
+import AuthCallback from "./pages/AuthCallback";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +69,9 @@ const App = () => (
             />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/complete-profile" element={<CompleteProfile />} />
+            <Route path="/auth-callback" element={<AuthCallback />} />
+
           </Routes>
         </AnimatePresence>
       </BrowserRouter>
