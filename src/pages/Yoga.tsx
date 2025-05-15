@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import SectionHeading from "@/components/common/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Heart, UserCheck, Wind, Moon, Sun, Flame, Calendar, BookOpen, Zap, ArrowRight, ChevronDown, Leaf, Activity, Eye, Brain, RotateCw, X, Clock3 } from "lucide-react";
+import { Clock, UserCheck, Wind, Moon, Sun, Flame, Calendar, BookOpen, Zap, ArrowRight, ChevronDown, Leaf, Activity, Eye, Brain, RotateCw, X, Clock3 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import yogaBanner from "@/assets/images/yoga-banner.png";
@@ -30,7 +30,7 @@ const YogaTipModal = ({ tip, onClose }: { tip: any, onClose: () => void }) => {
         >
           <X className="h-6 w-6" />
         </button>
-        
+
         <div className="flex items-start mb-4">
           <div className={`w-14 h-14 ${tip.iconBgClass} rounded-xl flex items-center justify-center mr-4 shadow-md`}>
             {tip.icon}
@@ -42,10 +42,10 @@ const YogaTipModal = ({ tip, onClose }: { tip: any, onClose: () => void }) => {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-4">
           <p className="text-gray-700">{tip.fullDescription}</p>
-          
+
           <div className="bg-white/80 rounded-lg p-4">
             <h4 className="font-medium mb-2 text-gray-800">How to practice:</h4>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
@@ -54,7 +54,7 @@ const YogaTipModal = ({ tip, onClose }: { tip: any, onClose: () => void }) => {
               ))}
             </ul>
           </div>
-          
+
           {tip.videoId && (
             <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mt-4">
               <iframe
@@ -121,7 +121,6 @@ const TrackingPanel = ({ totals, isLoading, error }: { totals: { daily: number, 
 };
 
 export default function Yoga() {
-  const [savedClasses, setSavedClasses] = useState<number[]>([]);
   const [selectedPose, setSelectedPose] = useState<any>(null);
   const [showMoreContent, setShowMoreContent] = useState(false);
   const [selectedTip, setSelectedTip] = useState<any>(null);
@@ -186,7 +185,7 @@ export default function Yoga() {
       }
 
       const data = await response.json();
-      console.log("GET /api/YogaVideo/totals response:", data); // Debug: Log API response
+      console.log("GET /api/YogaVideo/totals response:", data);
       if (!data || typeof data.dailyTotalHours !== 'number' || typeof data.weeklyTotalHours !== 'number' || typeof data.monthlyTotalHours !== 'number') {
         throw new Error("Invalid totals data received from server");
       }
@@ -227,9 +226,9 @@ export default function Yoga() {
         throw new Error("Failed to record watch time");
       }
 
-      console.log(`Sent watch time: ${videoId}, ${totalSeconds}s`); // Debug: Log sent data
+      console.log(`Sent watch time: ${videoId}, ${totalSeconds}s`);
       toast.success("Watch time recorded!");
-      await fetchTotals(); // Refresh totals after recording watch time
+      await fetchTotals();
     } catch (error: any) {
       console.error("Error sending watch time:", error);
       toast.error("Failed to record watch time.");
@@ -259,7 +258,7 @@ export default function Yoga() {
               const elapsed = (Date.now() - watchTimeRefs.current[playerId].startTime) / 1000;
               watchTimeRefs.current[playerId].totalSeconds += elapsed;
               sendWatchTime(videoId, Math.round(watchTimeRefs.current[playerId].totalSeconds));
-              watchTimeRefs.current[playerId].totalSeconds = 0; // Reset after sending
+              watchTimeRefs.current[playerId].totalSeconds = 0;
             }
           }
         },
@@ -267,23 +266,13 @@ export default function Yoga() {
     });
   };
 
-  const toggleSaveClass = (id: number) => {
-    if (savedClasses.includes(id)) {
-      setSavedClasses(savedClasses.filter(classId => classId !== id));
-      toast.info("Removed from saved classes");
-    } else {
-      setSavedClasses([...savedClasses, id]);
-      toast.success("Added to saved classes");
-    }
-  };
-
   const handleLearnMoreClick = () => {
     const newShowState = !showMoreContent;
     setShowMoreContent(newShowState);
-    
+
     if (newShowState && powerSectionRef.current) {
       setTimeout(() => {
-        powerSectionRef.current?.scrollIntoView({ 
+        powerSectionRef.current?.scrollIntoView({
           behavior: 'smooth',
           block: 'start'
         });
@@ -579,44 +568,43 @@ export default function Yoga() {
 
   return (
     <Layout>
-      {/* Hero Banner */}
-      <div className="relative h-[500px] md:h-[800px] overflow-hidden">
-        <div className="absolute inset-0">
+      {/* Yoga Banner - Matching Meditation Banner Design */}
+      <section className="relative h-[600px] py-16 bg-gradient-to-br from-zenLightBlue/30 to-white/30 overflow-hidden rounded-b-[40px]">
+        <div className="absolute inset-0 z-0 h-full w-full">
           <img
             src={yogaBanner}
             alt="Woman doing yoga outdoors"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover blur-[2px] brightness-90 scale-110"
             loading="eager"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         </div>
-
-        <div className="relative z-10 h-full flex items-end pb-16">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-zenLightBlue/40 to-white/30 z-0"></div>
+        <div className="container mx-auto px-4 relative z-10 h-full flex flex-col justify-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="container mx-auto px-4 text-white"
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-3xl mx-auto"
           >
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold mb-4">
+            <motion.h1 className="text-3xl md:text-5xl font-display font-bold mb-6 mt-20 text-white [text-shadow:_0_2px_8px_rgb(0_0_0_/_50%)]">
               Yoga & Wellness Journey
-            </h1>
-            <p className="text-lg md:text-xl lg:text-2xl mb-8 max-w-2xl">
-              Transform your body and mind with evidence-based yoga practices for all levels.
-            </p>
-            <div className="flex gap-4">
+            </motion.h1>
+            <motion.p className="text-xl md:text-2xl font-medium text-white/90 mb-8 [text-shadow:_0_1px_3px_rgb(0_0_0_/_40%)]">
+              Transform your body and mind with evidence-based yoga practices
+            </motion.p>
+            <motion.div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button
-                variant="outline"
-                className="bg-transparent border-white text-white hover:bg-white/10"
+                className="bg-zenBlue hover:bg-zenBlue/90 text-white px-8 py-6 text-lg font-semibold rounded-full shadow-lg transition-all hover:scale-105 flex items-center"
+                size="lg"
                 onClick={handleLearnMoreClick}
               >
-                {showMoreContent ? "Hide Details" : "Learn More"}
-                <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${showMoreContent ? "rotate-180" : ""}`} />
+                {showMoreContent ? "Hide Details" : "Start Your Journey"}
+                <ChevronDown className={`ml-2 h-5 w-5 transition-transform ${showMoreContent ? "rotate-180" : ""}`} />
               </Button>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
-      </div>
+      </section>
 
       {/* Scroll target div */}
       <div ref={powerSectionRef} className="scroll-mt-20"></div>
@@ -748,17 +736,6 @@ export default function Yoga() {
                         </span>
                       ))}
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`p-0 ${savedClasses.includes(yogaClass.id) ? "text-zenPink" : "text-gray-400"}`}
-                      onClick={() => toggleSaveClass(yogaClass.id)}
-                    >
-                      <Heart className="h-4 w-4 mr-1" fill={savedClasses.includes(yogaClass.id) ? "#E69EA2" : "none"} />
-                      {savedClasses.includes(yogaClass.id) ? "Saved" : "Save"}
-                    </Button>
                   </div>
                 </div>
               </motion.div>
@@ -946,7 +923,7 @@ export default function Yoga() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {studentYogaTips.map((tip) => (
-              <motion.div 
+              <motion.div
                 key={tip.id}
                 whileHover={{ y: -8, scale: 1.02 }}
                 className={`rounded-2xl p-6 shadow-lg border ${tip.borderClass} relative overflow-hidden cursor-pointer ${tip.bgClass}`}
@@ -970,9 +947,9 @@ export default function Yoga() {
 
         {/* Modal for showing tip details */}
         {selectedTip && (
-          <YogaTipModal 
-            tip={selectedTip} 
-            onClose={() => setSelectedTip(null)} 
+          <YogaTipModal
+            tip={selectedTip}
+            onClose={() => setSelectedTip(null)}
           />
         )}
       </section>

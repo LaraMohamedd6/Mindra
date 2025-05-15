@@ -28,7 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import fitnessbanner from "@/assets/images/fitness.png";
-
+import busyStudentImg from '../assets/images/busy_student.webp';
 const colors = {
   lightPink: "#F8E8E9",
   coral: "#E69EA2",
@@ -74,8 +74,8 @@ const WorkoutCard = ({ title, level, duration, calories, equipment, image, benef
           <Badge
             variant="outline"
             className={`absolute top-2 left-2 ${level === "Beginner" ? "border-[#7CAE9E] text-[#7CAE9E]" :
-                level === "Intermediate" ? "border-[#FEC0B3] text-[#FEC0B3]" :
-                  "border-[#E69EA2] text-[#E69EA2]"
+              level === "Intermediate" ? "border-[#FEC0B3] text-[#FEC0B3]" :
+                "border-[#E69EA2] text-[#E69EA2]"
               }`}
           >
             {level}
@@ -205,9 +205,6 @@ const WorkoutCard = ({ title, level, duration, calories, equipment, image, benef
               <Button variant="outline" onClick={() => setShowModal(false)}>
                 Close
               </Button>
-              <Button className="bg-[#E69EA2] hover:bg-[#E69EA2]/90 text-white">
-                Start Workout
-              </Button>
             </div>
           </motion.div>
         </div>
@@ -268,7 +265,7 @@ const Fitness = () => {
 
   useEffect(() => {
     const quoteInterval = setInterval(() => {
-      setCurrentQuoteIndex((prev) => 
+      setCurrentQuoteIndex((prev) =>
         prev === motivationalQuotes.length - 1 ? 0 : prev + 1
       );
     }, 8000); // Change quote every 8 seconds
@@ -319,130 +316,70 @@ const Fitness = () => {
   };
 
   const workouts = {
-    all: [
-      {
-        title: "Full Body HIIT",
-        level: "Intermediate",
-        duration: "30 min",
-        calories: "300-400 cal",
-        equipment: ["None", "Mat"],
-        image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8aGlpdCUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Total body workout", "Improves cardiovascular health", "Burns calories efficiently"],
-        videoId: "UBMk30rjy0o"
-      },
-      {
-        title: "Home Strength",
-        level: "Beginner",
-        duration: "20 min",
-        calories: "150-200 cal",
-        equipment: ["Resistance Band", "Chair"],
-        image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8d29ya291dCUyMGRvcm18ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["No special equipment needed", "Perfect for limited space", "Builds basic strength"],
-        videoId: "6eiQiIogJUQ"
-      },
-      {
-        title: "Study Break Stretches",
-        level: "Beginner",
-        duration: "10 min",
-        calories: "50-80 cal",
-        equipment: ["None", "Mat (optional)"],
-        image: "https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3RyZXRjaGluZ3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Relieves tension from sitting", "Improves flexibility", "Enhances focus for studying"],
-        videoId: "sTANio_2E0Q"
-      },
-      {
-        title: "Bodyweight Strength",
-        level: "Intermediate",
-        duration: "45 min",
-        calories: "350-450 cal",
-        equipment: ["Pull-up Bar", "Mat"],
-        image: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9keXdlaWdodCUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Builds functional strength", "Improves posture", "Increases muscle endurance"],
-        videoId: "jHyybVrnq7I"
-      },
-      {
-        title: "Stress Relief Cardio",
-        level: "All Levels",
-        duration: "25 min",
-        calories: "200-300 cal",
-        equipment: ["None"],
-        image: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8Y2FyZGlvJTIwd29ya291dHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Releases endorphins", "Reduces stress hormones", "Improves mood and energy"],
-        videoId: "ml6cT4AZdqI"
-      },
-      {
-        title: "Morning Energy Boost",
-        level: "Beginner",
-        duration: "15 min",
-        calories: "100-150 cal",
-        equipment: ["None"],
-        image: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9ybmluZyUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Wakes up the body", "Boosts metabolism", "Improves focus for morning classes"],
-        videoId: "Ao9dYr1jf8A"
-      }
-    ],
+    all: [],
+
     cardio: [
       {
-        title: "Stress Relief Cardio",
-        level: "All Levels",
-        duration: "25 min",
+        title: "Low Impact Cardio Workout",
+        level: "Beginner",
+        duration: "30 min",
         calories: "200-300 cal",
         equipment: ["None"],
-        image: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8Y2FyZGlvJTIwd29ya291dHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Releases endorphins", "Reduces stress hormones", "Improves mood and energy"],
+        image: "src/assets/images/cardio1.avif",
+        benefits: ["Improves heart health", "Low joint impact", "Boosts stamina"],
         videoId: "ml6cT4AZdqI"
       },
       {
-        title: "Morning Energy Boost",
-        level: "Beginner",
-        duration: "15 min",
-        calories: "100-150 cal",
-        equipment: ["None"],
-        image: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9ybmluZyUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Wakes up the body", "Boosts metabolism", "Improves focus for morning classes"],
-        videoId: "Ao9dYr1jf8A"
-      },
-      {
-        title: "Full Body HIIT",
+        title: "Fat-Burning HIIT Cardio",
         level: "Intermediate",
         duration: "30 min",
+        calories: "400-500 cal",
+        equipment: ["None"],
+        image: "src/assets/images/cardio2.avif",
+        benefits: ["Wakes up the body", "Boosts metabolism", "Improves focus for morning classes"],
+        videoId: "u8VeAlzCA8s"
+      },
+      {
+        title: "Full Body Cardio Workout",
+        level: "All Levels",
+        duration: "20 min",
         calories: "300-400 cal",
-        equipment: ["None", "Mat"],
-        image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8aGlpdCUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
+        equipment: ["None"],
+        image: "src/assets/images/cardio3.jpg",
         benefits: ["Total body workout", "Improves cardiovascular health", "Burns calories efficiently"],
         videoId: "UBMk30rjy0o"
       }
     ],
     strength: [
       {
-        title: "Home Strength",
+        title: "Strength Training (Bodyweight)",
         level: "Beginner",
-        duration: "20 min",
+        duration: "10 min",
         calories: "150-200 cal",
         equipment: ["Resistance Band", "Chair"],
-        image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8d29ya291dCUyMGRvcm18ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["No special equipment needed", "Perfect for limited space", "Builds basic strength"],
-        videoId: "6eiQiIogJUQ"
+        image: "src/assets/images/strength1.jpg",
+        benefits: ["Builds basic strength", "Improves stability"],
+        videoId: "30PqX2zvK88"
       },
       {
-        title: "Bodyweight Strength",
+        title: "Dumbbell Strength Workout",
         level: "Intermediate",
-        duration: "45 min",
+        duration: "15 min",
         calories: "350-450 cal",
-        equipment: ["Pull-up Bar", "Mat"],
-        image: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9keXdlaWdodCUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Builds functional strength", "Improves posture", "Increases muscle endurance"],
-        videoId: "jHyybVrnq7I"
+        equipment: ["Dumbbells"],
+        image: "src/assets/images/strength2.jpg",
+        benefits: ["Enhances muscle tone", "Increases power", "Core activation"],
+        videoId: "xqVBoyKXbsA"
       },
       {
-        title: "Upper Body Strength",
-        level: "Intermediate",
-        duration: "25 min",
-        calories: "200-300 cal",
-        equipment: ["Dumbbells", "Mat"],
-        image: "https://images.unsplash.com/photo-1571019614243-cf8a803d947c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8dXBwZXIlMjBib2R5JTIwd29ya291dHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Builds arm and shoulder strength", "Improves posture", "Enhances upper body endurance"],
-        videoId: "3p8ebBZqM_0"
+        title: "Full Body Strength Training",
+        level: "All Levels",
+        duration: "30 min",
+        calories: "400-500 cal",
+        equipment: ["None"],
+        image: "src/assets/images/strength3.webp",
+        benefits: ["Total body workout", "No gear needed", "Good for home"],
+        videoId: "9FBIaqr7TjQ"
       }
     ],
     flexibility: [
@@ -451,33 +388,37 @@ const Fitness = () => {
         level: "Beginner",
         duration: "10 min",
         calories: "50-80 cal",
-        equipment: ["None", "Mat (optional)"],
-        image: "https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3RyZXRjaGluZ3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+        equipment: ["Chair"],
+        image: "src/assets/images/flexibility1.jpeg",
         benefits: ["Relieves tension from sitting", "Improves flexibility", "Enhances focus for studying"],
-        videoId: "sTANio_2E0Q"
+        videoId: "LnCQ-MECZSw"
+      },
+      {
+        title: "Daily Stretch",
+        level: "Intermediate",
+        duration: "12 min",
+        calories: "100-150 cal",
+        equipment: ["Mat"],
+        image: "src/assets/images/flexibility2.jpeg",
+        benefits: ["Deep stretches", "Posture improvement", "Mind-body balance"],
+        videoId: "itJE4neqDJw"
       },
       {
         title: "Full Body Stretch",
-        level: "Beginner",
+        level: "All Levels",
         duration: "15 min",
-        calories: "60-100 cal",
-        equipment: ["Mat"],
-        image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3RyZXRjaGluZyUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Improves overall flexibility", "Reduces muscle tension", "Enhances mobility"],
-        videoId: "g_tea8ZNk5A"
-      },
-      {
-        title: "Yoga for Flexibility",
-        level: "Intermediate",
-        duration: "30 min",
         calories: "150-200 cal",
-        equipment: ["Yoga Mat"],
-        image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8eW9nYSUyMHN0cmV0Y2h8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
-        benefits: ["Deep stretches for all muscle groups", "Improves balance and posture", "Reduces stress"],
-        videoId: "Eml2xnoLpYE"
+        equipment: ["Mat (Optional)"],
+        image: "src/assets/images/flexibility3.jpeg",
+        benefits: ["Great for recovery", "Full-body flexibility", "Reduces muscle tension"],
+        videoId: "i6TzP2COtow"
       }
     ]
   };
+
+  // Merge all workouts into 'all'
+  workouts.all = [...workouts.cardio, ...workouts.strength, ...workouts.flexibility];
+
 
   const stressReliefExercises = [
     {
@@ -550,36 +491,36 @@ const Fitness = () => {
         {showQuotesModal && (
           <>
             {/* Overlay that allows clicking through to the page */}
-            <div 
+            <div
               className="fixed inset-0 z-40"
               onClick={() => setShowQuotesModal(false)}
               style={{ pointerEvents: 'auto' }}
             />
-            
+
             {/* Actual modal positioned near the bubble */}
             <motion.div
-              initial={{ 
+              initial={{
                 opacity: 0,
                 scale: 0.8,
                 x: 20,
                 y: 20
               }}
-              animate={{ 
+              animate={{
                 opacity: 1,
                 scale: 1,
                 x: 80,
                 y: 0
               }}
-              exit={{ 
+              exit={{
                 opacity: 0,
                 scale: 0.8,
                 x: 20,
                 y: 20
               }}
-              transition={{ 
-                type: "spring", 
-                damping: 25, 
-                stiffness: 300 
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 300
               }}
               className="fixed top-4 left-4 z-50 w-80 bg-white rounded-xl shadow-2xl overflow-hidden"
               style={{
@@ -599,7 +540,7 @@ const Fitness = () => {
                     <Quote className="h-5 w-5 text-[#7CAE9E]" />
                   </div>
                 </div>
-                
+
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentQuoteIndex}
@@ -623,9 +564,8 @@ const Fitness = () => {
                     <button
                       key={index}
                       onClick={() => setCurrentQuoteIndex(index)}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        index === currentQuoteIndex ? 'bg-[#7CAE9E] scale-125' : 'bg-gray-300'
-                      }`}
+                      className={`w-2 h-2 rounded-full transition-all ${index === currentQuoteIndex ? 'bg-[#7CAE9E] scale-125' : 'bg-gray-300'
+                        }`}
                       aria-label={`Go to quote ${index + 1}`}
                     />
                   ))}
@@ -639,14 +579,14 @@ const Fitness = () => {
       </AnimatePresence>
 
       {/* Banner with Image */}
-      <div className="relative h-[500px] md:h-[900px] overflow-hidden">
+      <div className="relative h-[500px] md:h-[600px] overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={fitnessbanner}
             alt="Fitness Banner"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover blur-[2px]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30"></div>
+          <div className="absolute inset-0"></div>
         </div>
         <div className="relative z-10 h-full flex items-center">
           <div className="container mx-auto px-6 md:px-12 lg:px-24">
@@ -657,8 +597,8 @@ const Fitness = () => {
               <p className="text-lg md:text-xl text-white/90 mb-8 max-w-lg">
                 Optimize your health with personalized workouts designed for your busy schedule
               </p>
-              <Button 
-                className="bg-[#7CAE9E] hover:bg-[#6B9D8D] text-white px-8 py-6 text-lg"
+              <Button
+                className="bg-[#7CAE9E] hover:bg-[#6B9D8D] text-white px-8 py-6 text-lg rounded-full"
                 onClick={scrollToSchedule}
               >
                 Get Started <ChevronRight size={20} className="ml-2" />
@@ -690,7 +630,7 @@ const Fitness = () => {
               </Button>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
             <div className="grid grid-cols-7 gap-0.5 bg-gray-100">
               {days.map((day, i) => {
@@ -704,22 +644,20 @@ const Fitness = () => {
                   >
                     <div className="flex flex-col items-center h-full">
                       <span className="text-sm font-medium text-[#4A5568] mb-2">{day}</span>
-                      <div className={`rounded-full h-12 w-12 flex items-center justify-center mb-3 ${
-                        schedule?.type === "Cardio" ? "bg-[#E69EA2] text-white" :
+                      <div className={`rounded-full h-12 w-12 flex items-center justify-center mb-3 ${schedule?.type === "Cardio" ? "bg-[#E69EA2] text-white" :
                         schedule?.type === "Strength" ? "bg-[#FEC0B3] text-white" :
-                        schedule?.type === "Flexibility" ? "bg-[#7CAE9E] text-white" :
-                        schedule?.type === "HIIT" ? "bg-[#2D7D7D] text-white" :
-                        "bg-gray-200 text-gray-500"
-                      }`}>
+                          schedule?.type === "Flexibility" ? "bg-[#7CAE9E] text-white" :
+                            schedule?.type === "HIIT" ? "bg-[#2D7D7D] text-white" :
+                              "bg-gray-200 text-gray-500"
+                        }`}>
                         {schedule?.type === "Cardio" ? <Heart size={20} /> :
                           schedule?.type === "Strength" ? <Dumbbell size={20} /> :
                             schedule?.type === "Flexibility" ? <Activity size={20} /> :
                               schedule?.type === "HIIT" ? <Timer size={20} /> :
                                 <FilterX size={20} />}
                       </div>
-                      <span className={`text-sm font-medium ${
-                        isCompleted ? "text-[#7CAE9E]" : "text-[#4A5568]"
-                      }`}>
+                      <span className={`text-sm font-medium ${isCompleted ? "text-[#7CAE9E]" : "text-[#4A5568]"
+                        }`}>
                         {schedule?.type || 'Rest'}
                       </span>
                       <div className="mt-3">
@@ -740,7 +678,7 @@ const Fitness = () => {
             </div>
           </div>
         </div>
-       
+
         {/* Schedule Workout Modal */}
         {showScheduleModal && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -974,15 +912,16 @@ const Fitness = () => {
                 ].map((item, index) => (
                   <div key={index} className="flex items-start">
                     <Check className="h-5 w-5 mr-2 mt-0.5 text-[#7CAE9E]" />
-                    <span>{item}</span>
+                    <span className="text-lg">{item}</span>  {/* Added text-lg here */}
                   </div>
                 ))}
               </div>
+
             </div>
             <div className="bg-white rounded-lg overflow-hidden shadow-md border border-[#CFECE0]">
               <AspectRatio ratio={16 / 9}>
                 <img
-                  src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW9ybmluZyUyMHdvcmtvdXR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60"
+                  src={busyStudentImg}
                   alt="Student workout"
                   className="object-cover w-full h-full"
                 />

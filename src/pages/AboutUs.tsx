@@ -6,55 +6,27 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Heart, Star, Book, Award, Users, CheckCircle, Globe, Clock, Lightbulb } from "lucide-react";
 import SectionHeading from "@/components/common/SectionHeading";
 import QuoteCard from "@/components/common/QuoteCard";
+import partner1Logo from '../assets/images/harvard.png';
+import partner2Logo from '../assets/images/world_health_organization.png';
+import partner3Logo from '../assets/images/National_Institute_of_Mental_Health.jpeg';
+import partner4Logo from '../assets/images/Mind_Mental_Health_Charity.jpeg';
+import ourStoryImg from '../assets/images/our_story.avif';
 
-const teamMembers = [
+const studentExperiences = [
   {
-    name: "Dr. Sarah Chen",
-    role: "Founder & Mental Health Director",
-    avatar: "https://i.pravatar.cc/150?img=1",
-    bio: "PhD in Clinical Psychology with 15 years of experience in student mental health services."
-  },
-  {
-    name: "Michael Rodriguez",
-    role: "Meditation Instructor",
-    avatar: "https://i.pravatar.cc/150?img=3",
-    bio: "Certified mindfulness coach with expertise in helping students manage academic stress."
-  },
-  {
-    name: "Aisha Johnson",
-    role: "Wellness Program Manager",
-    avatar: "https://i.pravatar.cc/150?img=5",
-    bio: "Master's in Health Education focused on developing accessible wellness programs for diverse student populations."
-  },
-  {
-    name: "David Park",
-    role: "Technology Lead",
-    avatar: "https://i.pravatar.cc/150?img=8",
-    bio: "Software engineer with a passion for creating digital tools that make mental wellness accessible."
-  }
-];
-
-const testimonials = [
-  {
-    text: "ZenZone Connect has completely changed how I handle stress during exam periods. The guided meditations and breathing exercises are exactly what I needed.",
-    author: "Jamie L., Psychology Student"
+    text: "Mindra has completely changed how I handle stress during exam periods. The guided meditations and breathing exercises are exactly what I needed.",
+    author: "Amr, Psychology Student"
   },
   {
     text: "As someone dealing with anxiety throughout my college years, having a platform that offers both emergency resources and daily wellness tools has been invaluable.",
-    author: "Raj P., Engineering Graduate"
+    author: "Malak, Engineering Graduate"
   },
   {
     text: "The mood tracking feature helped me identify patterns in my mental health that I never noticed before. Now I can be proactive about my wellbeing.",
-    author: "Taylor M., Business Student"
+    author: "Mohamed, Business Student"
   }
 ];
 
-const impactStats = [
-  { value: "50,000+", label: "Students Supported" },
-  { value: "200+", label: "Campus Partners" },
-  { value: "87%", label: "Report Stress Reduction" },
-  { value: "92%", label: "Would Recommend" }
-];
 
 const values = [
   {
@@ -81,36 +53,33 @@ const values = [
 
 const timeline = [
   {
-    year: "2018",
-    title: "The Idea",
-    description: "ZenZone begins as a research project at Cambridge University exploring digital interventions for student mental health."
-  },
-  {
-    year: "2019",
-    title: "First Launch",
-    description: "Initial version launches at 5 pilot universities, offering basic meditation and stress-management tools."
-  },
-  {
-    year: "2020",
-    title: "Pandemic Response",
-    description: "Rapidly expanded remote support features to address increased student mental health needs during global lockdowns."
-  },
-  {
-    year: "2021",
-    title: "Major Expansion",
-    description: "Added comprehensive mood tracking, journaling features, and emergency support resources."
-  },
-  {
-    year: "2022",
-    title: "Global Reach",
-    description: "Expanded to support students across 12 countries and integrated with university counseling services."
-  },
-  {
     year: "2023",
-    title: "Today",
-    description: "Continuing to innovate with AI-assisted support, community features, and customized wellness journeys."
+    title: "The Beginning",
+    description: "Mindra was born out of a university project to address the rising mental health concerns among students in an accessible and non-judgmental way."
+  },
+  {
+    year: "Early 2024",
+    title: "From Idea to Platform",
+    description: "Our team combined tech skills with mental health research to build a functional platform that includes tools like self-assessment, guided meditations, and wellness content."
+  },
+  {
+    year: "2025",
+    title: "Mindra Goes Public",
+    description: "After testing and refinement, we launched Mindra to the public—offering free, easy-to-use mental wellness tools tailored for students."
+  },
+  {
+    year: "Future",
+    title: "Expanding Beyond Campus",
+    description: "Our vision is to make Mindra a nationwide support platform for all youth—partnering with universities, NGOs, and health organizations."
+  },
+  {
+    year: "Beyond",
+    title: "Changing the Narrative",
+    description: "Mindra aims to lead a global shift in how mental health is approached—by promoting early support, reducing stigma, and building a supportive online community for everyone."
   }
 ];
+
+
 
 export default function AboutUs() {
   return (
@@ -127,7 +96,7 @@ export default function AboutUs() {
               Our Mission: Student Mental Wellness
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-8">
-              ZenZone Connect was created with one goal: to make mental wellness accessible, 
+              Mindra was created with one goal: to make mental wellness accessible,
               approachable, and effective for every student, everywhere.
             </p>
             <div className="flex justify-center">
@@ -147,38 +116,39 @@ export default function AboutUs() {
           transition={{ delay: 0.2 }}
           className="mb-20"
         >
-          <SectionHeading 
-            title="Our Story" 
-            subtitle="How ZenZone Connect came to be"
+          <SectionHeading
+            title="Our Story"
+            subtitle="How Mindra came to be"
             centered={true}
             className="mb-12"
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div className="rounded-xl overflow-hidden shadow-lg">
-              <img 
-                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80" 
-                alt="Students collaborating" 
+              <img
+                src={ourStoryImg}
+                alt="Team working on Mindra project"
                 className="w-full h-auto"
               />
             </div>
-            
-            <div className="space-y-6">
+
+            <div className="space-y-6 text-xl text-gray-700">
               <p className="text-gray-700">
-                ZenZone Connect began in 2018 when Dr. Sarah Chen, then a clinical psychologist at the University Counseling Center, recognized a critical gap in mental health support for students.
+                Mindra began as a graduation project by a group of computer scienece students passionate about mental health awareness.
               </p>
               <p className="text-gray-700">
-                Despite the increasing rates of anxiety, depression, and burnout among college students, many weren't seeking help due to stigma, lack of time, or limited access to resources.
+                During university, we noticed that many students silently struggled with stress, anxiety, and burnout — yet existing support systems were often inaccessible or intimidating.
               </p>
               <p className="text-gray-700">
-                Drawing from her experience and research in digital mental health interventions, Dr. Chen assembled a team of mental health professionals, educators, and technology experts to create a comprehensive digital wellness platform specifically designed for students.
+                We combined our technical skills with mental health research to build an accessible web platform that offers mood tracking, guided meditations, wellness content, and anonymous support—all tailored for students.
               </p>
               <p className="text-gray-700">
-                Today, ZenZone Connect serves over 50,000 students across 200+ campuses, providing evidence-based tools for stress management, emotional regulation, and crisis support—all in a format that fits into students' busy lives.
+                What started as a classroom idea turned into a mission: to help students prioritize their mental well-being in a way that's simple, supportive, and stigma-free.
               </p>
             </div>
           </div>
         </motion.div>
+
 
         {/* Timeline Section */}
         <motion.div
@@ -188,13 +158,13 @@ export default function AboutUs() {
           transition={{ delay: 0.3 }}
           className="mb-20"
         >
-          <SectionHeading 
-            title="Our Journey" 
-            subtitle="The evolution of ZenZone Connect"
+          <SectionHeading
+            title="Our Journey"
+            subtitle="The journey of building Mindra"
             centered={true}
             className="mb-12"
           />
-          
+
           <div className="relative border-l-2 border-zenSeafoam ml-4 md:ml-0 md:mx-auto md:max-w-3xl">
             {timeline.map((item, idx) => (
               <motion.div
@@ -209,16 +179,22 @@ export default function AboutUs() {
                   <h3 className="text-xl font-bold text-gray-900 mb-1">{item.title}</h3>
                   <p className="text-gray-700">{item.description}</p>
                 </div>
-                
-                <div className="bg-zenSeafoam rounded-full h-10 w-10 flex items-center justify-center absolute -left-5 md:static md:justify-self-center text-white font-medium">
+
+                <div className="bg-zenSeafoam rounded-full h-10 w-10 flex items-center justify-center 
+  absolute -left-8 top-0 
+  md:static md:row-start-1 md:col-start-2 md:justify-self-center
+  text-black font-semibold text-[11px] leading-tight text-center px-1 z-10">
                   {item.year}
                 </div>
-                
+
+
+
                 {idx % 2 === 0 ? <div></div> : null}
               </motion.div>
             ))}
           </div>
         </motion.div>
+
 
         {/* Values Section */}
         <motion.div
@@ -228,13 +204,13 @@ export default function AboutUs() {
           transition={{ delay: 0.2 }}
           className="mb-20"
         >
-          <SectionHeading 
-            title="Our Values" 
+          <SectionHeading
+            title="Our Values"
             subtitle="The principles that guide our work"
             centered={true}
             className="mb-12"
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value, idx) => (
               <motion.div
@@ -260,37 +236,7 @@ export default function AboutUs() {
           </div>
         </motion.div>
 
-        {/* Impact Stats */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="py-16 bg-gradient-to-r from-zenSeafoam/20 to-zenMint/20 rounded-2xl mb-20"
-        >
-          <SectionHeading 
-            title="Our Impact" 
-            centered={true}
-            className="mb-12"
-          />
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            {impactStats.map((stat, idx) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="text-center"
-              >
-                <p className="text-3xl md:text-4xl font-bold text-zenSage mb-2">{stat.value}</p>
-                <p className="text-gray-600">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Team Section */}
+        {/* Student Experiences Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -298,52 +244,15 @@ export default function AboutUs() {
           transition={{ delay: 0.2 }}
           className="mb-20"
         >
-          <SectionHeading 
-            title="Meet Our Team" 
-            subtitle="The people behind ZenZone Connect"
+          <SectionHeading
+            title="Student Experiences"
+            subtitle="Hear how Mindra is supporting students"
             centered={true}
             className="mb-12"
           />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {teamMembers.map((member, idx) => (
-              <motion.div
-                key={member.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="text-center"
-              >
-                <Avatar className="h-32 w-32 mx-auto mb-4">
-                  <AvatarImage src={member.avatar} alt={member.name} />
-                  <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <h3 className="text-xl font-semibold">{member.name}</h3>
-                <p className="text-zenPink mb-2">{member.role}</p>
-                <p className="text-gray-600">{member.bio}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
 
-        {/* Testimonials Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="mb-20"
-        >
-          <SectionHeading 
-            title="Student Testimonials" 
-            subtitle="Hear from those we've helped"
-            centered={true}
-            className="mb-12"
-          />
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, idx) => (
+            {studentExperiences.map((experience, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 20 }}
@@ -351,9 +260,9 @@ export default function AboutUs() {
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
               >
-                <QuoteCard 
-                  text={testimonial.text} 
-                  author={testimonial.author}
+                <QuoteCard
+                  text={experience.text}
+                  author={experience.author}
                 />
               </motion.div>
             ))}
@@ -368,75 +277,26 @@ export default function AboutUs() {
           transition={{ delay: 0.2 }}
           className="mb-20"
         >
-          <SectionHeading 
-            title="Our Partners" 
+          <SectionHeading
+            title="Our Partners"
             subtitle="Organizations we collaborate with"
             centered={true}
             className="mb-12"
           />
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
             <div className="p-6 grayscale hover:grayscale-0 transition-all">
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Harvard_shield_wreath.svg/1200px-Harvard_shield_wreath.svg.png" 
-                alt="Harvard University" 
-                className="h-16"
-              />
+              <img src={partner1Logo} alt="Harvard Medical School" className="h-16 object-contain" />
             </div>
             <div className="p-6 grayscale hover:grayscale-0 transition-all">
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/UCL_logo.svg/2560px-UCL_logo.svg.png" 
-                alt="University College London" 
-                className="h-16"
-              />
+              <img src={partner2Logo} alt="World Health Organization" className="h-16 object-contain" />
             </div>
             <div className="p-6 grayscale hover:grayscale-0 transition-all">
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Escudo_de_la_Universidad_Nacional_Aut%C3%B3noma_de_M%C3%A9xico.svg/1200px-Escudo_de_la_Universidad_Nacional_Aut%C3%B3noma_de_M%C3%A9xico.svg.png" 
-                alt="UNAM" 
-                className="h-16"
-              />
+              <img src={partner3Logo} alt="National Institute of Mental Health" className="h-16 object-contain" />
             </div>
             <div className="p-6 grayscale hover:grayscale-0 transition-all">
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/en/thumb/3/34/University_of_Tokyo_logo.svg/1200px-University_of_Tokyo_logo.svg.png" 
-                alt="University of Tokyo" 
-                className="h-16"
-              />
+              <img src={partner4Logo} alt="Mind Charity UK" className="h-16 object-contain" />
             </div>
-          </div>
-        </motion.div>
-
-        {/* Call to Action */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="text-center py-16 bg-gradient-to-r from-zenSeafoam to-zenMint rounded-2xl"
-        >
-          <h2 className="text-3xl md:text-4xl font-display font-semibold text-white mb-4">
-            Join Our Mission
-          </h2>
-          <p className="text-white/90 max-w-2xl mx-auto mb-8">
-            Whether you're a student looking for support, an institution seeking to enhance your wellness offerings, or a professional interested in joining our team, we'd love to connect.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <motion.a 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-white text-zenSage px-6 py-3 rounded-full font-medium"
-              href="/contact"
-            >
-              Contact Us
-            </motion.a>
-            <motion.a 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-zenSage text-white px-6 py-3 rounded-full font-medium"
-              href="/signup"
-            >
-              Sign Up Now
-            </motion.a>
           </div>
         </motion.div>
       </div>
