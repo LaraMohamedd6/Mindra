@@ -383,32 +383,32 @@ const Meditation = () => {
     {
       icon: <Leaf className="h-8 w-8" />,
       title: "Reduced Stress",
-      description: "Lowers cortisol levels",
+      description: "Meditation decreases cortisol levels, helping you manage stress more effectively.",
     },
     {
       icon: <Moon className="h-8 w-8" />,
       title: "Better Sleep",
-      description: "Improves sleep quality",
+      description: "Regular practice can improve sleep quality and help with insomnia.",
     },
     {
       icon: <Sun className="h-8 w-8" />,
       title: "Increased Focus",
-      description: "Enhances concentration",
+      description: "Enhances your ability to concentrate and maintain attention.",
     },
     {
       icon: <Activity className="h-8 w-8" />,
       title: "Emotional Health",
-      description: "Promotes wellbeing",
+      description: "Promotes emotional well-being and a more positive outlook on life.",
     },
     {
       icon: <Brain className="h-8 w-8" />,
       title: "Mental Clarity",
-      description: "Clears mental fog",
+      description: "Clears mental fog and improves decision-making abilities.",
     },
     {
       icon: <Smile className="h-8 w-8" />,
       title: "Self-Awareness",
-      description: "Deepens self-understanding",
+      description: "Helps you develop a stronger understanding of yourself.",
     },
   ];
 

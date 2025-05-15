@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import fitnessbanner from "@/assets/images/fitness.png";
+import fitnessbanner from "@/assets/images/fitbanner.jpg";
 
 const colors = {
   lightPink: "#F8E8E9",
@@ -74,8 +74,8 @@ const WorkoutCard = ({ title, level, duration, calories, equipment, image, benef
           <Badge
             variant="outline"
             className={`absolute top-2 left-2 ${level === "Beginner" ? "border-[#7CAE9E] text-[#7CAE9E]" :
-                level === "Intermediate" ? "border-[#FEC0B3] text-[#FEC0B3]" :
-                  "border-[#E69EA2] text-[#E69EA2]"
+              level === "Intermediate" ? "border-[#FEC0B3] text-[#FEC0B3]" :
+                "border-[#E69EA2] text-[#E69EA2]"
               }`}
           >
             {level}
@@ -268,7 +268,7 @@ const Fitness = () => {
 
   useEffect(() => {
     const quoteInterval = setInterval(() => {
-      setCurrentQuoteIndex((prev) => 
+      setCurrentQuoteIndex((prev) =>
         prev === motivationalQuotes.length - 1 ? 0 : prev + 1
       );
     }, 8000); // Change quote every 8 seconds
@@ -550,36 +550,36 @@ const Fitness = () => {
         {showQuotesModal && (
           <>
             {/* Overlay that allows clicking through to the page */}
-            <div 
+            <div
               className="fixed inset-0 z-40"
               onClick={() => setShowQuotesModal(false)}
               style={{ pointerEvents: 'auto' }}
             />
-            
+
             {/* Actual modal positioned near the bubble */}
             <motion.div
-              initial={{ 
+              initial={{
                 opacity: 0,
                 scale: 0.8,
                 x: 20,
                 y: 20
               }}
-              animate={{ 
+              animate={{
                 opacity: 1,
                 scale: 1,
                 x: 80,
                 y: 0
               }}
-              exit={{ 
+              exit={{
                 opacity: 0,
                 scale: 0.8,
                 x: 20,
                 y: 20
               }}
-              transition={{ 
-                type: "spring", 
-                damping: 25, 
-                stiffness: 300 
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 300
               }}
               className="fixed top-4 left-4 z-50 w-80 bg-white rounded-xl shadow-2xl overflow-hidden"
               style={{
@@ -599,7 +599,7 @@ const Fitness = () => {
                     <Quote className="h-5 w-5 text-[#7CAE9E]" />
                   </div>
                 </div>
-                
+
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentQuoteIndex}
@@ -623,9 +623,8 @@ const Fitness = () => {
                     <button
                       key={index}
                       onClick={() => setCurrentQuoteIndex(index)}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        index === currentQuoteIndex ? 'bg-[#7CAE9E] scale-125' : 'bg-gray-300'
-                      }`}
+                      className={`w-2 h-2 rounded-full transition-all ${index === currentQuoteIndex ? 'bg-[#7CAE9E] scale-125' : 'bg-gray-300'
+                        }`}
                       aria-label={`Go to quote ${index + 1}`}
                     />
                   ))}
@@ -639,14 +638,14 @@ const Fitness = () => {
       </AnimatePresence>
 
       {/* Banner with Image */}
-      <div className="relative h-[500px] md:h-[900px] overflow-hidden">
+      <div className="relative h-[500px] md:h-[600px] overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={fitnessbanner}
             alt="Fitness Banner"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover blur-[2px]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30"></div>
+          <div className="absolute inset-0"></div>
         </div>
         <div className="relative z-10 h-full flex items-center">
           <div className="container mx-auto px-6 md:px-12 lg:px-24">
@@ -657,8 +656,8 @@ const Fitness = () => {
               <p className="text-lg md:text-xl text-white/90 mb-8 max-w-lg">
                 Optimize your health with personalized workouts designed for your busy schedule
               </p>
-              <Button 
-                className="bg-[#7CAE9E] hover:bg-[#6B9D8D] text-white px-8 py-6 text-lg"
+              <Button
+                className="bg-[#7CAE9E] hover:bg-[#6B9D8D] text-white px-8 py-6 text-lg rounded-full"
                 onClick={scrollToSchedule}
               >
                 Get Started <ChevronRight size={20} className="ml-2" />
@@ -690,7 +689,7 @@ const Fitness = () => {
               </Button>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
             <div className="grid grid-cols-7 gap-0.5 bg-gray-100">
               {days.map((day, i) => {
@@ -704,22 +703,20 @@ const Fitness = () => {
                   >
                     <div className="flex flex-col items-center h-full">
                       <span className="text-sm font-medium text-[#4A5568] mb-2">{day}</span>
-                      <div className={`rounded-full h-12 w-12 flex items-center justify-center mb-3 ${
-                        schedule?.type === "Cardio" ? "bg-[#E69EA2] text-white" :
-                        schedule?.type === "Strength" ? "bg-[#FEC0B3] text-white" :
-                        schedule?.type === "Flexibility" ? "bg-[#7CAE9E] text-white" :
-                        schedule?.type === "HIIT" ? "bg-[#2D7D7D] text-white" :
-                        "bg-gray-200 text-gray-500"
-                      }`}>
+                      <div className={`rounded-full h-12 w-12 flex items-center justify-center mb-3 ${schedule?.type === "Cardio" ? "bg-[#E69EA2] text-white" :
+                          schedule?.type === "Strength" ? "bg-[#FEC0B3] text-white" :
+                            schedule?.type === "Flexibility" ? "bg-[#7CAE9E] text-white" :
+                              schedule?.type === "HIIT" ? "bg-[#2D7D7D] text-white" :
+                                "bg-gray-200 text-gray-500"
+                        }`}>
                         {schedule?.type === "Cardio" ? <Heart size={20} /> :
                           schedule?.type === "Strength" ? <Dumbbell size={20} /> :
                             schedule?.type === "Flexibility" ? <Activity size={20} /> :
                               schedule?.type === "HIIT" ? <Timer size={20} /> :
                                 <FilterX size={20} />}
                       </div>
-                      <span className={`text-sm font-medium ${
-                        isCompleted ? "text-[#7CAE9E]" : "text-[#4A5568]"
-                      }`}>
+                      <span className={`text-sm font-medium ${isCompleted ? "text-[#7CAE9E]" : "text-[#4A5568]"
+                        }`}>
                         {schedule?.type || 'Rest'}
                       </span>
                       <div className="mt-3">
@@ -740,7 +737,7 @@ const Fitness = () => {
             </div>
           </div>
         </div>
-       
+
         {/* Schedule Workout Modal */}
         {showScheduleModal && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">

@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Apple, Clock, Coffee, Moon, Sun, Brain, Calendar, CheckCircle2, MessageSquare, Leaf, Activity, HeartPulse, Laugh, Users, BookOpen, RefreshCw } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import lifestyleBanner from "@/assets/images/lifestyle.png";
+import lifestyleBanner from "@/assets/images/free.jpg";
 
 
 export default function Lifestyle() {
@@ -27,7 +27,7 @@ export default function Lifestyle() {
   // Save completed routines to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('completedRoutines', JSON.stringify(completedRoutines));
-    
+
     // Check if all routines are completed
     if (completedRoutines.length === dailyRoutineTips.length) {
       setShowCongrats(true);
@@ -259,17 +259,18 @@ export default function Lifestyle() {
 
   return (
     <Layout>
-      {/* Hero Section with Banner - Updated with center-left aligned text */}
+      {/* Hero Section with Left-Aligned Content */}
       <section className="relative">
-        <div className="relative h-[500px] md:h-[800px] overflow-hidden">
-          <img 
-            src={lifestyleBanner} 
-            alt="Healthy lifestyle" 
-            className="w-full h-full object-cover"
+        <div className="relative h-[500px] md:h-[600px] overflow-hidden">
+          <img
+            src={lifestyleBanner}
+            alt="Healthy lifestyle"
+            className="w-full h-full object-cover blur-[2px]"
           />
-          <div className="absolute inset-0 bg-black/80 flex items-center">
-            <div className="text-left px-8 md:px-16 max-w-2xl ml-[10%] md:ml-[15%]">
-              <motion.h1 
+          {/* Remove flex centering and use absolute positioning for left alignment */}
+          <div className="absolute inset-0 bg-black/30"> {/* Added overlay for better text readability */}
+            <div className="absolute top-1/2 transform -translate-y-1/2 px-8 md:px-16 max-w-2xl">
+              <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
@@ -277,22 +278,21 @@ export default function Lifestyle() {
               >
                 Balanced Lifestyle
               </motion.h1>
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-xl text-white mb-6"
               >
-                Practical strategies for holistic wellbeing in your daily life
+                Reclaim balance in our fast-paced world with evidence-based approaches to sleep, nutrition, movement, and mindfulness tailored for real, busy lives
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="flex justify-start"
               >
-                <Button 
-                  className="bg-zenSage hover:bg-zenSage/90 text-white text-lg py-6 px-8 rounded-xl"
+                <Button
+                  className="bg-zenSage hover:bg-zenSage/90 text-white text-lg py-6 px-8 rounded-full shadow-lg hover:scale-105 transition-transform"
                   onClick={scrollToRoutine}
                 >
                   Start Healthy Habits
@@ -306,15 +306,15 @@ export default function Lifestyle() {
       {/* Daily Routines Section */}
       <section className="py-14 bg-white" ref={dailyRoutineRef}>
         <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="Daily Routine Guide" 
+          <SectionHeading
+            title="Daily Routine Guide"
             subtitle="Structure your day for optimal wellbeing and productivity"
           />
-          
+
           <div className="relative">
             {/* Timeline line with animated progress and dynamic color */}
             <div className="absolute left-1/2 top-0 h-full w-1.5 bg-gray-200/50 transform -translate-x-1/2 hidden md:block rounded-full">
-              <motion.div 
+              <motion.div
                 className="absolute top-0 left-0 w-full h-full origin-top rounded-full"
                 style={{
                   background: `linear-gradient(to bottom, 
@@ -322,13 +322,13 @@ export default function Lifestyle() {
                     rgba(79, 190, 157, ${colorIntensity}))`
                 }}
                 initial={{ scaleY: 0 }}
-                animate={{ 
+                animate={{
                   scaleY: progressPercentage / 100,
                   transition: { duration: 0.8, ease: "easeOut" }
                 }}
               />
             </div>
-            
+
             <div className="space-y-8">
               {dailyRoutineTips.map((routine, idx) => {
                 const isCompleted = completedRoutines.includes(routine.id);
@@ -346,7 +346,7 @@ export default function Lifestyle() {
                     className="relative group"
                   >
                     <div className={`md:w-1/2 ${idx % 2 === 0 ? 'md:pr-12 md:ml-0' : 'md:pl-12 md:ml-auto'}`}>
-                      <motion.div 
+                      <motion.div
                         className={`bg-white rounded-xl shadow-sm p-6 relative z-10 transition-all duration-300 ${isClickable ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed opacity-80'}`}
                         onClick={() => isClickable && toggleRoutineCompletion(routine.id)}
                         whileHover={isClickable ? { scale: 1.02 } : {}}
@@ -365,10 +365,10 @@ export default function Lifestyle() {
                         <p className="text-gray-600">{routine.description}</p>
                       </motion.div>
                     </div>
-                    
+
                     {/* Timeline circle marker - fixed position with animation */}
                     <div className="absolute top-6 left-1/2 transform -translate-x-1/2 w-6 h-6 z-20 hidden md:block">
-                      <motion.div 
+                      <motion.div
                         className={`w-full h-full rounded-full flex items-center justify-center ${isCompleted ? 'bg-zenSage border-zenSage' : 'bg-white border-2 border-gray-300'} shadow-md`}
                         whileHover={isClickable ? { scale: 1.1 } : {}}
                         onClick={(e) => {
@@ -378,15 +378,15 @@ export default function Lifestyle() {
                         whileTap={{ scale: 0.95 }}
                       >
                         {isCompleted && (
-                          <motion.svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="16" 
-                            height="16" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            strokeWidth="3" 
-                            strokeLinecap="round" 
+                          <motion.svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            strokeLinecap="round"
                             strokeLinejoin="round"
                             initial={{ pathLength: 0 }}
                             animate={{ pathLength: 1 }}
@@ -405,7 +405,7 @@ export default function Lifestyle() {
 
           {/* Congratulations Message */}
           {showCongrats && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -415,7 +415,7 @@ export default function Lifestyle() {
                 <div className="text-6xl mb-4">🎉</div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">Daily Routine Complete!</h3>
                 <p className="text-gray-600 mb-6">Congratulations on completing all your daily routines! You're doing amazing work for your wellbeing.</p>
-                <Button 
+                <Button
                   onClick={resetRoutines}
                   variant="outline"
                   className="border-zenSage text-zenSage hover:bg-zenSage/10"
@@ -431,11 +431,11 @@ export default function Lifestyle() {
       {/* Lifestyle Balance Section - Updated with colorful cards */}
       <section className="py-14 bg-gradient-to-br from-zenSeafoam/20 to-white">
         <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="Pillars of Balanced Lifestyle" 
+          <SectionHeading
+            title="Pillars of Balanced Lifestyle"
             subtitle="Key areas to focus on for holistic wellbeing"
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {lifestylePillars.map((pillar, idx) => (
               <motion.div
@@ -477,11 +477,11 @@ export default function Lifestyle() {
       {/* Healthy Habits Section */}
       <section className="py-14 bg-white">
         <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="Sustainable Healthy Habits" 
+          <SectionHeading
+            title="Sustainable Healthy Habits"
             subtitle="Small changes that make a big difference"
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {healthyHabits.map((habit, idx) => (
               <motion.div
@@ -511,20 +511,20 @@ export default function Lifestyle() {
       {/* Food Tips Section - Updated with smaller image */}
       <section className="py-14 bg-gradient-to-br from-zenMint/30 to-white">
         <div className="container mx-auto px-4">
-          <SectionHeading 
-            title="Nutrition for Wellbeing" 
+          <SectionHeading
+            title="Nutrition for Wellbeing"
             subtitle="Simple and affordable eating strategies for balanced living"
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div className="rounded-xl overflow-hidden h-full flex items-center">
-              <img 
-                src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
-                alt="Healthy meal preparation" 
+              <img
+                src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                alt="Healthy meal preparation"
                 className="w-full h-auto max-h-[350px] object-cover"
               />
             </div>
-            
+
             <div>
               <h3 className="text-xl font-semibold mb-4">Nutritious Foods for Energy</h3>
               <ScrollArea className="h-64 pr-4">
