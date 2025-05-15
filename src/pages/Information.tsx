@@ -134,7 +134,7 @@ const egyptianProfessionals = [
     name: "DR. John Gamal",
     specialty: "Specialist Psychiatrist",
     photo: phsy1,
-    bio: "Dr. John Gamal mostly utilizes different techniques in therapy varying from Humanistic approach, Four-Step Integrative Model of Psychotherapy and Psychodynamic approaches, depending on the client’s needs to overcome their mental and difficulties.",
+    bio: "Dr. John Gamal mostly utilizes different techniques in therapy varying from Humanistic approach, Four-Step Integrative Model of Psychotherapy and Psychodynamic approaches.",
     phone: "+20 109 094 9477",
     location: "Maadi, Cairo",
     languages: ["Arabic", "English"]
@@ -143,7 +143,7 @@ const egyptianProfessionals = [
     name: "DR Ashraf Adel",
     specialty: "Consultant Psychiatrist ",
     photo: phsy2,
-    bio: "Ashraf practices Gestalt therapy, which focuses upon the individual's experience in the present moment, and Eclectic therapy which incorporates a variety of therapeutic principles in order to create the ideal treatment program.",
+    bio: "Ashraf practices Gestalt therapy and Eclectic therapy which incorporates a variety of therapeutic principles in order to create the ideal treatment program.",
     phone: "+20 100 141 0140",
     location: "Maadi, Cairo",
     languages: ["Arabic", "English"]
@@ -152,7 +152,7 @@ const egyptianProfessionals = [
     name: "DR. Mohamed Hossam",
     specialty: "Consultant of addiction treatment",
     photo: phsy3,
-    bio: "Psychiatrist specialized in stress, adult psychiatry, adolescent psychiatry, family counseling, toxicology, and pediatric psychiatry. With extensive experience in dual diagnosis cases, I provide comprehensive treatment plans that address mental health.",
+    bio: "Psychiatrist specialized in stress, adult psychiatry, and pediatric psychiatry. I provide comprehensive treatment plans that address mental health.",
     phone: "+20 225983999",
     location: "New Cairo, Cairo",
     languages: ["Arabic", "English"]
@@ -161,7 +161,7 @@ const egyptianProfessionals = [
     name: "DR. Nourhan Hamdy",
     specialty: "Psychotherapist Specialist",
     photo: phsy4,
-    bio: "Psychiatrist specializing in the treatment of depression, adult mental health, and adolescent psychiatric conditions. My expertise spans from early intervention for teens to complex dual diagnosis cases in adults struggling with depression.",
+    bio: "Psychiatrist specializing in the treatment of depression and adolescent psychiatric conditions. My expertise spans from early intervention for teens to complex dual diagnosis cases.",
     phone: "16676 - through vezeeta",
     location: "Heliopolis ,Cairo",
     languages: ["Arabic", "English"]

@@ -586,7 +586,7 @@ const Fitness = () => {
             alt="Fitness Banner"
             className="w-full h-full object-cover blur-[2px]"
           />
-          <div className="absolute inset-0"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30"></div>
         </div>
         <div className="relative z-10 h-full flex items-center">
           <div className="container mx-auto px-6 md:px-12 lg:px-24">

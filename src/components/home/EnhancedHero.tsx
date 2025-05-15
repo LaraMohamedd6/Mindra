@@ -55,7 +55,7 @@ export default function EnhancedHero() {
               Your Path to Mental Wellness
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-lg">
-              ZenZone Connect helps students navigate mental health challenges with interactive tools, resources, and guidance for a balanced academic journey.
+              Mindra helps students navigate mental health challenges with interactive tools, resources, and guidance for a balanced academic journey.
             </p>
 
             <motion.div

@@ -68,7 +68,7 @@ export default function CTA() {
             <div className="mb-6">
               <h2 className="text-3xl font-display font-semibold mb-4">Start Your Wellness Journey Today</h2>
               <p className="text-gray-600 mb-6">
-                Join thousands of students who are prioritizing their mental health with ZenZone Connect. Sign up for free access to all our resources.
+                Join thousands of students who are prioritizing their mental health with Mindra. Sign up for free access to all our resources.
               </p>
               
               <div className="space-y-3">

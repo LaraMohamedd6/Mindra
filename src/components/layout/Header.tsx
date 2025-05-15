@@ -43,7 +43,7 @@ export default function Header() {
                 <Heart className="h-4 w-4 text-white" />
               </div>
             </div>
-            <span className="text-xl font-display font-semibold">ZenZone Connect</span>
+            <span className="text-xl font-display font-semibold">Mindra</span>
           </Link>
 
           {/* Desktop Navigation */}

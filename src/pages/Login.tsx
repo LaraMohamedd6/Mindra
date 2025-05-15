@@ -269,7 +269,7 @@ export default function Login() {
                 <span className="text-white text-sm">Z</span>
               </div>
             </div>
-            ZenZone Connect
+            Mindra
           </Link>
         </motion.div>
 

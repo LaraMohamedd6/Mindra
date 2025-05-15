@@ -428,7 +428,7 @@ export default function Signup() {
                 <span className="text-white text-sm">Z</span>
               </div>
             </div>
-            ZenZone Connect
+            Mindra
           </Link>
         </motion.div>
 

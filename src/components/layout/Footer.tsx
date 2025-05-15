@@ -12,7 +12,7 @@ export default function Footer() {
               <div className="rounded-full bg-gradient-to-br from-zenPink to-zenPeach p-1.5">
                 <Heart className="w-5 h-5 text-white" />
               </div>
-              <span className="font-display font-semibold text-xl">ZenZone</span>
+              <span className="font-display font-semibold text-xl">Mindra</span>
             </Link>
             <p className="text-gray-600 text-sm">
               Supporting student mental wellness with interactive tools, resources, 
@@ -105,11 +105,11 @@ export default function Footer() {
             <div className="space-y-3">
               <div className="flex items-center">
                 <Mail className="w-5 h-5 mr-3 text-zenPink" />
-                <span className="text-gray-600">support@zenzone.edu</span>
+                <span className="text-gray-600">Mindra.services@gmail.com</span>
               </div>
               <div className="flex items-center">
                 <Phone className="w-5 h-5 mr-3 text-zenPink" />
-                <span className="text-gray-600">+1 (800) 123-4567</span>
+                <span className="text-gray-600">+20 106 446 6321</span>
               </div>
               <div className="flex items-center">
                 <MessageCircle className="w-5 h-5 mr-3 text-zenPink" />
@@ -123,7 +123,7 @@ export default function Footer() {
         
         <div className="mt-12 border-t border-gray-200 pt-6">
           <p className="text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} ZenZone Connect. All rights reserved.
+            &copy; {new Date().getFullYear()} Mindra. All rights reserved.
           </p>
         </div>
       </div>
