@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Clock, UserCheck, Wind, Moon, Sun, Flame, Calendar, BookOpen, Zap, ArrowRight, ChevronDown, Leaf, Activity, Eye, Brain, RotateCw, X, Clock3 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
-import yogaBanner from "@/assets/images/yoga-banner.png";
+import yogaBanner from "@/assets/images/ybanner.jpg";
 
 // Yoga Tip Modal Component
 const YogaTipModal = ({ tip, onClose }: { tip: any, onClose: () => void }) => {

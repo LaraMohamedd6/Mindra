@@ -139,13 +139,19 @@ export default function Progress({ journalData }: ProgressProps) {
         // Fetch yoga data
         const yogaResponse = await axios.get<YogaTimeDto>(
           `${API_BASE_URL}/api/YogaVideo/totals`,
-          { ...authHeader, cache: "no-store" } // Prevent caching
+          { 
+            ...authHeader, 
+            headers: { 
+              ...authHeader.headers, 
+              "Cache-Control": "no-store" 
+            } 
+          } // Prevent caching
         );
         if (!yogaResponse.data) {
           throw new Error("No yoga data received from server");
         }
         console.log("Yoga API Response:", yogaResponse.data); // Debug
-        setYogaData(yogaResponse.data);
+        setYogaData(yogaResponse.data as YogaTimeDto);
 
         // Fetch journal stats
         const journalResponse = await axios.get<JournalStatsDto>(

@@ -5,27 +5,36 @@ import { Book, Brain, Coffee, HeartPulse, Moon, Sun, Calendar, HeadingIcon, Arro
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import SectionHeading from "@/components/common/SectionHeading";
 import { Link } from 'react-router-dom';
+import selfCareImage from "@/assets/images/selfcare.jpg"; 
+import depImage from "@/assets/images/dep.jpg";  
+import academicStress from "@/assets/images/acstress.jpg"; 
+import sleepHygiene from "@/assets/images/sleep.jpg"; 
+import phsy1 from "@/assets/images/phsy1.png"; 
+import phsy2 from "@/assets/images/phsy2.png"; 
+import phsy3 from "@/assets/images/phsy3.png"; 
+import phsy4 from "@/assets/images/phsy4.png"; 
+
 
 const mentalHealthTopics = [
   {
     title: "Understanding Depression",
     icon: Brain,
     content: "Depression is more than just feeling sad. It's a persistent feeling of sadness or loss of interest that can affect how you think, feel, and handle daily activities.",
-    image: "https://images.unsplash.com/photo-1598153346810-860daa814c4b?q=80&w=3270&auto=format&fit=crop",
+    image: depImage,
     url: "https://www.nimh.nih.gov/health/topics/depression"
   },
-  {
-    title: "Managing Anxiety",
-    icon: HeartPulse,
-    content: "Many students experience anxiety, especially during high-stress periods like exams. Discover practical techniques to manage academic anxiety.",
-    image: "https://images.unsplash.com/photo-1474418397713-7ede21d49118?q=80&w=2853&auto=format&fit=crop",
-    url: "https://adaa.org/understanding-anxiety"
+    {
+    title: "Self-Care Practices",
+    icon: Sun,
+    content: "Self-care isn't selfish—it's necessary. Discover simple yet effective self-care practices for busy students.",
+    image: selfCareImage, // Changed from URL to imported image
+    url: "https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health"
   },
   {
     title: "Sleep Hygiene",
     icon: Moon,
     content: "Quality sleep is essential for mental health and academic performance. Learn about establishing healthy sleep patterns.",
-    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?q=80&w=3342&auto=format&fit=crop",
+    image: sleepHygiene,
     url: "https://www.sleepfoundation.org/sleep-hygiene"
   },
   {
@@ -36,17 +45,17 @@ const mentalHealthTopics = [
     url: "https://www.healthdirect.gov.au/work-life-balance"
   },
   {
-    title: "Self-Care Practices",
-    icon: Sun,
-    content: "Self-care isn't selfish—it's necessary. Discover simple yet effective self-care practices for busy students.",
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=3431&auto=format&fit=crop",
-    url: "https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health"
+    title: "Managing Anxiety",
+    icon: HeartPulse,
+    content: "Many students experience anxiety, especially during high-stress periods like exams. Discover practical techniques to manage academic anxiety.",
+    image: "https://images.unsplash.com/photo-1474418397713-7ede21d49118?q=80&w=2853&auto=format&fit=crop",
+    url: "https://adaa.org/understanding-anxiety"
   },
   {
     title: "Academic Stress",
     icon: Book,
     content: "Academic pressure can sometimes feel overwhelming. Learn about recognizing the signs of burnout.",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=3270&auto=format&fit=crop",
+    image: academicStress,
     url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9243415/"
   },
 ];
@@ -122,40 +131,40 @@ const myths = [
 
 const egyptianProfessionals = [
   {
-    name: "Dr. Ahmed Samir",
-    specialty: "Psychiatrist",
-    photo: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=3270&auto=format&fit=crop",
-    bio: "Specialized in cognitive behavioral therapy with 15 years of experience treating anxiety and depression in university students.",
-    phone: "+20 100 123 4567",
+    name: "DR. John Gamal",
+    specialty: "Specialist Psychiatrist",
+    photo: phsy1,
+    bio: "Dr. John Gamal mostly utilizes different techniques in therapy varying from Humanistic approach, Four-Step Integrative Model of Psychotherapy and Psychodynamic approaches, depending on the client’s needs to overcome their mental and difficulties.",
+    phone: "+20 109 094 9477",
     location: "Maadi, Cairo",
     languages: ["Arabic", "English"]
   },
   {
-    name: "Dr. Mona El-Sayed",
-    specialty: "Clinical Psychologist",
-    photo: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=3270&auto=format&fit=crop",
-    bio: "Expert in adolescent mental health and academic stress management. Provides both individual and group therapy sessions.",
-    phone: "+20 122 345 6789",
-    location: "Zamalek, Cairo",
-    languages: ["Arabic", "English", "French"]
-  },
-  {
-    name: "Dr. Karim Hassan",
-    specialty: "Psychotherapist",
-    photo: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=3270&auto=format&fit=crop",
-    bio: "Focuses on mindfulness-based stress reduction techniques for students. Evening appointments available.",
-    phone: "+20 155 678 9012",
-    location: "Heliopolis, Cairo",
+    name: "DR Ashraf Adel",
+    specialty: "Consultant Psychiatrist ",
+    photo: phsy2,
+    bio: "Ashraf practices Gestalt therapy, which focuses upon the individual's experience in the present moment, and Eclectic therapy which incorporates a variety of therapeutic principles in order to create the ideal treatment program.",
+    phone: "+20 100 141 0140",
+    location: "Maadi, Cairo",
     languages: ["Arabic", "English"]
   },
   {
-    name: "Dr. Yasmine Farouk",
-    specialty: "Counseling Psychologist",
-    photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=3270&auto=format&fit=crop",
-    bio: "Specializes in student mental health with focus on study-life balance and time management strategies.",
-    phone: "+20 133 456 7890",
-    location: "New Cairo",
-    languages: ["Arabic", "English", "German"]
+    name: "DR. Mohamed Hossam",
+    specialty: "Consultant of addiction treatment",
+    photo: phsy3,
+    bio: "Psychiatrist specialized in stress, adult psychiatry, adolescent psychiatry, family counseling, toxicology, and pediatric psychiatry. With extensive experience in dual diagnosis cases, I provide comprehensive treatment plans that address mental health.",
+    phone: "+20 225983999",
+    location: "New Cairo, Cairo",
+    languages: ["Arabic", "English"]
+  },
+  {
+    name: "DR. Nourhan Hamdy",
+    specialty: "Psychotherapist Specialist",
+    photo: phsy4,
+    bio: "Psychiatrist specializing in the treatment of depression, adult mental health, and adolescent psychiatric conditions. My expertise spans from early intervention for teens to complex dual diagnosis cases in adults struggling with depression.",
+    phone: "16676 - through vezeeta",
+    location: "Heliopolis ,Cairo",
+    languages: ["Arabic", "English"]
   }
 ];
 
