@@ -64,7 +64,7 @@ const Meditation = () => {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-  
+
     const initTracking = async () => {
       try {
         const summary = await getTimeSummary();
@@ -130,7 +130,7 @@ const Meditation = () => {
         a.currentTime = 0;
       }
     });
-    
+
     // Pause any playing video
     if (playingVideo) {
       const player = players.current[playingVideo];
@@ -179,7 +179,7 @@ const Meditation = () => {
         tag.src = 'https://www.youtube.com/iframe_api';
         const firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
-        
+
         window.onYouTubeIframeAPIReady = initializePlayers;
       } else {
         console.log("YouTube API already loaded, initializing players");
@@ -191,7 +191,7 @@ const Meditation = () => {
 
     return () => {
       console.log("Cleaning up YouTube API");
-      window.onYouTubeIframeAPIReady = () => {};
+      window.onYouTubeIframeAPIReady = () => { };
       Object.values(players.current).forEach(player => {
         if (player && player.destroy) {
           player.destroy();
@@ -254,14 +254,14 @@ const Meditation = () => {
               const audioSessionDuration = Math.floor(
                 (Date.now() - audioStartTimes.current[playingAudio]) / 1000
               );
-              
+
               if ((isAuthenticated || localStorage.getItem('token')) && audioSessionDuration > 0) {
                 console.log(`Tracking audio on video play: ${playingAudio}, duration: ${audioSessionDuration}s`);
                 await trackTime(playingAudio, "audio", audioSessionDuration);
                 const updatedSummary = await getTimeSummary();
                 setTimeSummary(updatedSummary);
               }
-              
+
               setPlayingAudio(null);
             }
           }
@@ -274,7 +274,7 @@ const Meditation = () => {
               const videoSessionDuration = Math.floor(
                 (Date.now() - videoStartTimes.current[playingVideo]) / 1000
               );
-              
+
               if ((isAuthenticated || localStorage.getItem('token')) && videoSessionDuration > 0) {
                 console.log(`Tracking video on other video play: ${playingVideo}, duration: ${videoSessionDuration}s`);
                 await trackTime(playingVideo, "video", videoSessionDuration);
@@ -297,7 +297,7 @@ const Meditation = () => {
             );
 
             console.log(`Video paused after: ${sessionDuration} seconds`);
-            
+
             if ((isAuthenticated || localStorage.getItem('token')) && sessionDuration > 0) {
               console.log(`Tracking video: ${videoId}, duration: ${sessionDuration}s`);
               try {
@@ -329,7 +329,7 @@ const Meditation = () => {
             );
 
             console.log(`Video ended after: ${sessionDuration} seconds`);
-            
+
             if ((isAuthenticated || localStorage.getItem('token')) && sessionDuration > 0) {
               console.log(`Tracking video on end: ${videoId}, duration: ${sessionDuration}s`);
               await trackTime(videoId, "video", sessionDuration);
@@ -562,29 +562,35 @@ const Meditation = () => {
                   <TabsTrigger value="stress">Stress Relief</TabsTrigger>
                   <TabsTrigger value="sleep">Sleep</TabsTrigger>
                 </TabsList>
+
                 <TabsContent value="stress" className="space-y-4">
-                  {["stress-0", "stress-1", "stress-2"].map((audioId, i) => (
+                  {[
+                    { id: "stress-0", name: "Quick Stress Relief", time: "3:01", author: "David Robson" },
+                    { id: "stress-1", name: "Progressive Muscle Relaxation", time: "8:06", author: "Milla Brown" },
+                    { id: "stress-2", name: "Guided Forest Visualisation", time: "13:11", author: "Sarah Johnson" }
+                  ].map((audio, i) => (
                     <div
                       key={i}
                       className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex justify-between items-center"
                     >
                       <div>
                         <h3 className="font-medium text-lg">
-                          Meditation {i + 1}
+                          {audio.name}
                         </h3>
                         <div className="flex items-center text-sm text-gray-500 mt-1">
                           <Clock className="h-4 w-4 mr-1" />
-                          <span>
-                            {i * 5 + 3}:{i < 2 ? "0" + (i * 5 + 1) : i * 5 + 1}
-                          </span>
+                          <span>{audio.time}</span>
+                        </div>
+                        <div className="text-sm text-gray-400 mt-1">
+                          By {audio.author}
                         </div>
                       </div>
                       <Button
                         size="sm"
                         className="bg-zenSage hover:bg-zenSage/90 text-white"
-                        onClick={() => toggleAudio(audioId)}
+                        onClick={() => toggleAudio(audio.id)}
                       >
-                        {playingAudio === audioId ? (
+                        {playingAudio === audio.id ? (
                           <>
                             <Pause className="h-4 w-4 mr-2" />
                             Pause
@@ -599,29 +605,35 @@ const Meditation = () => {
                     </div>
                   ))}
                 </TabsContent>
+
                 <TabsContent value="sleep" className="space-y-4">
-                  {["sleep-0", "sleep-1", "sleep-2"].map((audioId, i) => (
+                  {[
+                    { id: "sleep-0", name: "Quiet Night", time: "8:15", author: "Mia Johnson" },
+                    { id: "sleep-1", name: "Pre-Sleep Relaxation", time: "13:17", author: "Dr. Emma Wilson" },
+                    { id: "sleep-2", name: "Pentatonic Waves", time: "18:19", author: "Michael Chen" }
+                  ].map((audio, i) => (
                     <div
                       key={i}
                       className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex justify-between items-center"
                     >
                       <div>
                         <h3 className="font-medium text-lg">
-                          Sleep Meditation {i + 1}
+                          {audio.name}
                         </h3>
                         <div className="flex items-center text-sm text-gray-500 mt-1">
                           <Clock className="h-4 w-4 mr-1" />
-                          <span>
-                            {i * 5 + 8}:{i * 2 + 15}
-                          </span>
+                          <span>{audio.time}</span>
+                        </div>
+                        <div className="text-sm text-gray-400 mt-1">
+                          By {audio.author}
                         </div>
                       </div>
                       <Button
                         size="sm"
                         className="bg-zenSage hover:bg-zenSage/90 text-white"
-                        onClick={() => toggleAudio(audioId)}
+                        onClick={() => toggleAudio(audio.id)}
                       >
-                        {playingAudio === audioId ? (
+                        {playingAudio === audio.id ? (
                           <>
                             <Pause className="h-4 w-4 mr-2" />
                             Pause
