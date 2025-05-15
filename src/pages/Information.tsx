@@ -301,7 +301,7 @@ export default function Information() {
         </section>
 
         {/* Egyptian Professionals Section */}
-        <section className="mb-20">
+        <section id="egyptian-professionals" className="mb-20 scroll-mt-20">
           <SectionHeading 
             title="Mental Health Professionals in Egypt" 
             subtitle="Trusted doctors who can help with student mental health"

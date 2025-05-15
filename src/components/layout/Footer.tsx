@@ -54,7 +54,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link to="/k10test" className="text-gray-600 hover:text-zenPink">
-                  K10 Assessment
+                  Depression Severity Test
                 </Link>
               </li>
               <li>

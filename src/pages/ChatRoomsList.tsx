@@ -268,7 +268,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({ topics, onCreateRoom, i
     defaultValues: {
       name: "",
       topic: "",
-      capacity: 0,
+      capacity: 2,
       description: "",
     },
   });
@@ -378,6 +378,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({ topics, onCreateRoom, i
                     <FormControl>
                       <Input
                         type="number"
+                        min = {2}
                         placeholder="Maximum number of users"
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}

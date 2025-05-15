@@ -85,6 +85,15 @@ export default {
 						height: 'var(--radix-accordion-content-height)'
 					}
 				},
+
+								'pulse-soft': {
+					'0%, 100%': {
+						transform: 'scale(1)'
+					},
+					'50%': {
+						transform: 'scale(1.03)'
+					}
+				},
 				'accordion-up': {
 					from: {
 						height: 'var(--radix-accordion-content-height)'
@@ -121,7 +130,9 @@ export default {
         'slide-in': 'slide-in 0.5s ease-out forwards',
         'pulse-light': 'pulse-light 3s infinite ease-in-out',
         'spin-slow': 'spin-slow 12s linear infinite',
-        'breathe': 'breathe 4s infinite ease-in-out'
+        'breathe': 'breathe 4s infinite ease-in-out',
+		'pulse-soft': 'pulse-soft 4s ease-in-out infinite',
+
 			},
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

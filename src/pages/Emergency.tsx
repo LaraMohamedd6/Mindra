@@ -1,273 +1,173 @@
 
-import { useState, useEffect } from "react";
-import Layout from "@/components/layout/Layout";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { Button } from "@/components/ui/button";
-import { Phone, MessageSquare, Heart, Shield, CheckCircle, Headphones, Flag } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { AlertTriangle, Clock, ExternalLink, Phone } from "lucide-react";
+import Header from "../components/layout/Header";
 
-const emergencyContacts = [
-  {
-    title: "National Suicide Prevention Lifeline",
-    phone: "1-800-273-8255",
-    description: "24/7 free and confidential support for people in distress",
-    icon: Phone,
-  },
-  {
-    title: "Crisis Text Line",
-    phone: "Text HOME to 741741",
-    description: "24/7 crisis counseling via text message",
-    icon: MessageSquare,
-  },
-  {
-    title: "Student Mental Health Helpline",
-    phone: "1-855-487-1234",
-    description: "Support specifically for college students in crisis",
-    icon: Headphones,
-  },
-];
 
-const resources = [
-  {
-    title: "5-4-3-2-1 Grounding Technique",
-    content: "When feeling overwhelmed, identify 5 things you can see, 4 things you can touch, 3 things you can hear, 2 things you can smell, and 1 thing you can taste. This helps bring you back to the present moment.",
-    icon: Heart,
-    steps: [
-      "Acknowledge 5 things you can see around you",
-      "Acknowledge 4 things you can touch around you",
-      "Acknowledge 3 things you can hear",
-      "Acknowledge 2 things you can smell",
-      "Acknowledge 1 thing you can taste"
-    ]
-  },
-  {
-    title: "Box Breathing",
-    content: "Breathe in for 4 counts, hold for 4 counts, breathe out for 4 counts, hold for 4 counts. Repeat until you feel calmer.",
-    icon: Shield,
-    steps: [
-      "Breathe in slowly to the count of 4",
-      "Hold your breath for a count of 4",
-      "Exhale slowly to the count of 4",
-      "Hold your breath for a count of 4",
-      "Repeat the cycle several times"
-    ]
-  },
-  {
-    title: "Progressive Muscle Relaxation",
-    content: "Tense and then release each muscle group, starting from your toes and moving up to your head.",
-    icon: CheckCircle,
-    steps: [
-      "Find a quiet, comfortable place to sit or lie down",
-      "Close your eyes and take a few deep breaths",
-      "Tense the muscles in your feet for 5 seconds, then release completely",
-      "Work your way up through each muscle group (calves, thighs, etc.)",
-      "Focus on the feeling of relaxation after releasing each tension"
-    ]
-  },
-];
-
-const countries = [
-  { name: "United States", number: "911" },
-  { name: "United Kingdom", number: "999" },
-  { name: "Australia", number: "000" },
-  { name: "Canada", number: "911" },
-  { name: "New Zealand", number: "111" },
-  { name: "India", number: "112" },
-  { name: "Germany", number: "112" },
-  { name: "France", number: "112" },
-  { name: "Japan", number: "119" },
-  { name: "China", number: "120" },
-];
-
-export default function Emergency() {
-  const [showFloatingButton, setShowFloatingButton] = useState(true);
-  const [pulseAnimation, setPulseAnimation] = useState(false);
-  const { toast } = useToast();
-
-  // Effect to create pulsing animation every 10 seconds
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setPulseAnimation(true);
-      setTimeout(() => setPulseAnimation(false), 1000);
-    }, 10000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const handleEmergencyCall = (number: string) => {
-    window.location.href = `tel:${number.replace(/\D/g, '')}`;
-    toast({
-      title: "Calling Emergency Services",
-      description: "Connecting you to help...",
-    });
-  };
-
+const Emergency = () => {
   return (
-    <Layout>
-      <div 
-        className="relative bg-gradient-to-b from-red-50 to-white"
-        style={{ 
-          backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ff0000\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
-        }}
-      >
-        <div className="container mx-auto px-4 py-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mx-auto text-center mb-8"
-          >
-            <h1 className="text-4xl font-display font-semibold text-red-600 mb-4">
-              Emergency Resources
-            </h1>
-            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-8 rounded shadow-md">
-              <p className="text-lg font-semibold">
-                If you or someone you know is in immediate danger, please call emergency services (911) immediately.
-              </p>
-            </div>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {emergencyContacts.map((contact, index) => (
-              <motion.div
-                key={contact.title}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="relative"
-              >
-                <div className="absolute inset-0 bg-red-500 rounded-lg opacity-10 animate-pulse"></div>
-                <Card className="bg-white border-red-200 relative z-10">
-                  <CardHeader>
-                    <div className="flex items-center gap-4">
-                      <div className="rounded-full bg-red-500 p-3">
-                        <contact.icon className="h-6 w-6 text-white" />
-                      </div>
-                      <CardTitle className="text-xl">{contact.title}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 mb-4">{contact.description}</p>
-                    <Button
-                      className="w-full bg-red-500 hover:bg-red-600"
-                      size="lg"
-                      onClick={() => handleEmergencyCall(contact.phone)}
-                    >
-                      <Phone className="mr-2 h-4 w-4" /> {contact.phone}
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mx-auto text-center mb-8"
-          >
-            <h2 className="text-3xl font-display font-semibold text-gray-800 mb-4">
-              Grounding Techniques
-            </h2>
-            <p className="text-lg text-gray-600 mb-8">
-              When you're feeling overwhelmed or anxious, try these techniques to help ground yourself in the present moment.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {resources.map((resource, index) => (
-              <motion.div
-                key={resource.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 + 0.2 }}
-              >
-                <Card className="h-full">
-                  <CardHeader>
-                    <div className="flex items-center gap-4">
-                      <div className="rounded-full bg-zenSeafoam p-3">
-                        <resource.icon className="h-6 w-6 text-zenSage" />
-                      </div>
-                      <CardTitle className="text-xl">{resource.title}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 mb-4">{resource.content}</p>
-                    <ol className="list-decimal pl-5 space-y-2 text-gray-600">
-                      {resource.steps.map((step, stepIndex) => (
-                        <li key={stepIndex}>{step}</li>
-                      ))}
-                    </ol>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mx-auto text-center mb-8"
-          >
-            <h2 className="text-3xl font-display font-semibold text-gray-800 mb-4">
-              Emergency Numbers by Country
-            </h2>
-            <p className="text-lg text-gray-600 mb-8">
-              Find emergency service numbers for different countries.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-12">
-            {countries.map((country, index) => (
-              <motion.div
-                key={country.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center"
-              >
-                <div className="flex items-center justify-center mb-2">
-                  <Flag className="h-5 w-5 text-red-500 mr-2" />
-                  <p className="font-medium">{country.name}</p>
-                </div>
-                <Button 
-                  variant="outline" 
-                  className="w-full border-red-200 hover:bg-red-50"
-                  onClick={() => handleEmergencyCall(country.number)}
-                >
-                  {country.number}
-                </Button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Floating Call Button */}
-        <AnimatePresence>
-          {showFloatingButton && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ 
-                opacity: 1, 
-                scale: pulseAnimation ? 1.1 : 1, 
-                y: 0 
-              }}
-              exit={{ opacity: 0, scale: 0.8, y: 20 }}
-              transition={{ duration: 0.3 }}
-              className="fixed bottom-10 right-10 z-50"
-            >
-              <Button
-                size="lg"
-                className="bg-red-600 hover:bg-red-700 shadow-lg flex items-center gap-2 rounded-full px-6"
-                onClick={() => handleEmergencyCall("911")}
-              >
-                <Phone className="h-5 w-5 animate-pulse" />
-                <span>Call for Help</span>
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <><Header /><div className="space-y-8 py-10 px-28 md:px-32">  {/* 7rem → 8rem */}
+      <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6 text-center space-y-4 animate-pulse-soft">
+        <AlertTriangle className="h-12 w-12 mx-auto text-destructive" />
+        <h1 className="text-2xl md:text-3xl font-bold text-destructive">Emergency Mental Health Resources</h1>
+        <p className="text-destructive/80 max-w-2xl mx-auto">
+          If you or someone you know is experiencing a mental health crisis or having thoughts of suicide,
+          please reach out for help immediately using one of the resources below.
+        </p>
       </div>
-    </Layout>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="border-destructive/50">
+          <CardHeader className="bg-destructive/5">
+            <CardTitle className="flex items-center gap-2">
+              <Phone className="h-5 w-5" />
+              Immediate Phone Support
+            </CardTitle>
+            <CardDescription>24/7 Crisis Lines Available</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-6">
+            <div className="border-l-4 border-destructive pl-4 py-2">
+              <h3 className="font-bold text-lg">National Suicide Prevention Lifeline</h3>
+              <p className="text-muted-foreground mb-2">Free and confidential support for people in distress</p>
+              <Button variant="destructive" className="w-full">
+                <Phone className="mr-2 h-4 w-4" />
+                <a href="tel:988">Call 762-1602</a>
+              </Button>
+            </div>
+
+            <div className="border-l-4 border-destructive pl-4 py-2">
+              <h3 className="font-bold text-lg">Crisis Text Line</h3>
+              <p className="text-muted-foreground mb-2">Text with a trained crisis counselor</p>
+              <p className="font-medium">Text HOME to 741741</p>
+            </div>
+
+{/*             <div className="border-l-4 border-destructive pl-4 py-2">
+              <h3 className="font-bold text-lg">Campus Security</h3>
+              <p className="text-muted-foreground mb-2">Your university's emergency services</p>
+              <Button variant="outline" className="w-full">
+                <Phone className="mr-2 h-4 w-4" />
+                <a href="tel:123-456-7890">Call Campus Security</a>
+              </Button>
+            </div> */}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Warning Signs
+            </CardTitle>
+            <CardDescription>
+              Recognize the signs that someone may need immediate help
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1">
+                <AccordionTrigger>Talking about suicide or wanting to die</AccordionTrigger>
+                <AccordionContent>
+                  Any talk about suicide, wanting to die, or feeling hopeless should be taken seriously. This includes statements like "I wish I wasn't here" or "Everyone would be better off without me."
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-2">
+                <AccordionTrigger>Increasing alcohol or drug use</AccordionTrigger>
+                <AccordionContent>
+                  A sudden increase in substance use, especially when combined with other warning signs, may indicate someone is trying to self-medicate severe emotional distress.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-3">
+                <AccordionTrigger>Withdrawing from friends and activities</AccordionTrigger>
+                <AccordionContent>
+                  When someone suddenly pulls away from friends, family, and activities they previously enjoyed, it could be a sign of severe depression or suicidal thoughts.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-4">
+                <AccordionTrigger>Aggressive or reckless behavior</AccordionTrigger>
+                <AccordionContent>
+                  Acting with unusual aggression, recklessness, or engaging in risky activities without concern for safety can indicate a crisis state.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-5">
+                <AccordionTrigger>Dramatic mood changes</AccordionTrigger>
+                <AccordionContent>
+                  Extreme mood swings or sudden shifts from deep depression to calm or even happiness can sometimes indicate a person has made a decision about suicide.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>What To Do In a Crisis</CardTitle>
+          <CardDescription>Steps to take when you or someone you know needs immediate help</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-red-100 p-4 rounded-lg">
+              <h3 className="font-bold text-lg mb-2">1. Ensure Safety</h3>
+              <ul className="list-disc list-inside text-sm space-y-1">
+                <li>Stay with the person (or ask someone else to)</li>
+                <li>Remove potential means of harm if possible</li>
+                <li>Call emergency services if danger is imminent</li>
+              </ul>
+            </div>
+
+            <div className="bg-red-100 p-4 rounded-lg">
+              <h3 className="font-bold text-lg mb-2">2. Connect to Help</h3>
+              <ul className="list-disc list-inside text-sm space-y-1">
+                <li>Call a crisis hotline with them</li>
+                <li>Offer to take them to the ER or urgent care</li>
+                <li>Contact campus counseling services</li>
+              </ul>
+            </div>
+
+            <div className="bg-red-100 p-4 rounded-lg">
+              <h3 className="font-bold text-lg mb-2">3. Listen & Support</h3>
+              <ul className="list-disc list-inside text-sm space-y-1">
+                <li>Stay calm and listen without judgment</li>
+                <li>Express care and concern directly</li>
+                <li>Don't promise to keep their situation secret</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t pt-4 mt-4">
+            <h3 className="font-bold text-lg mb-2">After the Immediate Crisis</h3>
+            <p className="mb-4">
+              Even after the immediate danger has passed, continued support is crucial. Help connect the person to ongoing resources:
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Follow up regularly and check in</li>
+              <li>Help them connect with a mental health professional</li>
+              <li>Assist with making and keeping appointments</li>
+              <li>Learn about their safety plan and how you can support it</li>
+            </ul>
+          </div>
+        </CardContent>
+        <CardFooter className="bg-muted/50 flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Remember: Taking action can save a life. You don't need to be an expert to help someone in crisis.
+          </p>
+          <Button variant="outline" className="w-full sm:w-auto" asChild>
+            <a href="https://www.nami.org/Support-Education/Resources" target="_blank" rel="noreferrer">
+              More Resources
+              <ExternalLink className="ml-2 h-4 w-4" />
+            </a>
+          </Button>
+        </CardFooter>
+      </Card>
+    </div></>
   );
-}
+};
+
+export default Emergency;

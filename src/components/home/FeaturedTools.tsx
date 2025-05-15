@@ -39,8 +39,8 @@ export default function FeaturedTools() {
       },
       {
         icon: <Brain className="h-7 w-7" />,
-        title: "K10 Assessment",
-        description: "Evaluate your current mental health status",
+        title: "Depression Severity Test (DST-9)",
+        description: "Don’t ignore the signs. Take the test.",
         link: "/k10test",
         color: "bg-gradient-to-br from-blue-100 to-cyan-50 text-blue-600"
       }

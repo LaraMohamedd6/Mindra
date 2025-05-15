@@ -8,8 +8,8 @@ export default function Features() {
   const features = [
     {
       icon: <Brain className="h-6 w-6" />,
-      title: "Mental Health Assessment",
-      description: "Take our K10 assessment to understand your current mental state."
+      title: "Depression Severity Test",
+      description: "This test helps you understand your recent emotions and predict depression severity."
     },
     {
       icon: <HeartPulse className="h-6 w-6" />,

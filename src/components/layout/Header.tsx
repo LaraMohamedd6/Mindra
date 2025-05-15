@@ -84,7 +84,7 @@ export default function Header() {
                         { title: "Mental Health Info", href: "/information", description: "Evidence-based resources" },
                         { title: "Emergency Support", href: "/emergency", description: "Crisis resources" },
                         { title: "Study Helper", href: "/study-helper", description: "Tools for academic success" },
-                        { title: "K10 Assessment", href: "/k10test", description: "Mental wellbeing check" }
+                        { title: "Depression Severity Test", href: "/k10test", description: "Mental wellbeing check" }
                       ].map((item) => (
                         <li key={item.title}>
                           <Link
