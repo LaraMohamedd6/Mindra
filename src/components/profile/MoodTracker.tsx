@@ -13,7 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import {
   AreaChart,
@@ -41,7 +41,13 @@ interface MoodEntry {
 
 const MOOD_EMOJIS = ["😔", "😟", "😐", "🙂", "😊"];
 const MOOD_LABELS = ["Very Sad", "Sad", "Neutral", "Good", "Excellent"];
-const MOOD_COLORS = ["bg-red-200", "bg-orange-200", "bg-yellow-200", "bg-blue-200", "bg-green-200"];
+const MOOD_COLORS = [
+  "bg-red-300",
+  "bg-orange-300",
+  "bg-yellow-300",
+  "bg-blue-300",
+  "bg-green-300",
+];
 
 export default function MoodTracker() {
   const { toast } = useToast();
@@ -53,6 +59,13 @@ export default function MoodTracker() {
   const [selectedEntry, setSelectedEntry] = useState<MoodEntry | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  // Helper function to check if date is in the future
+  const isFutureDate = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date > today;
+  };
 
   // Helper function to get auth header
   const getAuthHeader = () => {
@@ -97,21 +110,19 @@ export default function MoodTracker() {
     try {
       const moodEmoji = MOOD_EMOJIS[moodValue - 1];
       const urlDate = format(date, "yyyy-MM-dd");
-      const isoDate = format(date, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // ISO 8601 format
+      const isoDate = format(date, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
-      const userId = localStorage.getItem("userId") || "123"; // Replace with actual user ID
+      const userId = localStorage.getItem("userId") || "123";
       if (!userId) throw new Error("User ID is required");
 
       const entry = {
-        id: 0, // 0 for new or update (backend will handle)
+        id: 0,
         userId,
         date: isoDate,
         moodValue,
         moodEmoji,
         notes,
       };
-
-      console.log("Saving mood entry:", { urlDate, entry });
 
       try {
         const response = await axios.put(
@@ -132,13 +143,7 @@ export default function MoodTracker() {
         throw updateError;
       }
     } catch (error) {
-      console.error("Failed to save mood entry:", {
-        message: error.message,
-        ...(axios.isAxiosError(error) && {
-          status: error.response?.status,
-          response: error.response?.data,
-        }),
-      });
+      console.error("Failed to save mood entry:", error);
       throw new Error("Failed to save mood entry");
     }
   };
@@ -179,6 +184,15 @@ export default function MoodTracker() {
   const handleDateSelect = async (date: Date | undefined) => {
     if (!date) return;
     
+    if (isFutureDate(date)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Date",
+        description: "You can't select future dates",
+      });
+      return;
+    }
+
     const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     setSelectedDate(normalizedDate);
     try {
@@ -203,10 +217,18 @@ export default function MoodTracker() {
   const handleMoodSelect = async (moodValue: number) => {
     if (!selectedDate) return;
     
+    if (isFutureDate(selectedDate)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Date",
+        description: "You can't log moods for future dates",
+      });
+      return;
+    }
+
     try {
       const savedEntry = await saveMoodEntry(selectedDate, moodValue, notes);
       
-      // Re-fetch mood history to ensure consistency
       const updatedHistory = await fetchMoodHistory();
       setMoodHistory(updatedHistory);
 
@@ -257,12 +279,10 @@ export default function MoodTracker() {
 
     const days: (Date | null)[] = [];
     
-    // Previous month's days
     for (let i = 0; i < startingDay; i++) {
       days.push(null);
     }
 
-    // Current month's days
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       days.push(date);
@@ -272,134 +292,173 @@ export default function MoodTracker() {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-64">Loading mood data...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        >
+          <CalendarIcon className="h-8 w-8 text-primary" />
+        </motion.div>
+      </div>
+    );
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6">
+    <div className="grid grid-cols-1 gap-8 p-4 md:p-6">
       {/* Mood Tracking Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Mood Input Card */}
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <CardTitle>Track Your Mood</CardTitle>
+        <Card className="shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-semibold">Track Your Mood</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-6 space-y-6">
             <div>
-              <p className="mb-4 font-medium">How are you feeling today?</p>
-              <div className="flex justify-between">
+              <p className="mb-4 font-medium text-base">How are you feeling today?</p>
+              <div className="flex justify-between gap-2">
                 {MOOD_EMOJIS.map((emoji, index) => {
                   const moodValue = index + 1;
                   const isSelected = selectedMood === moodValue;
+                  const isFuture = selectedDate ? isFutureDate(selectedDate) : false;
 
                   return (
-                    <Button
+                    <motion.button
                       key={index}
-                      variant={isSelected ? "default" : "outline"}
-                      className={`rounded-full h-14 w-14 text-2xl ${
-                        isSelected ? "bg-primary hover:bg-primary/90" : ""
-                      }`}
+                      whileHover={{ scale: isFuture ? 1 : 1.1 }}
+                      whileTap={{ scale: isFuture ? 1 : 0.95 }}
+                      className={`rounded-full h-16 w-16 text-3xl flex items-center justify-center transition-colors ${
+                        isSelected
+                          ? `${MOOD_COLORS[index]} border-2 border-primary`
+                          : "border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      } ${isFuture ? "opacity-50 cursor-not-allowed" : ""}`}
                       onClick={() => handleMoodSelect(moodValue)}
+                      disabled={isFuture}
+                      aria-label={`Select ${MOOD_LABELS[index]} mood`}
                     >
                       {emoji}
-                    </Button>
+                    </motion.button>
                   );
                 })}
               </div>
-              <div className="flex justify-between text-xs text-muted-foreground mt-2 px-1">
+              <div className="flex justify-between text-xs text-muted-foreground mt-3 px-2">
                 {MOOD_LABELS.map((label, index) => (
-                  <span key={index}>{label}</span>
+                  <span key={index} className="text-center flex-1">{label}</span>
                 ))}
               </div>
             </div>
 
             <div>
-              <p className="mb-2 font-medium">Notes:</p>
+              <p className="mb-2 font-medium text-base">Notes:</p>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Add any notes about your mood..."
-                className="min-h-[100px]"
+                className="min-h-[120px] rounded-lg border-gray-300 dark:border-gray-600"
               />
             </div>
 
             {selectedDate && selectedMood && (
-              <div className="mt-6 p-4 bg-muted rounded-lg">
-                <p className="font-medium">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              >
+                <p className="font-medium text-base">
                   Your mood on {format(selectedDate, "PPP")}:
                 </p>
                 <div className="flex items-center mt-2">
-                  <span className="text-4xl mr-2">
-                    {MOOD_EMOJIS[selectedMood - 1]}
-                  </span>
+                  <span className="text-4xl mr-3">{MOOD_EMOJIS[selectedMood - 1]}</span>
                   <span className="text-lg font-medium">
-                    {selectedMood}/5
+                    {MOOD_LABELS[selectedMood - 1]} ({selectedMood}/5)
                   </span>
                 </div>
-              </div>
+              </motion.div>
             )}
           </CardContent>
         </Card>
 
         {/* Mood Calendar Card */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Mood Calendar</CardTitle>
+        <Card className="shadow-lg lg:col-span-2">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-semibold">Mood Calendar</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex justify-between items-center mb-4">
-              <Button variant="outline" onClick={handlePrevMonth}>
-                Previous
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handlePrevMonth}
+                aria-label="Previous month"
+              >
+                <ChevronLeft className="h-5 w-5" />
               </Button>
-              <h3 className="text-lg font-medium">
+              <h3 className="text-lg font-semibold">
                 {format(currentMonth, "MMMM yyyy")}
               </h3>
-              <Button variant="outline" onClick={handleNextMonth}>
-                Next
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleNextMonth}
+                aria-label="Next month"
+              >
+                <ChevronRight className="h-5 w-5" />
               </Button>
             </div>
 
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-2">
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                <div key={day} className="text-center font-medium text-sm py-2">
+                <div
+                  key={day}
+                  className="text-center font-semibold text-sm py-2 text-gray-600 dark:text-gray-300"
+                >
                   {day}
                 </div>
               ))}
 
               {generateCalendarDays().map((date, index) => {
                 if (!date) {
-                  return <div key={`empty-${index}`} className="h-10"></div>;
+                  return <div key={`empty-${index}`} className="h-12"></div>;
                 }
 
+                const isFuture = isFutureDate(date);
                 const entry = getMoodForDate(date);
                 const isToday = isSameDay(date, new Date());
                 const isSelected = selectedDate && isSameDay(date, selectedDate);
 
                 return (
-                  <div
+                  <motion.div
                     key={date.toString()}
-                    className={`h-10 flex flex-col items-center justify-center rounded-md cursor-pointer transition-colors
-                      ${isToday ? "border border-primary" : ""}
-                      ${isSelected ? "bg-accent" : ""}
-                      ${entry ? MOOD_COLORS[entry.moodValue - 1] : "hover:bg-muted"}
+                    whileHover={{ scale: isFuture ? 1 : 1.05 }}
+                    className={`h-12 w-12 flex flex-col items-center justify-center rounded-full transition-colors relative
+                      ${isToday ? "ring-2 ring-primary" : ""}
+                      ${isSelected ? "bg-primary text-white" : ""}
+                      ${isFuture ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                      ${entry ? MOOD_COLORS[entry.moodValue - 1] : "bg-gray-100 dark:bg-gray-700"}
                     `}
-                    onClick={() => {
-                      handleDateSelect(date);
+                    onClick={() => !isFuture && handleDateSelect(date)}
+                    role="button"
+                    tabIndex={isFuture ? -1 : 0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !isFuture) handleDateSelect(date);
                     }}
+                    aria-label={`Select ${format(date, "MMMM d, yyyy")}${entry ? `, mood: ${MOOD_LABELS[entry.moodValue - 1]}` : ""}`}
                   >
-                    <div className="text-sm">{date.getDate()}</div>
+                    <span className={`text-sm font-medium ${isSelected ? "text-white" : "text-gray-800 dark:text-gray-200"}`}>
+                      {date.getDate()}
+                    </span>
                     {entry && (
-                      <div 
-                        className="text-xl"
+                      <div
+                        className="text-lg absolute -bottom-2"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleViewEntry(entry);
+                          if (!isFuture) handleViewEntry(entry);
                         }}
                       >
                         {entry.moodEmoji}
                       </div>
                     )}
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -408,69 +467,76 @@ export default function MoodTracker() {
       </div>
 
       {/* Mood History Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Mood History</CardTitle>
+      <Card className="shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl font-semibold">Mood History</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-64">
+        <CardContent className="p-6">
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={moodHistory.map(entry => ({
                   date: format(new Date(entry.date), "MMM dd"),
                   value: entry.moodValue,
-                  mood: entry.moodEmoji
+                  mood: entry.moodEmoji,
                 }))}
-                margin={{
-                  top: 10,
-                  right: 10,
-                  left: -20,
-                  bottom: 0,
-                }}
+                margin={{ top: 20, right: 20, left: 0, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} />
+                <defs>
+                  <linearGradient id="colorMood" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#7CAE9E" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#CFECE0" stopOpacity={0.2} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                <YAxis domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 12 }} />
                 <RechartsTooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    padding: "8px",
+                  }}
                   formatter={(value) => [
-                    `${MOOD_EMOJIS[Number(value) - 1]} (${value}/5)`,
+                    `${MOOD_EMOJIS[Number(value) - 1]} ${MOOD_LABELS[Number(value) - 1]} (${value}/5)`,
                     "Mood",
                   ]}
-                  labelFormatter={(label) => label}
+                  labelFormatter={(label) => `Date: ${label}`}
                 />
                 <Area
                   type="monotone"
                   dataKey="value"
                   stroke="#7CAE9E"
-                  fill="#CFECE0"
-                  activeDot={{ r: 8 }}
+                  fill="url(#colorMood)"
+                  activeDot={{ r: 8, fill: "#7CAE9E" }}
                 />
               </AreaChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="mt-6 space-y-2">
-            <h3 className="font-medium">Recent entries:</h3>
-            <div className="max-h-40 overflow-y-auto space-y-2">
+          <div className="mt-8 space-y-3">
+            <h3 className="font-semibold text-base">Recent Entries</h3>
+            <div className="max-h-48 overflow-y-auto space-y-3">
               {[...moodHistory]
-                .sort((a, b) => {
-                  const dateA = new Date(a.date);
-                  const dateB = new Date(b.date);
-                  return dateB.getTime() - dateA.getTime();
-                })
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                 .slice(0, 5)
                 .map((entry, idx) => (
-                  <div
+                  <motion.div
                     key={idx}
-                    className="flex justify-between items-center p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/50"
+                    whileHover={{ y: -2 }}
+                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:shadow-sm transition-shadow"
                     onClick={() => handleViewEntry(entry)}
                   >
-                    <span>{format(new Date(entry.date), "PPP")}</span>
-                    <div className="flex items-center">
-                      <span className="text-2xl mr-1">{entry.moodEmoji}</span>
-                      <span>{entry.moodValue}/5</span>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-2xl">{entry.moodEmoji}</span>
+                      <span className="text-sm font-medium">{format(new Date(entry.date), "PPP")}</span>
                     </div>
-                  </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium">{MOOD_LABELS[entry.moodValue - 1]}</span>
+                      <span className="text-sm text-muted-foreground">({entry.moodValue}/5)</span>
+                    </div>
+                  </motion.div>
                 ))}
             </div>
           </div>
@@ -479,43 +545,43 @@ export default function MoodTracker() {
 
       {/* Entry Details Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Mood Entry Details</DialogTitle>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="bg-gradient-to-r from-blue-100 to-green-100 dark:from-gray-700 dark:to-gray-800 p-4 rounded-t-lg">
+            <DialogTitle className="text-lg font-semibold">Mood Entry Details</DialogTitle>
           </DialogHeader>
           {selectedEntry && (
-            <div className="space-y-4">
+            <div className="p-6 space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Date:</p>
-                  <p>{format(new Date(selectedEntry.date), "PPP")}</p>
+                  <p className="font-medium text-sm">Date</p>
+                  <p className="text-base">{format(new Date(selectedEntry.date), "PPP")}</p>
                 </div>
-                <div className="text-4xl">
-                  {selectedEntry.moodEmoji}
-                </div>
+                <span className="text-4xl">{selectedEntry.moodEmoji}</span>
               </div>
-              
               <div>
-                <p className="font-medium">Mood Rating:</p>
-                <p>{selectedEntry.moodValue}/5 ({MOOD_LABELS[selectedEntry.moodValue - 1]})</p>
+                <p className="font-medium text-sm">Mood Rating</p>
+                <p className="text-base">
+                  {selectedEntry.moodValue}/5 ({MOOD_LABELS[selectedEntry.moodValue - 1]})
+                </p>
               </div>
-              
               <div>
-                <p className="font-medium">Notes:</p>
-                <p className="whitespace-pre-wrap">
+                <p className="font-medium text-sm">Notes</p>
+                <p className="text-base whitespace-pre-wrap">
                   {selectedEntry.notes || "No notes added"}
                 </p>
               </div>
-              
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setSelectedDate(new Date(selectedEntry.date));
-                  setIsDialogOpen(false);
-                }}
-              >
-                Edit This Entry
-              </Button>
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedDate(new Date(selectedEntry.date));
+                    setIsDialogOpen(false);
+                  }}
+                  className="px-4 py-2"
+                >
+                  Edit This Entry
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>

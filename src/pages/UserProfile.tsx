@@ -16,6 +16,7 @@ import {
   Mail,
   User as UserIcon,
   Loader2,
+  ChevronRight,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -46,50 +48,20 @@ const avatarOptions = [
   "https://api.dicebear.com/9.x/micah/svg?seed=Easton&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
   "https://api.dicebear.com/9.x/micah/svg?seed=Ryan&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
   "https://api.dicebear.com/9.x/micah/svg?seed=Liam&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-  "https://api.dicebear.com/9.x/micah/svg?seed=Eliza&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-  "https://api.dicebear.com/9.x/micah/svg?seed=Eden&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-  "https://api.dicebear.com/9.x/micah/svg?seed=Sawyer&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-  "https://api.dicebear.com/9.x/micah/svg?seed=Mason&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-  "https://api.dicebear.com/9.x/micah/svg?seed=Aiden&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-  "https://api.dicebear.com/9.x/micah/svg?seed=Christian&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-  "https://api.dicebear.com/9.x/micah/svg?seed=Emery&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-  "https://api.dicebear.com/9.x/personas/svg?seed=Caleb&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-  "https://api.dicebear.com/9.x/personas/svg?seed=Leah&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-  "https://api.dicebear.com/9.x/personas/svg?seed=Easton&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-  "https://api.dicebear.com/9.x/personas/svg?seed=Katherine&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-  "https://api.dicebear.com/9.x/personas/svg?seed=Ryan&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-  "https://api.dicebear.com/9.x/personas/svg?seed=Liam&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-  "https://api.dicebear.com/9.x/personas/svg?seed=Eliza&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-  "https://api.dicebear.com/9.x/personas/svg?seed=Robert&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-  "https://api.dicebear.com/9.x/personas/svg?seed=Christian&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Caleb&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Leah&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Easton&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Katherine&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Wyatt&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Kingston&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Ryan&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Liam&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Nolan&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Robert&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Eden&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Alexander&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Kimberly&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Aiden&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Mackenzie&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
 ];
 
-const moodData = [
-  { date: "2023-04-10", value: 5, mood: "😊" },
-  { date: "2023-04-11", value: 4, mood: "😊" },
-  { date: "2023-04-12", value: 3, mood: "😐" },
-  { date: "2023-04-13", value: 2, mood: "😔" },
-  { date: "2023-04-14", value: 1, mood: "😔" },
-  { date: "2023-04-15", value: 2, mood: "😔" },
-  { date: "2023-04-16", value: 3, mood: "😐" },
-  { date: "2023-04-17", value: 4, mood: "😊" },
-  { date: "2023-04-18", value: 5, mood: "😊" },
-  { date: "2023-04-19", value: 5, mood: "😊" },
+
+const mentalHealthQuotes = [
+  "You don’t have to be positive all the time. It’s okay to feel sad, angry, or scared. – Unknown",
+  "Healing takes time, and asking for help is a courageous step. – Mariska Hargitay",
+  "Your mental health is a priority. Your happiness is essential. – Unknown",
+  "You are enough just as you are. – Meghan Markle",
+  "It’s okay to not be okay, as long as you don’t give up. – Unknown",
+  "Self-care is how you take your power back. – Lalah Delia",
+  "You don’t have to control your thoughts. You just have to stop letting them control you. – Dan Millman",
+  "There is hope, even when your brain tells you there isn’t. – John Green",
+  "Be gentle with yourself. You’re doing the best you can. – Unknown",
+  "Your feelings are valid, and you deserve to be heard. – Unknown",
 ];
 
 const activityData = [
@@ -99,32 +71,7 @@ const activityData = [
   { name: "Reading", value: 30 },
 ];
 
-const journalEntries = [
-  {
-    id: 1,
-    date: "2023-04-19",
-    title: "Finding Peace in Chaos",
-    content:
-      "Today was challenging, but I managed to find moments of calm through meditation and deep breathing exercises. The 10-minute guided session really helped clear my mind.",
-    tags: ["meditation", "calm", "reflection"],
-  },
-  {
-    id: 2,
-    date: "2023-04-17",
-    title: "Academic Pressure",
-    content:
-      "Feeling overwhelmed by upcoming exams. Need to create a better study schedule and remember to take breaks. The burnout is real, but I'm learning to pace myself better.",
-    tags: ["stress", "academics", "planning"],
-  },
-  {
-    id: 3,
-    date: "2023-04-15",
-    title: "Social Connection",
-    content:
-      "Spent time with friends today. It's amazing how much social connection can boost my mood. We went for coffee and just talked about life. These moments matter so much.",
-    tags: ["friends", "connection", "gratitude"],
-  },
-];
+
 
 interface UserProfile {
   fullName: string;
@@ -154,8 +101,7 @@ export default function UserProfile() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [editProfile, setEditProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [moodHistory, setMoodHistory] = useState(moodData);
-  const [journalData, setJournalData] = useState(journalEntries);
+  const [journalData, setJournalData] = useState();
   const [newJournal, setNewJournal] = useState({
     title: "",
     content: "",
@@ -165,8 +111,19 @@ export default function UserProfile() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [currentQuote, setCurrentQuote] = useState(mentalHealthQuotes[0]);
 
   const { toast } = useToast();
+
+  // Change quote every 10 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * mentalHealthQuotes.length);
+      setCurrentQuote(mentalHealthQuotes[randomIndex]);
+    }, 600000); // 10 minutes in milliseconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
 
   const fetchUserData = async (token: string, username: string): Promise<UserProfile> => {
     try {
@@ -178,7 +135,7 @@ export default function UserProfile() {
       if (!response.ok) {
         throw new Error(response.status === 401 ? "Unauthorized" : "User not found");
       }
-
+     
       const userData: UserProfile = await response.json();
       
       const updatedProfile = {
@@ -449,17 +406,31 @@ export default function UserProfile() {
     <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
+          {/* Enhanced Profile Card with Modern Design */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="mb-8 relative"
           >
+            {/* Decorative top border */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-zenPink/70 to-transparent dark:via-zenSage/70"></div>
+            
             <Card className="border-0 overflow-hidden relative bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 group">
+              {/* Decorative corner elements */}
+              <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-zenPink dark:border-zenSage"></div>
+              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-zenPink dark:border-zenSage"></div>
+              <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-zenPink dark:border-zenSage"></div>
+              <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-zenPink dark:border-zenSage"></div>
+              
               <div className="relative z-10 px-8 pb-8 pt-10">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-                  <motion.div className="relative" whileHover={{ y: -5 }}>
-                    <div className="relative p-1 rounded-full bg-white dark:bg-gray-700 shadow-md">
+                  {/* Avatar Section */}
+                  <motion.div 
+                    className="relative group"
+                    whileHover={{ y: -5 }}
+                  >
+                    <div className="relative p-1 rounded-full bg-gradient-to-br from-zenPink/20 to-zenSage/20 dark:from-zenPink/10 dark:to-zenSage/10 shadow-md">
                       <Avatar className="relative h-32 w-32 md:h-36 md:w-36 border-[3px] border-white dark:border-gray-800 z-10">
                         <AvatarImage src={selectedAvatar || undefined} />
                         <AvatarFallback className="bg-gray-100 dark:bg-gray-700">
@@ -474,7 +445,7 @@ export default function UserProfile() {
                     >
                       <Button
                         size="icon"
-                        className="bg-zenPink hover:bg-zenPink/90 dark:bg-zenSage dark:hover:bg-zenSage/90 rounded-full h-11 w-11 shadow-lg border-2 border-white dark:border-gray-800 transition-all"
+                        className="bg-zenPink hover:bg-zenPink/90 dark:bg-zenSage dark:hover:bg-zenSage/90 rounded-full h-11 w-11 shadow-lg border-2 border-white dark:border-gray-800 transition-all group-hover:shadow-zenPink/30 dark:group-hover:shadow-zenSage/30"
                         onClick={() => setIsAvatarDialogOpen(true)}
                       >
                         <Edit2 className="h-5 w-5 text-white" />
@@ -482,6 +453,7 @@ export default function UserProfile() {
                     </motion.div>
                   </motion.div>
 
+                  {/* Profile Info Section */}
                   <div className="flex-grow text-center md:text-left mt-4 md:mt-0 space-y-3 relative">
                     <motion.h1
                       className="text-4xl font-bold text-gray-800 dark:text-white relative pb-2"
@@ -490,7 +462,9 @@ export default function UserProfile() {
                       transition={{ delay: 0.1 }}
                     >
                       {userProfile.username}
+                      <span className="absolute bottom-0 left-0 w-16 h-1 bg-zenPink dark:bg-zenSage"></span>
                     </motion.h1>
+                    
                     <motion.div
                       className="flex items-center justify-center md:justify-start space-x-2 mt-2"
                       initial={{ opacity: 0 }}
@@ -504,8 +478,35 @@ export default function UserProfile() {
                         {userProfile.email}
                       </p>
                     </motion.div>
+                    
+                    {/* User's Age */}
+                    <motion.div
+                      className="flex items-center justify-center md:justify-start space-x-2 mt-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <div className="p-1.5 rounded-lg bg-zenSage/10 border border-zenSage/20">
+                        <UserIcon className="h-5 w-5 text-zenPink dark:text-zenSage" />
+                      </div>
+                      <p className="text-gray-600 dark:text-gray-300 font-medium">
+                        Age: {userProfile.age || "Not specified"}
+                      </p>
+                    </motion.div>
+                    
+                    {/* Mental Health Quote */}
+                    <motion.div
+                      className="mt-4 italic text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto md:mx-0"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      aria-label={`Mental health quote: ${currentQuote}`}
+                    >
+                      "{currentQuote}"
+                    </motion.div>
                   </div>
 
+                  {/* Edit Button Section */}
                   <motion.div
                     className="md:ml-auto mt-6 md:mt-0"
                     initial={{ opacity: 0 }}
@@ -514,33 +515,40 @@ export default function UserProfile() {
                   >
                     <Button
                       onClick={() => setIsEditing(true)}
-                      className="relative bg-zenPink hover:bg-zenPink/90 dark:bg-zenSage dark:hover:bg-zenSage/90 text-white px-6 py-3 rounded-lg shadow-md transition-all border border-zenPink/30 dark:border-zenSage/30"
+                      className="relative bg-zenPink hover:bg-zenPink/90 dark:bg-zenSage dark:hover:bg-zenSage/90 text-white px-6 py-3 rounded-lg shadow-md transition-all border border-zenPink/30 dark:border-zenSage/30 group"
                     >
                       <span className="flex items-center">
-                        <Edit2 className="h-5 w-5 mr-2" />
+                        <Edit2 className="h-5 w-5 mr-2 transition-transform group-hover:rotate-12" />
                         <span className="font-semibold">Edit Profile</span>
+                        <ChevronRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                       </span>
                     </Button>
                   </motion.div>
                 </div>
               </div>
+              
+              {/* Decorative bottom border */}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-zenPink/70 to-transparent dark:via-zenSage/70"></div>
             </Card>
           </motion.div>
 
+          {/* Avatar Selection Dialog */}
           <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
-            <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 bg-white dark:bg-gray-800">
+            <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 bg-white dark:bg-gray-800 rounded-lg">
               <DialogHeader className="px-8 pt-8 pb-6">
-                <h2 className="text-3xl font-bold text-center">
+                <DialogTitle className="text-3xl font-bold text-center bg-gradient-to-r from-zenPink to-zenSage bg-clip-text text-transparent">
                   Choose Your Avatar
-                </h2>
+                </DialogTitle>
               </DialogHeader>
               <div className="px-8 pb-8">
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-6">
                   {avatarOptions.map((avatar, index) => (
                     <motion.div
                       key={index}
-                      className={`flex flex-col items-center cursor-pointer ${
-                        selectedAvatar === avatar ? "ring-2 ring-zenSage dark:ring-zenMint" : ""
+                      className={`flex flex-col items-center cursor-pointer p-2 rounded-lg transition-all ${
+                        selectedAvatar === avatar 
+                          ? "bg-zenPink/10 dark:bg-zenSage/10 ring-2 ring-zenPink dark:ring-zenSage" 
+                          : "hover:bg-gray-100 dark:hover:bg-gray-700"
                       }`}
                       onClick={() => handleAvatarChange(avatar)}
                       whileHover={{ scale: 1.05 }}
@@ -556,90 +564,148 @@ export default function UserProfile() {
             </DialogContent>
           </Dialog>
 
-          {isEditing ? (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <Card>
+          {/* Edit Profile Modal */}
+          {isEditing && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }} 
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+            >
+              <Card className="border-0 bg-white dark:bg-gray-800 shadow-lg relative">
+                {/* Decorative elements */}
+                <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-zenPink dark:border-zenSage"></div>
+                <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-zenPink dark:border-zenSage"></div>
+                
                 <CardHeader>
-                  <CardTitle>Edit Profile</CardTitle>
+                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-zenPink to-zenSage bg-clip-text text-transparent">
+                    Edit Your Profile
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="fullName">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      value={editProfile?.fullName || ""}
-                      onChange={(e) => handleInputChange("fullName", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="username">Username</Label>
-                    <Input
-                      id="username"
-                      value={editProfile?.username || ""}
-                      onChange={(e) => handleInputChange("username", e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="age">Age</Label>
-                    <Input
-                      id="age"
-                      type="number"
-                      value={editProfile?.age || 0}
-                      onChange={(e) => handleInputChange("age", parseInt(e.target.value) || 0)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="gender">Gender</Label>
-                    <Select
-                      value={editProfile?.gender || ""}
-                      onValueChange={(value) => handleInputChange("gender", value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Male">Male</SelectItem>
-                        <SelectItem value="Female">Female</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
+                
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="fullName" className="text-gray-700 dark:text-gray-300">
+                        Full Name
+                      </Label>
+                      <Input
+                        id="fullName"
+                        value={editProfile?.fullName || ""}
+                        onChange={(e) => handleInputChange("fullName", e.target.value)}
+                        className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="username" className="text-gray-700 dark:text-gray-300">
+                        Username
+                      </Label>
+                      <Input
+                        id="username"
+                        value={editProfile?.username || ""}
+                        onChange={(e) => handleInputChange("username", e.target.value)}
+                        className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="age" className="text-gray-700 dark:text-gray-300">
+                        Age
+                      </Label>
+                      <Input
+                        id="age"
+                        type="number"
+                        value={editProfile?.age || 0}
+                        onChange={(e) => handleInputChange("age", parseInt(e.target.value) || 0)}
+                        className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="gender" className="text-gray-700 dark:text-gray-300">
+                        Gender
+                      </Label>
+                      <Select
+                        value={editProfile?.gender || ""}
+                        onValueChange={(value) => handleInputChange("gender", value)}
+                      >
+                        <SelectTrigger className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage">
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
+                          <SelectItem value="Male">Male</SelectItem>
+                          <SelectItem value="Female">Female</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setIsEditing(false)}>
+                
+                <CardFooter className="flex justify-end space-x-4 pt-6">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsEditing(false)}
+                    className="border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleProfileUpdate}
                     disabled={isSaving}
-                    className="bg-zenSage hover:bg-zenSage/90 text-white"
+                    className="bg-zenPink hover:bg-zenPink/90 dark:bg-zenSage dark:hover:bg-zenSage/90 text-white px-6 py-3 rounded-lg transition-all"
                   >
-                    {isSaving && <Loader2 className="h-5 w-5 animate-spin mr-2" />}
-                    Save Changes
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
                   </Button>
                 </CardFooter>
               </Card>
             </motion.div>
-          ) : (
+          )}
+
+          {/* Profile Tabs */}
+          {!isEditing && (
             <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-              <TabsList className="bg-gray-100 p-1 w-full flex justify-center">
-                <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
-                <TabsTrigger value="mood-tracker" className="flex-1">Mood Tracker</TabsTrigger>
-                <TabsTrigger value="journal" className="flex-1">Journal</TabsTrigger>
-                <TabsTrigger value="progress" className="flex-1">Progress</TabsTrigger>
+              <TabsList className="bg-gray-100 dark:bg-gray-700 p-1 w-full flex justify-center rounded-lg">
+                <TabsTrigger 
+                  value="overview" 
+                  className="flex-1 py-2 px-4 rounded-md data-[state=active]:bg-zenPink data-[state=active]:text-white dark:data-[state=active]:bg-zenSage"
+                >
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="mood-tracker" 
+                  className="flex-1 py-2 px-4 rounded-md data-[state=active]:bg-zenPink data-[state=active]:text-white dark:data-[state=active]:bg-zenSage"
+                >
+                  Mood Tracker
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="journal" 
+                  className="flex-1 py-2 px-4 rounded-md data-[state=active]:bg-zenPink data-[state=active]:text-white dark:data-[state=active]:bg-zenSage"
+                >
+                  Journal
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="progress" 
+                  className="flex-1 py-2 px-4 rounded-md data-[state=active]:bg-zenPink data-[state=active]:text-white dark:data-[state=active]:bg-zenSage"
+                >
+                  Progress
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview">
                 <Overview
-                  moodHistory={moodHistory}
-                  activityData={activityData}
                   journalData={journalData}
                 />
               </TabsContent>
               <TabsContent value="mood-tracker">
                 <MoodTracker
-                  moodHistory={moodHistory}
-                  setMoodHistory={setMoodHistory}
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
                   selectedMood={selectedMood}
@@ -649,7 +715,6 @@ export default function UserProfile() {
               <TabsContent value="journal">
                 <Journal
                   journalData={journalData}
-                  setJournalData={setJournalData}
                   newJournal={newJournal}
                   setNewJournal={setNewJournal}
                   isAddingJournal={isAddingJournal}
