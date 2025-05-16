@@ -1,67 +1,42 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 const isAuthenticated = () => {
   return !!localStorage.getItem("token");
 };
 
+// Only these paths are restricted
+const restrictedPaths = [
+  "/chatbot",
+  "/chatroom",
+  "/meditation",
+  "/yoga",
+  "/userprofile",
+  "/fitness",
+  "/lifestyle",
+  "/studyhelper",
+  "/depression-test",
+];
+
 const ProtectedRoute = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [showDialog, setShowDialog] = useState(false);
+  const loggedIn = isAuthenticated();
+  const isRestricted = restrictedPaths.includes(location.pathname);
 
   useEffect(() => {
-    if (!isAuthenticated() && !["/", "/information", "/about", "/contact", "/emergency"].includes(location.pathname)) {
-      setShowDialog(true);
+    if (!loggedIn && isRestricted) {
+      navigate("/login");
     }
-  }, [location]);
+  }, [location.pathname, loggedIn, isRestricted, navigate]);
 
-  const handleLogin = () => {
-    setShowDialog(false);
-    navigate("/login");
-  };
-
-  const handleClose = () => {
-    setShowDialog(false);
-    // Redirect to home or info hub when the dialog is closed
-    if (!isAuthenticated()) {
-      navigate("/");
-    }
-  };
-
-  if (!isAuthenticated() && !["/", "/information", "/about", "/contact", "/emergency"].includes(location.pathname)) {
-    return (
-      <>
-        {children}
-        <Dialog open={showDialog} onOpenChange={handleClose}>
-          <DialogContent>
-            <DialogHeader>Welcome to Your Journey</DialogHeader>
-            <p>To get started and enjoy the full experience, please log in.</p>
-            <DialogFooter>
-              <Button onClick={handleLogin}>Login</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </>
-    );
+  // If user is not logged in and trying to access a restricted page,
+  // don't render the protected content
+  if (!loggedIn && isRestricted) {
+    return null;
   }
 
-  return (
-    <>
-      {children}
-      <Dialog open={showDialog} onOpenChange={handleClose}>
-        <DialogContent>
-          <DialogHeader>Welcome to Your Journey</DialogHeader>
-          <p>To get started and enjoy the full experience, please log in.</p>
-          <DialogFooter>
-            <Button onClick={handleLogin}>Login</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;
