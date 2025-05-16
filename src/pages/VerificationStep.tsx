@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, AlertCircle, ChevronLeft, RotateCw, Mail, Hash } from "lucide-react";
+import { CheckCircle, AlertCircle, ChevronLeft, ChevronRight, Mail, Hash } from "lucide-react";
 
 interface VerificationStepProps {
   email: string;
@@ -27,7 +30,6 @@ export function VerificationStep({
 }: VerificationStepProps) {
   const [verificationCode, setVerificationCode] = useState("");
 
-  // Auto-submit when 6 digits are entered
   useEffect(() => {
     if (verificationCode.length === 6) {
       handleVerify();
@@ -40,100 +42,144 @@ export function VerificationStep({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col items-center space-y-3 text-center">
-        <div className="bg-zenSage/20 p-3 rounded-full">
-          <Hash className="h-7 w-7 text-zenSage" strokeWidth={2} />
-        </div>
-        <h2 className="text-xl font-bold text-gray-800">Verify Your Email</h2>
-        <div className="flex items-center text-sm text-gray-600">
-          <Mail className="h-4 w-4 mr-1" />
-          <span className="font-medium">{email}</span>
-        </div>
-        <p className="text-sm text-gray-500">
-          Enter the 6-digit verification code sent to your email
-        </p>
-      </div>
-
-      {verificationError && (
-        <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-md text-sm flex items-start">
-          <AlertCircle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
-          <span>{verificationError}</span>
-        </div>
-      )}
-
-      {verificationSuccess && (
-        <div className="bg-green-50 border border-green-200 text-green-600 p-3 rounded-md text-sm flex items-start">
-          <CheckCircle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
-          <span>{verificationSuccess}</span>
-        </div>
-      )}
-
-      <div>
-        <Label htmlFor="code" className="text-gray-700 font-medium">
-          Verification Code
-        </Label>
-        <div className="relative mt-1">
-          <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
-            id="code"
-            name="code"
-            type="text"
-            placeholder="••••••"
-            value={verificationCode}
-            onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, "").slice(0, 6);
-              setVerificationCode(value);
-            }}
-            maxLength={6}
-            className="pl-10 text-lg font-mono tracking-widest h-12 focus:border-zenSage border-gray-300"
-            autoFocus
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="flex-1 h-11 gap-2"
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#F8E8E9] to-[#EBFFF5] p-4">
+      <div className="w-full max-w-xl">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <ChevronLeft className="h-4 w-4" />
-          Back
-        </Button>
-        <Button
-          type="button"
-          onClick={handleVerify}
-          className="flex-1 h-11 bg-zenSage hover:bg-zenSage/90 text-white"
-          disabled={isLoading || verificationCode.length !== 6}
-        >
-          {isLoading ? (
-            <span className="flex items-center gap-2">
-              <RotateCw className="h-4 w-4 animate-spin" />
-              Verifying...
-            </span>
-          ) : (
-            "Verify Account"
-          )}
-        </Button>
-      </div>
+          <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-white w-full max-w-lg mx-auto">
+            <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
+            
+            <CardHeader className="pb-6 px-10">
+              <div className="flex flex-col items-center space-y-2">
+                <div className="bg-[#F8E8E9]/80 p-4 rounded-full mb-4">
+                  <Hash className="h-8 w-8 text-[#E69EA2]" strokeWidth={2} />
+                </div>
+                <h1 className="text-3xl font-bold text-[#7CAE9E]">Verify Your Email</h1>
+                <div className="flex items-center text-md text-gray-600">
+                  <Mail className="h-5 w-5 mr-2 text-[#E69EA2]" />
+                  <span className="font-medium">{email}</span>
+                </div>
+                <p className="text-gray-500 text-md">
+                  Enter the 6-digit verification code sent to your email
+                </p>
+              </div>
+            </CardHeader>
 
-      <div className="text-center text-sm text-gray-500">
-        <p>
-          Didn't receive a code?{" "}
-          <button
-            onClick={onResendCode}
-            className={`font-medium ${
-              resendTimer > 0
-                ? "text-gray-400 cursor-not-allowed"
-                : "text-zenSage hover:underline"
-            }`}
-            disabled={resendTimer > 0}
-          >
-            {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend code"}
-          </button>
-        </p>
+            <CardContent className="px-10 pb-8">
+              {verificationError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6 p-4 bg-[#F8E8E9]/80 text-[#E69EA2] rounded-lg flex items-center border border-[#FEC0B3]/50"
+                >
+                  <AlertCircle className="h-6 w-6 mr-3" />
+                  <span className="font-medium text-md">{verificationError}</span>
+                </motion.div>
+              )}
+
+              {verificationSuccess && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6 p-4 bg-[#EBFFF5]/80 text-[#7CAE9E] rounded-lg flex items-center border border-[#CFECE0]"
+                >
+                  <CheckCircle className="h-6 w-6 mr-3" />
+                  <span className="font-medium text-md">{verificationSuccess}</span>
+                </motion.div>
+              )}
+
+              <div className="space-y-3">
+                <Label htmlFor="code" className="text-[#7CAE9E] font-medium text-md">
+                  Verification Code
+                </Label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Hash className="h-6 w-6 text-[#E69EA2]" />
+                  </div>
+                  <Input
+                    id="code"
+                    name="code"
+                    type="text"
+                    placeholder="••••••"
+                    value={verificationCode}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+                      setVerificationCode(value);
+                    }}
+                    maxLength={6}
+                    className="pl-12 text-lg font-mono tracking-widest h-14 rounded-xl border-[#CFECE0] focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onBack}
+                  className="flex-1 h-14 rounded-xl border-[#CFECE0] hover:bg-[#EBFFF5] text-[#7CAE9E] hover:text-[#6a9d8d]"
+                >
+                  <ChevronLeft className="h-5 w-5 mr-1" />
+                  <span className="text-md">Back</span>
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleVerify}
+                  className="flex-1 h-14 rounded-xl bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] hover:from-[#d18e92] hover:to-[#eeb0a5] text-white"
+                  disabled={isLoading || verificationCode.length !== 6}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="h-6 w-6 border-2 border-white border-t-transparent rounded-full mr-3"
+                      />
+                      Verifying...
+                    </div>
+                  ) : (
+                    <span className="font-medium">Verify Account</span>
+                  )}
+                </Button>
+              </div>
+
+              <div className="text-center text-md text-gray-500 mt-6">
+                <p>
+                  Didn't receive a code?{" "}
+                  <button
+                    onClick={onResendCode}
+                    className={`font-medium ${
+                      resendTimer > 0
+                        ? "text-gray-400 cursor-not-allowed"
+                        : "text-[#7CAE9E] hover:underline hover:text-[#6a9d8d]"
+                    }`}
+                    disabled={resendTimer > 0}
+                  >
+                    {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend code"}
+                  </button>
+                </p>
+              </div>
+            </CardContent>
+
+            <CardFooter className="justify-center pb-10">
+              <Link
+                to="/"
+                className="text-md text-[#7CAE9E] hover:text-[#6a9d8d] flex items-center justify-center transition-colors duration-200"
+              >
+                Return to home page
+                <ChevronRight className="h-5 w-5 ml-1.5 mt-0.5" />
+              </Link>
+            </CardFooter>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );
