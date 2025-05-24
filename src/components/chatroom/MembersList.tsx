@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { jwtDecode } from "jwt-decode";
 
 type ChatUser = {
   id: string;
@@ -29,6 +30,17 @@ interface UserListProps {
   isAdmin: boolean;
 }
 
+type JwtPayload = {
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": string;
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": string;
+  Username: string;
+  Avatar: string;
+  Gender: string;
+  Age: string;
+  isTemporary: string;
+  exp: number;
+};
+
 const UserList: React.FC<UserListProps> = ({
   users,
   currentUser,
@@ -36,11 +48,36 @@ const UserList: React.FC<UserListProps> = ({
   onKickUser,
   isAdmin,
 }) => {
+  // Function to get the best available avatar URL
+// Then update your getAvatarUrl function
+const getAvatarUrl = (user: ChatUser) => {
+  // First try the user's avatar property
+  if (user.avatar) return user.avatar;
+  
+  // Fallback to checking the token for current user
+  if (user.id === currentUser.id) {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode<JwtPayload>(token); // Use the JwtPayload type
+        return decoded.Avatar || ""; // Now TypeScript knows decoded has an Avatar property
+      } catch (error) {
+        console.error("Failed to decode token:", error);
+        return "";
+      }
+    }
+  }
+  
+  // Final fallback to empty string
+  return "";
+};
+
   return (
     <div className="space-y-3">
       {users.map((user) => {
         const isCurrentUserItem = user.id === currentUser.id;
         const canManageUser = isAdmin && !isCurrentUserItem;
+        const avatarUrl = getAvatarUrl(user);
 
         return (
           <div
@@ -51,8 +88,17 @@ const UserList: React.FC<UserListProps> = ({
           >
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback>{user.name[0]}</AvatarFallback>
+                {/* Only show AvatarImage if we have a valid URL */}
+                {avatarUrl ? (
+                  <AvatarImage 
+                    src={avatarUrl} 
+                    alt={user.name}
+                    className="object-cover"
+                  />
+                ) : null}
+                <AvatarFallback className="bg-[#EBFFF5] text-[#7CAE9E]">
+                  {user.name[0].toUpperCase()}
+                </AvatarFallback>
               </Avatar>
 
               <div>

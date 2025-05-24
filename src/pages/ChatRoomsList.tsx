@@ -22,6 +22,8 @@ type JwtPayload = {
   name: string;
   Username: string;
   Age: string;
+  Avatar: string;  // Add this
+
 };
 
 export type ChatUser = {
@@ -144,7 +146,7 @@ const getUserFromToken = (): ChatUser | null => {
       id: decoded.Username,
       name: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"],
       username: decoded.Username,
-      avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${decoded.Username}`,
+      avatar: decoded.Avatar,  // Use the avatar from token instead of generating one
       isAdmin: false
     };
   } catch (error) {
