@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC, ReactNode } from "react";
 import Layout from "@/components/layout/Layout";
 import { motion } from "framer-motion";
 import {
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Edit2,
   Mail,
@@ -18,6 +18,8 @@ import {
   Loader2,
   ChevronRight,
   Trash2,
+  Settings,
+  MoreVertical,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -28,6 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -41,6 +44,12 @@ import MoodTracker from "@/components/profile/MoodTracker";
 import Journal from "@/components/profile/Journal";
 import Progress from "@/components/profile/Progress";
 import { jwtDecode } from "jwt-decode";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const API_BASE_URL = "https://localhost:7223";
 
@@ -58,18 +67,6 @@ const mentalHealthQuotes = [
   "Your mental health is a priority. Your happiness is essential. – Unknown",
   "You are enough just as you are. – Meghan Markle",
   "It's okay to not be okay, as long as you don't give up. – Unknown",
-  "Self-care is how you take your power back. – Lalah Delia",
-  "You don't have to control your thoughts. You just have to stop letting them control you. – Dan Millman",
-  "There is hope, even when your brain tells you there isn't. – John Green",
-  "Be gentle with yourself. You're doing the best you can. – Unknown",
-  "Your feelings are valid, and you deserve to be heard. – Unknown",
-];
-
-const activityData = [
-  { name: "Meditation", value: 35 },
-  { name: "Yoga", value: 20 },
-  { name: "Journaling", value: 15 },
-  { name: "Reading", value: 30 },
 ];
 
 interface UserProfile {
@@ -91,42 +88,38 @@ interface JwtPayload {
   Age?: number;
 }
 
+interface LayoutProps {
+  children: ReactNode;
+}
+
+const TypedLayout = Layout as FC<LayoutProps>;
+
 export default function UserProfile() {
   const [selectedTab, setSelectedTab] = useState("overview");
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
-  );
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [editProfile, setEditProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [journalData, setJournalData] = useState();
-  const [newJournal, setNewJournal] = useState({
-    title: "",
-    content: "",
-    tags: "",
-  });
-  const [isAddingJournal, setIsAddingJournal] = useState(false);
+  const [journalData, setJournalData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [currentQuote, setCurrentQuote] = useState(mentalHealthQuotes[0]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [deletePassword, setDeletePassword] = useState("");
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const { toast } = useToast();
 
-  // Change quote every 10 minutes
   useEffect(() => {
     const interval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * mentalHealthQuotes.length);
       setCurrentQuote(mentalHealthQuotes[randomIndex]);
-    }, 600000); // 10 minutes in milliseconds
-
-    return () => clearInterval(interval); // Cleanup on unmount
+    }, 600000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchUserData = async (
@@ -158,6 +151,7 @@ export default function UserProfile() {
         avatar: userData.avatar || null,
       };
 
+      console.log("Fetched profile with gender:", updatedProfile.gender);
       setUserProfile(updatedProfile);
       setEditProfile(updatedProfile);
       setSelectedAvatar(userData.avatar);
@@ -168,15 +162,22 @@ export default function UserProfile() {
 
       try {
         const decoded: JwtPayload = jwtDecode(token);
+        const normalizedGender =
+          decoded.Gender === "M"
+            ? "Male"
+            : decoded.Gender === "F"
+            ? "Female"
+            : decoded.Gender || null;
         const fallbackProfile = {
           fullName: decoded.name || "Unknown",
           username: decoded.sub || decoded.Username || username || "Unknown",
           age: decoded.Age || 0,
-          gender: decoded.Gender || null,
+          gender: normalizedGender,
           email: decoded.email || "Unknown",
           avatar: decoded.Avatar || null,
         };
 
+        console.log("Fallback profile with gender:", fallbackProfile.gender);
         setUserProfile(fallbackProfile);
         setEditProfile(fallbackProfile);
         setSelectedAvatar(decoded.Avatar);
@@ -353,7 +354,6 @@ export default function UserProfile() {
     }
   };
 
-  // Update the delete account handler
   const handleAccountDeletion = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -373,7 +373,7 @@ export default function UserProfile() {
       }
 
       localStorage.removeItem("token");
-      window.location.href = "/"; // Redirect to home page
+      window.location.href = "/";
       toast({
         title: "Account Deleted",
         description: "Your account has been permanently deleted.",
@@ -430,19 +430,19 @@ export default function UserProfile() {
 
   if (isLoading) {
     return (
-      <Layout>
+      <TypedLayout>
         <div className="flex flex-col items-center justify-center min-h-screen gap-4">
           <Loader2 className="w-12 h-12 animate-spin text-zenSage" />
           <h1 className="text-2xl font-semibold">Loading Profile...</h1>
           <p className="text-gray-500">Please wait while we load your data</p>
         </div>
-      </Layout>
+      </TypedLayout>
     );
   }
 
   if (error || !userProfile) {
     return (
-      <Layout>
+      <TypedLayout>
         <div className="flex flex-col items-center justify-center min-h-screen gap-4">
           <h1 className="text-2xl font-semibold text-red-600">Error</h1>
           <p className="text-gray-500">{error || "Failed to load profile"}</p>
@@ -453,26 +453,23 @@ export default function UserProfile() {
             Retry
           </Button>
         </div>
-      </Layout>
+      </TypedLayout>
     );
   }
 
   return (
-    <Layout>
+    <TypedLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          {/* Enhanced Profile Card with Modern Design */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="mb-8 relative"
           >
-            {/* Decorative top border */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-zenPink/70 to-transparent dark:via-zenSage/70"></div>
 
             <Card className="border-0 overflow-hidden relative bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 group">
-              {/* Decorative corner elements */}
               <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-zenPink dark:border-zenSage"></div>
               <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-zenPink dark:border-zenSage"></div>
               <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-zenPink dark:border-zenSage"></div>
@@ -480,7 +477,6 @@ export default function UserProfile() {
 
               <div className="relative z-10 px-8 pb-8 pt-10">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-                  {/* Avatar Section */}
                   <motion.div className="relative group" whileHover={{ y: -5 }}>
                     <div className="relative p-1 rounded-full bg-gradient-to-br from-zenPink/20 to-zenSage/20 dark:from-zenPink/10 dark:to-zenSage/10 shadow-md">
                       <Avatar className="relative h-32 w-32 md:h-36 md:w-36 border-[3px] border-white dark:border-gray-800 z-10">
@@ -505,17 +501,42 @@ export default function UserProfile() {
                     </motion.div>
                   </motion.div>
 
-                  {/* Profile Info Section */}
                   <div className="flex-grow text-center md:text-left mt-4 md:mt-0 space-y-3 relative">
-                    <motion.h1
-                      className="text-4xl font-bold text-gray-800 dark:text-white relative pb-2"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 }}
-                    >
-                      {userProfile.username}
-                      <span className="absolute bottom-0 left-0 w-16 h-1 bg-zenPink dark:bg-zenSage"></span>
-                    </motion.h1>
+                    <div className="flex justify-between items-start">
+                      <motion.h1
+                        className="text-4xl font-bold text-gray-800 dark:text-white relative pb-2"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 }}
+                      >
+                        {userProfile.username}
+                        <span className="absolute bottom-0 left-0 w-16 h-1 bg-zenPink dark:bg-zenSage"></span>
+                      </motion.h1>
+                      
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="rounded-full">
+                            <MoreVertical className="h-5 w-5 text-gray-500 hover:text-zenPink dark:hover:text-zenSage" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                          <DropdownMenuItem
+                            onClick={() => setIsEditing(true)}
+                            className="cursor-pointer focus:bg-gray-100 dark:focus:bg-gray-700"
+                          >
+                            <Edit2 className="mr-2 h-4 w-4" />
+                            <span>Edit Profile</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setIsDeleteDialogOpen(true)}
+                            className="cursor-pointer text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Delete Account</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
 
                     <motion.div
                       className="flex items-center justify-center md:justify-start space-x-2 mt-2"
@@ -531,7 +552,6 @@ export default function UserProfile() {
                       </p>
                     </motion.div>
 
-                    {/* User's Age */}
                     <motion.div
                       className="flex items-center justify-center md:justify-start space-x-2 mt-2"
                       initial={{ opacity: 0 }}
@@ -546,7 +566,6 @@ export default function UserProfile() {
                       </p>
                     </motion.div>
 
-                    {/* Mental Health Quote */}
                     <motion.div
                       className="mt-4 italic text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto md:mx-0"
                       initial={{ opacity: 0 }}
@@ -557,50 +576,13 @@ export default function UserProfile() {
                       "{currentQuote}"
                     </motion.div>
                   </div>
-
-                  {/* Edit and Delete Buttons Section */}
-                  <div className="flex flex-col md:flex-row md:ml-auto mt-6 md:mt-0 gap-4">
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.4 }}
-                    >
-                      <Button
-                        onClick={() => setIsEditing(true)}
-                        className="relative bg-zenPink hover:bg-zenPink/90 dark:bg-zenSage dark:hover:bg-zenSage/90 text-white px-6 py-3 rounded-lg shadow-md transition-all border border-zenPink/30 dark:border-zenSage/30 group"
-                      >
-                        <span className="flex items-center">
-                          <Edit2 className="h-5 w-5 mr-2 transition-transform group-hover:rotate-12" />
-                          <span className="font-semibold">Edit Profile</span>
-                          <ChevronRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                        </span>
-                      </Button>
-                    </motion.div>
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.4 }}
-                    >
-                      <Button
-                        onClick={() => setIsDeleteDialogOpen(true)}
-                        className="relative bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg shadow-md transition-all border border-red-600/30 group"
-                      >
-                        <span className="flex items-center">
-                          <Trash2 className="h-5 w-5 mr-2 transition-transform group-hover:rotate-12" />
-                          <span className="font-semibold">Delete Account</span>
-                          <ChevronRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                        </span>
-                      </Button>
-                    </motion.div>
-                  </div>
                 </div>
               </div>
 
-              {/* Decorative bottom border */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-zenPink/70 to-transparent dark:via-zenSage/70"></div>
             </Card>
           </motion.div>
-          {/* Avatar Selection Dialog */}
+
           <Dialog
             open={isAvatarDialogOpen}
             onOpenChange={setIsAvatarDialogOpen}
@@ -634,26 +616,33 @@ export default function UserProfile() {
               </div>
             </DialogContent>
           </Dialog>
-          // Update the delete confirmation dialog
+
           <Dialog
             open={isDeleteDialogOpen}
             onOpenChange={setIsDeleteDialogOpen}
           >
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-red-600">
-                  Delete Your Account
+                <DialogTitle className="text-2xl font-bold text-red-600 dark:text-red-400">
+                  Confirm Account Deletion
                 </DialogTitle>
+                <DialogDescription className="text-gray-600 dark:text-gray-400">
+                  This action cannot be undone. All your data will be permanently removed.
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
-                <p className="text-gray-700 dark:text-gray-300">
-                  Are you sure you want to delete your account? This action
-                  cannot be undone. All your data will be permanently removed.
-                </p>
-                <p className="text-sm text-red-500 dark:text-red-400">
-                  Warning: This will immediately delete your account without
-                  additional confirmation.
-                </p>
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                  <p className="text-red-600 dark:text-red-400 font-medium">
+                    Warning: This will immediately delete your account and all associated data.
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    type="text"
+                    placeholder="Type 'DELETE' to confirm"
+                    className="border-red-300 dark:border-red-700 focus:ring-red-500 dark:focus:ring-red-400"
+                  />
+                </div>
               </div>
               <DialogFooter>
                 <Button
@@ -666,21 +655,21 @@ export default function UserProfile() {
                 <Button
                   onClick={handleAccountDeletion}
                   disabled={isDeleting}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white"
                 >
                   {isDeleting ? (
                     <>
-                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       Deleting...
                     </>
                   ) : (
-                    "Delete Account Permanently"
+                    "Delete Account"
                   )}
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          {/* Edit Profile Modal */}
+
           {isEditing && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -688,7 +677,6 @@ export default function UserProfile() {
               className="mb-8"
             >
               <Card className="border-0 bg-white dark:bg-gray-800 shadow-lg relative">
-                {/* Decorative elements */}
                 <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-zenPink dark:border-zenSage"></div>
                 <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-zenPink dark:border-zenSage"></div>
 
@@ -726,10 +714,9 @@ export default function UserProfile() {
                       </Label>
                       <Input
                         id="username"
+                        type="text"
                         value={editProfile?.username || ""}
-                        onChange={(e) =>
-                          handleInputChange("username", e.target.value)
-                        }
+                        onChange={(e) => handleInputChange("username", e.target.value)}
                         className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage"
                       />
                     </div>
@@ -745,12 +732,7 @@ export default function UserProfile() {
                         id="age"
                         type="number"
                         value={editProfile?.age || 0}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "age",
-                            parseInt(e.target.value) || 0
-                          )
-                        }
+                        onChange={(e) => handleInputChange("age", parseInt(e.target.value) || 0)}
                         className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage"
                       />
                     </div>
@@ -763,13 +745,11 @@ export default function UserProfile() {
                         Gender
                       </Label>
                       <Select
-                        value={editProfile?.gender || ""}
-                        onValueChange={(value) =>
-                          handleInputChange("gender", value)
-                        }
+                        value={editProfile?.gender || undefined}
+                        onValueChange={(value) => handleInputChange("gender", value)}
                       >
                         <SelectTrigger className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage">
-                          <SelectValue placeholder="Select gender" />
+                          <SelectValue placeholder={editProfile?.gender || "Select gender"} />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
                           <SelectItem value="Male">Male</SelectItem>
@@ -807,14 +787,14 @@ export default function UserProfile() {
               </Card>
             </motion.div>
           )}
-          {/* Profile Tabs */}
+
           {!isEditing && (
             <Tabs
               value={selectedTab}
               onValueChange={setSelectedTab}
               className="space-y-6"
             >
-              <TabsList className="bg-gray-100 dark:bg-gray-700 p-1 w-full flex justify-center rounded-lg">
+              <TabsList className="bg-white dark:bg-gray-800 p-2 rounded-lg flex justify-center">
                 <TabsTrigger
                   value="overview"
                   className="flex-1 py-2 px-4 rounded-md data-[state=active]:bg-zenPink data-[state=active]:text-white dark:data-[state=active]:bg-zenSage"
@@ -855,10 +835,7 @@ export default function UserProfile() {
               <TabsContent value="journal">
                 <Journal
                   journalData={journalData}
-                  newJournal={newJournal}
-                  setNewJournal={setNewJournal}
-                  isAddingJournal={isAddingJournal}
-                  setIsAddingJournal={setIsAddingJournal}
+                  setJournalData={setJournalData}
                 />
               </TabsContent>
               <TabsContent value="progress">
@@ -868,6 +845,6 @@ export default function UserProfile() {
           )}
         </div>
       </div>
-    </Layout>
+    </TypedLayout>
   );
 }

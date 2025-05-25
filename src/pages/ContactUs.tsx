@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,17 +8,40 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin, Send, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { jwtDecode } from "jwt-decode";
+
+interface JwtPayload {
+  sub?: string;
+  Username?: string;
+  name?: string;
+  email?: string;
+}
 
 export default function ContactUs() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     subject: "",
-    message: ""
+    message: "",
+    userId: ""
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Extract username from token when component mounts
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded: JwtPayload = jwtDecode(token);
+        const username = decoded.sub || decoded.Username || "";
+        setFormData(prev => ({ ...prev, userId: username }));
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -28,7 +51,6 @@ export default function ContactUs() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Simple validation
     if (!formData.name || !formData.email || !formData.message) {
       toast({
         title: "Error",
@@ -41,10 +63,12 @@ export default function ContactUs() {
     setIsLoading(true);
 
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch("https://localhost:7223/api/Contact", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify(formData)
       });
@@ -113,7 +137,13 @@ export default function ContactUs() {
                       className="mt-8 bg-zenSage hover:bg-zenSage/90"
                       onClick={() => {
                         setIsSubmitted(false);
-                        setFormData({ name: "", email: "", subject: "", message: "" });
+                        setFormData({ 
+                          name: "", 
+                          email: "", 
+                          subject: "", 
+                          message: "",
+                          userId: formData.userId // Keep the userId
+                        });
                       }}
                     >
                       Send Another Message
@@ -194,6 +224,8 @@ export default function ContactUs() {
               </CardContent>
             </Card>
           </motion.div>
+
+
 
           <motion.div
             initial={{ opacity: 0, x: 30 }}
