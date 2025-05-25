@@ -17,6 +17,7 @@ import {
   User as UserIcon,
   Loader2,
   ChevronRight,
+  Trash2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -50,17 +52,16 @@ const avatarOptions = [
   "https://api.dicebear.com/9.x/micah/svg?seed=Liam&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
 ];
 
-
 const mentalHealthQuotes = [
-  "You don’t have to be positive all the time. It’s okay to feel sad, angry, or scared. – Unknown",
+  "You don't have to be positive all the time. It's okay to feel sad, angry, or scared. – Unknown",
   "Healing takes time, and asking for help is a courageous step. – Mariska Hargitay",
   "Your mental health is a priority. Your happiness is essential. – Unknown",
   "You are enough just as you are. – Meghan Markle",
-  "It’s okay to not be okay, as long as you don’t give up. – Unknown",
+  "It's okay to not be okay, as long as you don't give up. – Unknown",
   "Self-care is how you take your power back. – Lalah Delia",
-  "You don’t have to control your thoughts. You just have to stop letting them control you. – Dan Millman",
-  "There is hope, even when your brain tells you there isn’t. – John Green",
-  "Be gentle with yourself. You’re doing the best you can. – Unknown",
+  "You don't have to control your thoughts. You just have to stop letting them control you. – Dan Millman",
+  "There is hope, even when your brain tells you there isn't. – John Green",
+  "Be gentle with yourself. You're doing the best you can. – Unknown",
   "Your feelings are valid, and you deserve to be heard. – Unknown",
 ];
 
@@ -70,8 +71,6 @@ const activityData = [
   { name: "Journaling", value: 15 },
   { name: "Reading", value: 30 },
 ];
-
-
 
 interface UserProfile {
   fullName: string;
@@ -94,7 +93,9 @@ interface JwtPayload {
 
 export default function UserProfile() {
   const [selectedTab, setSelectedTab] = useState("overview");
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date()
+  );
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
@@ -112,6 +113,9 @@ export default function UserProfile() {
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [currentQuote, setCurrentQuote] = useState(mentalHealthQuotes[0]);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
 
   const { toast } = useToast();
 
@@ -125,19 +129,26 @@ export default function UserProfile() {
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
-  const fetchUserData = async (token: string, username: string): Promise<UserProfile> => {
+  const fetchUserData = async (
+    token: string,
+    username: string
+  ): Promise<UserProfile> => {
     try {
-      const apiUrl = `${API_BASE_URL}/api/account/${encodeURIComponent(username)}`;
+      const apiUrl = `${API_BASE_URL}/api/account/${encodeURIComponent(
+        username
+      )}`;
       const response = await fetch(apiUrl, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
-        throw new Error(response.status === 401 ? "Unauthorized" : "User not found");
+        throw new Error(
+          response.status === 401 ? "Unauthorized" : "User not found"
+        );
       }
-     
+
       const userData: UserProfile = await response.json();
-      
+
       const updatedProfile = {
         fullName: userData.fullName || "Unknown",
         username: userData.username || username,
@@ -146,7 +157,7 @@ export default function UserProfile() {
         email: userData.email || "Unknown",
         avatar: userData.avatar || null,
       };
-      
+
       setUserProfile(updatedProfile);
       setEditProfile(updatedProfile);
       setSelectedAvatar(userData.avatar);
@@ -154,7 +165,7 @@ export default function UserProfile() {
       return updatedProfile;
     } catch (err: any) {
       console.error("Fetch User Data Error:", err.message);
-      
+
       try {
         const decoded: JwtPayload = jwtDecode(token);
         const fallbackProfile = {
@@ -165,7 +176,7 @@ export default function UserProfile() {
           email: decoded.email || "Unknown",
           avatar: decoded.Avatar || null,
         };
-        
+
         setUserProfile(fallbackProfile);
         setEditProfile(fallbackProfile);
         setSelectedAvatar(decoded.Avatar);
@@ -195,19 +206,18 @@ export default function UserProfile() {
     try {
       const decoded: JwtPayload = jwtDecode(token);
       const username = decoded.sub || decoded.Username;
-      
+
       if (!username) {
         throw new Error("Username not found in token");
       }
 
       setIsLoading(true);
       fetchUserData(token, username)
-        .catch(err => {
+        .catch((err) => {
           console.error("Initial fetch error:", err);
           setError(err.message);
         })
         .finally(() => setIsLoading(false));
-        
     } catch (decodeErr) {
       console.error("JWT Decode Error:", decodeErr);
       setError("Invalid token format");
@@ -232,21 +242,24 @@ export default function UserProfile() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/account/update-avatar`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(avatar),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/api/account/update-avatar`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(avatar),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to update avatar");
       }
 
       const data = await response.json();
-      
+
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
@@ -294,38 +307,40 @@ export default function UserProfile() {
 
     setIsSaving(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/account/update-profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          fullName: editProfile.fullName,
-          username: editProfile.username,
-          age: editProfile.age,
-          gender: editProfile.gender,
-        }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/api/account/update-profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            fullName: editProfile.fullName,
+            username: editProfile.username,
+            age: editProfile.age,
+            gender: editProfile.gender,
+          }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(await response.text() || "Failed to update profile");
+        throw new Error((await response.text()) || "Failed to update profile");
       }
 
       const data = await response.json();
-      
+
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
 
       await fetchUserData(data.token || token, editProfile.username);
-      
+
       setIsEditing(false);
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
       });
-
     } catch (err: any) {
       console.error("Profile update error:", err);
       toast({
@@ -338,7 +353,47 @@ export default function UserProfile() {
     }
   };
 
-  const handleInputChange = (field: keyof UserProfile, value: string | number) => {
+  // Update the delete account handler
+  const handleAccountDeletion = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/account/delete`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error((await response.text()) || "Failed to delete account");
+      }
+
+      localStorage.removeItem("token");
+      window.location.href = "/"; // Redirect to home page
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been permanently deleted.",
+      });
+    } catch (err: any) {
+      console.error("Account deletion error:", err);
+      toast({
+        title: "Error",
+        description: err.message || "Failed to delete account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleInputChange = (
+    field: keyof UserProfile,
+    value: string | number
+  ) => {
     if (!editProfile) return;
     setEditProfile({ ...editProfile, [field]: value });
   };
@@ -358,7 +413,7 @@ export default function UserProfile() {
     try {
       const decoded: JwtPayload = jwtDecode(token);
       const username = decoded.sub || decoded.Username;
-      
+
       if (!username) {
         throw new Error("Username not found in token");
       }
@@ -415,21 +470,18 @@ export default function UserProfile() {
           >
             {/* Decorative top border */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-zenPink/70 to-transparent dark:via-zenSage/70"></div>
-            
+
             <Card className="border-0 overflow-hidden relative bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 group">
               {/* Decorative corner elements */}
               <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-zenPink dark:border-zenSage"></div>
               <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-zenPink dark:border-zenSage"></div>
               <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-zenPink dark:border-zenSage"></div>
               <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-zenPink dark:border-zenSage"></div>
-              
+
               <div className="relative z-10 px-8 pb-8 pt-10">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
                   {/* Avatar Section */}
-                  <motion.div 
-                    className="relative group"
-                    whileHover={{ y: -5 }}
-                  >
+                  <motion.div className="relative group" whileHover={{ y: -5 }}>
                     <div className="relative p-1 rounded-full bg-gradient-to-br from-zenPink/20 to-zenSage/20 dark:from-zenPink/10 dark:to-zenSage/10 shadow-md">
                       <Avatar className="relative h-32 w-32 md:h-36 md:w-36 border-[3px] border-white dark:border-gray-800 z-10">
                         <AvatarImage src={selectedAvatar || undefined} />
@@ -464,7 +516,7 @@ export default function UserProfile() {
                       {userProfile.username}
                       <span className="absolute bottom-0 left-0 w-16 h-1 bg-zenPink dark:bg-zenSage"></span>
                     </motion.h1>
-                    
+
                     <motion.div
                       className="flex items-center justify-center md:justify-start space-x-2 mt-2"
                       initial={{ opacity: 0 }}
@@ -478,7 +530,7 @@ export default function UserProfile() {
                         {userProfile.email}
                       </p>
                     </motion.div>
-                    
+
                     {/* User's Age */}
                     <motion.div
                       className="flex items-center justify-center md:justify-start space-x-2 mt-2"
@@ -493,7 +545,7 @@ export default function UserProfile() {
                         Age: {userProfile.age || "Not specified"}
                       </p>
                     </motion.div>
-                    
+
                     {/* Mental Health Quote */}
                     <motion.div
                       className="mt-4 italic text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto md:mx-0"
@@ -506,34 +558,53 @@ export default function UserProfile() {
                     </motion.div>
                   </div>
 
-                  {/* Edit Button Section */}
-                  <motion.div
-                    className="md:ml-auto mt-6 md:mt-0"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    <Button
-                      onClick={() => setIsEditing(true)}
-                      className="relative bg-zenPink hover:bg-zenPink/90 dark:bg-zenSage dark:hover:bg-zenSage/90 text-white px-6 py-3 rounded-lg shadow-md transition-all border border-zenPink/30 dark:border-zenSage/30 group"
+                  {/* Edit and Delete Buttons Section */}
+                  <div className="flex flex-col md:flex-row md:ml-auto mt-6 md:mt-0 gap-4">
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
                     >
-                      <span className="flex items-center">
-                        <Edit2 className="h-5 w-5 mr-2 transition-transform group-hover:rotate-12" />
-                        <span className="font-semibold">Edit Profile</span>
-                        <ChevronRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                      </span>
-                    </Button>
-                  </motion.div>
+                      <Button
+                        onClick={() => setIsEditing(true)}
+                        className="relative bg-zenPink hover:bg-zenPink/90 dark:bg-zenSage dark:hover:bg-zenSage/90 text-white px-6 py-3 rounded-lg shadow-md transition-all border border-zenPink/30 dark:border-zenSage/30 group"
+                      >
+                        <span className="flex items-center">
+                          <Edit2 className="h-5 w-5 mr-2 transition-transform group-hover:rotate-12" />
+                          <span className="font-semibold">Edit Profile</span>
+                          <ChevronRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                        </span>
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <Button
+                        onClick={() => setIsDeleteDialogOpen(true)}
+                        className="relative bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg shadow-md transition-all border border-red-600/30 group"
+                      >
+                        <span className="flex items-center">
+                          <Trash2 className="h-5 w-5 mr-2 transition-transform group-hover:rotate-12" />
+                          <span className="font-semibold">Delete Account</span>
+                          <ChevronRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                        </span>
+                      </Button>
+                    </motion.div>
+                  </div>
                 </div>
               </div>
-              
+
               {/* Decorative bottom border */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-zenPink/70 to-transparent dark:via-zenSage/70"></div>
             </Card>
           </motion.div>
-
           {/* Avatar Selection Dialog */}
-          <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
+          <Dialog
+            open={isAvatarDialogOpen}
+            onOpenChange={setIsAvatarDialogOpen}
+          >
             <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto p-0 bg-white dark:bg-gray-800 rounded-lg">
               <DialogHeader className="px-8 pt-8 pb-6">
                 <DialogTitle className="text-3xl font-bold text-center bg-gradient-to-r from-zenPink to-zenSage bg-clip-text text-transparent">
@@ -546,8 +617,8 @@ export default function UserProfile() {
                     <motion.div
                       key={index}
                       className={`flex flex-col items-center cursor-pointer p-2 rounded-lg transition-all ${
-                        selectedAvatar === avatar 
-                          ? "bg-zenPink/10 dark:bg-zenSage/10 ring-2 ring-zenPink dark:ring-zenSage" 
+                        selectedAvatar === avatar
+                          ? "bg-zenPink/10 dark:bg-zenSage/10 ring-2 ring-zenPink dark:ring-zenSage"
                           : "hover:bg-gray-100 dark:hover:bg-gray-700"
                       }`}
                       onClick={() => handleAvatarChange(avatar)}
@@ -563,11 +634,56 @@ export default function UserProfile() {
               </div>
             </DialogContent>
           </Dialog>
-
+          // Update the delete confirmation dialog
+          <Dialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+          >
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold text-red-600">
+                  Delete Your Account
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <p className="text-gray-700 dark:text-gray-300">
+                  Are you sure you want to delete your account? This action
+                  cannot be undone. All your data will be permanently removed.
+                </p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  Warning: This will immediately delete your account without
+                  additional confirmation.
+                </p>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDeleteDialogOpen(false)}
+                  className="border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleAccountDeletion}
+                  disabled={isDeleting}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                      Deleting...
+                    </>
+                  ) : (
+                    "Delete Account Permanently"
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           {/* Edit Profile Modal */}
           {isEditing && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }} 
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="mb-8"
             >
@@ -575,59 +691,82 @@ export default function UserProfile() {
                 {/* Decorative elements */}
                 <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-zenPink dark:border-zenSage"></div>
                 <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-zenPink dark:border-zenSage"></div>
-                
+
                 <CardHeader>
                   <CardTitle className="text-2xl font-bold bg-gradient-to-r from-zenPink to-zenSage bg-clip-text text-transparent">
                     Edit Your Profile
                   </CardTitle>
                 </CardHeader>
-                
+
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <Label htmlFor="fullName" className="text-gray-700 dark:text-gray-300">
+                      <Label
+                        htmlFor="fullName"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
                         Full Name
                       </Label>
                       <Input
                         id="fullName"
                         value={editProfile?.fullName || ""}
-                        onChange={(e) => handleInputChange("fullName", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("fullName", e.target.value)
+                        }
                         className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage"
                       />
                     </div>
-                    
+
                     <div>
-                      <Label htmlFor="username" className="text-gray-700 dark:text-gray-300">
+                      <Label
+                        htmlFor="username"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
                         Username
                       </Label>
                       <Input
                         id="username"
                         value={editProfile?.username || ""}
-                        onChange={(e) => handleInputChange("username", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("username", e.target.value)
+                        }
                         className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage"
                       />
                     </div>
-                    
+
                     <div>
-                      <Label htmlFor="age" className="text-gray-700 dark:text-gray-300">
+                      <Label
+                        htmlFor="age"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
                         Age
                       </Label>
                       <Input
                         id="age"
                         type="number"
                         value={editProfile?.age || 0}
-                        onChange={(e) => handleInputChange("age", parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "age",
+                            parseInt(e.target.value) || 0
+                          )
+                        }
                         className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage"
                       />
                     </div>
-                    
+
                     <div>
-                      <Label htmlFor="gender" className="text-gray-700 dark:text-gray-300">
+                      <Label
+                        htmlFor="gender"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
                         Gender
                       </Label>
                       <Select
                         value={editProfile?.gender || ""}
-                        onValueChange={(value) => handleInputChange("gender", value)}
+                        onValueChange={(value) =>
+                          handleInputChange("gender", value)
+                        }
                       >
                         <SelectTrigger className="mt-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-zenPink dark:focus:ring-zenSage">
                           <SelectValue placeholder="Select gender" />
@@ -641,10 +780,10 @@ export default function UserProfile() {
                     </div>
                   </div>
                 </CardContent>
-                
+
                 <CardFooter className="flex justify-end space-x-4 pt-6">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => setIsEditing(false)}
                     className="border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
@@ -668,31 +807,34 @@ export default function UserProfile() {
               </Card>
             </motion.div>
           )}
-
           {/* Profile Tabs */}
           {!isEditing && (
-            <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
+            <Tabs
+              value={selectedTab}
+              onValueChange={setSelectedTab}
+              className="space-y-6"
+            >
               <TabsList className="bg-gray-100 dark:bg-gray-700 p-1 w-full flex justify-center rounded-lg">
-                <TabsTrigger 
-                  value="overview" 
+                <TabsTrigger
+                  value="overview"
                   className="flex-1 py-2 px-4 rounded-md data-[state=active]:bg-zenPink data-[state=active]:text-white dark:data-[state=active]:bg-zenSage"
                 >
                   Overview
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="mood-tracker" 
+                <TabsTrigger
+                  value="mood-tracker"
                   className="flex-1 py-2 px-4 rounded-md data-[state=active]:bg-zenPink data-[state=active]:text-white dark:data-[state=active]:bg-zenSage"
                 >
                   Mood Tracker
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="journal" 
+                <TabsTrigger
+                  value="journal"
                   className="flex-1 py-2 px-4 rounded-md data-[state=active]:bg-zenPink data-[state=active]:text-white dark:data-[state=active]:bg-zenSage"
                 >
                   Journal
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="progress" 
+                <TabsTrigger
+                  value="progress"
                   className="flex-1 py-2 px-4 rounded-md data-[state=active]:bg-zenPink data-[state=active]:text-white dark:data-[state=active]:bg-zenSage"
                 >
                   Progress
@@ -700,9 +842,7 @@ export default function UserProfile() {
               </TabsList>
 
               <TabsContent value="overview">
-                <Overview
-                  journalData={journalData}
-                />
+                <Overview journalData={journalData} />
               </TabsContent>
               <TabsContent value="mood-tracker">
                 <MoodTracker
