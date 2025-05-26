@@ -25,6 +25,7 @@ import {
   ChevronLeft,
   RotateCw,
   Mail,
+  X,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
@@ -56,6 +57,7 @@ export default function Signup() {
     email: { exists: null as boolean | null, message: "" },
   });
   const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const [showTermsPopup, setShowTermsPopup] = useState(false);
 
   const navigate = useNavigate();
 
@@ -337,6 +339,120 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#F8E8E9] to-[#EBFFF5] p-4">
+      {/* Terms & Conditions Popup */}
+      {showTermsPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
+          >
+            <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
+            <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-2xl font-bold text-[#7CAE9E]">Terms & Conditions</h3>
+                <button 
+                  onClick={() => setShowTermsPopup(false)}
+                  className="text-[#E69EA2] hover:text-[#d18e92]"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              
+              <div className="space-y-4 text-gray-700">
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">1. Acceptance of Terms</h5>
+                  <p className="mt-1">By accessing or using our services, you agree to be bound by these terms and all applicable laws and regulations.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">2. User Responsibilities</h5>
+                  <p className="mt-1">You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">3. Privacy Policy</h5>
+                  <p className="mt-1">Your privacy is important to us. Our Privacy Policy explains how we collect, use, and protect your personal information.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">4. Intellectual Property</h5>
+                  <p className="mt-1">All content, trademarks, and data on this website are the property of our company and are protected by intellectual property laws.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">5. Prohibited Activities</h5>
+                  <p className="mt-1">You agree not to engage in any illegal activities, spamming, hacking, or any activity that disrupts the service.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">6. Account Termination</h5>
+                  <p className="mt-1">We may terminate or suspend your account immediately for any violation of these terms without prior notice.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">7. Limitation of Liability</h5>
+                  <p className="mt-1">In no event shall we be liable for any indirect, incidental, special, consequential or punitive damages arising from your use of the service.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">8. Governing Law</h5>
+                  <p className="mt-1">These terms shall be governed by and construed in accordance with the laws of the jurisdiction where our company is registered.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">9. Changes to Terms</h5>
+                  <p className="mt-1">We reserve the right to modify these terms at any time. Your continued use constitutes acceptance of the modified terms.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">10. Contact Information</h5>
+                  <p className="mt-1">For any questions about these Terms, please contact us at legal@example.com or through our contact page.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">11. User Content</h5>
+                  <p className="mt-1">You retain ownership of any content you submit, but grant us a worldwide license to use, reproduce, and display such content.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">12. Third-Party Services</h5>
+                  <p className="mt-1">We may use third-party services to provide our services, and you agree to their terms where applicable.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">13. Dispute Resolution</h5>
+                  <p className="mt-1">Any disputes shall first attempt to be resolved through mediation before pursuing legal action.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">14. Refund Policy</h5>
+                  <p className="mt-1">Refunds will be processed within 30 days of request, subject to our refund policy conditions.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">15. Service Availability</h5>
+                  <p className="mt-1">We do not guarantee uninterrupted service and may perform maintenance that temporarily limits access.</p>
+                </div>
+                
+                <div>
+                  <h5 className="text-[#E69EA2] text-lg font-medium">16. Age Restrictions</h5>
+                  <p className="mt-1">Users must be at least 13 years old to use our services, or older depending on local regulations.</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border-t border-[#CFECE0] flex justify-end">
+              <Button
+                onClick={() => setShowTermsPopup(false)}
+                className="bg-[#7CAE9E] hover:bg-[#6a9d8d] text-white"
+              >
+                I Understand
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       <div className="w-full max-w-xl">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -655,7 +771,14 @@ export default function Signup() {
                         htmlFor="terms"
                         className="text-sm text-[#7CAE9E] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        I agree to the Terms of Service and Privacy Policy
+                        I agree to the{' '}
+                        <button 
+                          type="button" 
+                          onClick={() => setShowTermsPopup(true)}
+                          className="underline hover:text-[#6a9d8d]"
+                        >
+                          Terms of Service and Privacy Policy
+                        </button>
                       </label>
                       {errors.terms && <ErrorMessage message={errors.terms} />}
                     </div>
@@ -693,7 +816,7 @@ export default function Signup() {
               {step === 1 && (
                 <>
                   <div className="text-md text-gray-500">
-                    Already have an account?{" "}
+                    Already have an account?{' '}
                     <Link
                       to="/login"
                       className="text-[#7CAE9E] hover:text-[#6a9d8d] hover:underline font-medium transition-colors"
