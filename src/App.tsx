@@ -9,7 +9,6 @@ import Index from "./pages/Index";
 import Meditation from "./pages/Meditation";
 import Information from "./pages/Information";
 import Emergency from "./pages/Emergency";
-import MoodTracker from "./pages/MoodTracker";
 import Analysis from "./pages/Analysis";
 import K10Test from "./pages/K10Test";
 import NotFound from "./pages/NotFound";
@@ -47,7 +46,6 @@ const App = () => (
             <Route path="/meditation" element={<ProtectedRoute><Meditation /></ProtectedRoute>} />
             <Route path="/information" element={<Information />} />
             <Route path="/emergency" element={<ProtectedRoute><Emergency /></ProtectedRoute>} />
-            <Route path="/mood-tracker" element={<ProtectedRoute><MoodTracker /></ProtectedRoute>} />
             <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
             <Route path="/k10test" element={<ProtectedRoute><K10Test /></ProtectedRoute>} />
             <Route path="/fitness" element={<ProtectedRoute><Fitness /></ProtectedRoute>} />

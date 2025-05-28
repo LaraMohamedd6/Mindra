@@ -133,7 +133,6 @@ export default function Header() {
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {[
-                        { title: "Mood Tracker", href: "/mood-tracker", description: "Monitor your emotional wellbeing" },
                         { title: "Analysis", href: "/analysis", description: "Visualize your progress" },
                         { title: "Profile", href: "/profile", description: "Your personal dashboard" }
                       ].map((item) => (

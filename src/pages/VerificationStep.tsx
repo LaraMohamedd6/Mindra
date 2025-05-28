@@ -168,16 +168,6 @@ export function VerificationStep({
                 </p>
               </div>
             </CardContent>
-
-            <CardFooter className="justify-center pb-10">
-              <Link
-                to="/"
-                className="text-md text-[#7CAE9E] hover:text-[#6a9d8d] flex items-center justify-center transition-colors duration-200"
-              >
-                Return to home page
-                <ChevronRight className="h-5 w-5 ml-1.5 mt-0.5" />
-              </Link>
-            </CardFooter>
           </Card>
         </motion.div>
       </div>

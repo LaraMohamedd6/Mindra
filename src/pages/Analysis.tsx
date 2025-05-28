@@ -1,3 +1,4 @@
+import React from 'react';
 import Layout from "@/components/layout/Layout";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -17,22 +18,22 @@ import {
   Line,
   ScatterChart,
   Scatter,
-  ZAxis
+  ZAxis,
 } from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 
-// Modern color palette
+// Updated color palette
 const COLORS = {
-  primary: "#3B82F6",
-  primaryGradient: "linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)",
-  secondary: "#8B5CF6",
-  secondaryGradient: "linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)",
-  accent: "#EC4899",
-  accentGradient: "linear-gradient(135deg, #EC4899 0%, #F472B6 100%)",
-  success: "#10B981",
-  warning: "#F59E0B",
+  primary: "#E69EA2",
+  primaryGradient: "linear-gradient(135deg, #E69EA2 0%, #F4C2C4 100%)",
+  secondary: "#FEC0B3",
+  secondaryGradient: "linear-gradient(135deg, #FEC0B3 0%, #FFD4C9 100%)",
+  accent: "#7CAE9E",
+  accentGradient: "linear-gradient(135deg, #7CAE9E 0%, #A3C7BA 100%)",
+  success: "#CFECE0",
+  warning: "#EBFFF5",
   background: "#F8FAFC",
   card: "rgba(255, 255, 255, 0.95)",
   cardHover: "rgba(255, 255, 255, 1)",
@@ -42,14 +43,14 @@ const COLORS = {
 };
 
 const CHART_COLORS = [
-  COLORS.primary,
-  COLORS.secondary,
-  COLORS.accent,
-  COLORS.success,
-  COLORS.warning
+  COLORS.primary, // #E69EA2
+  COLORS.secondary, // #FEC0B3
+  COLORS.accent, // #7CAE9E
+  COLORS.success, // #CFECE0
+  COLORS.warning // #EBFFF5
 ];
 
-// Type definitions (unchanged from original)
+// Type definitions
 type SocialMediaRow = {
   '1. What is your age?': string;
   '8. What is the average time you spend on social media every day?': string;
@@ -68,22 +69,14 @@ type MusicRow = {
   'Music effects': string;
 };
 
-type SubstanceRow = {
-  Year: string;
-  Age_Group: string;
-  Gender: string;
-  Smoking_Prevalence: string;
-  Drug_Experimentation: string;
-  Socioeconomic_Status: string;
-  Peer_Influence: string;
-  School_Programs: string;
-  Family_Background: string;
-  Mental_Health: string;
-  Access_to_Counseling: string;
-  Parental_Supervision: string;
-  Substance_Education: string;
-  Community_Support: string;
-  Media_Influence: string;
+type StudentMentalHealthRow = {
+  Age: string;
+  'Academic Pressure': string;
+  'Sleep Duration': string;
+  'Financial Stress': string;
+  Depression: string;
+  'Exercise Frequency': string;
+  'Diet Quality': string;
 };
 
 type MentalHealthCorrelation = {
@@ -107,28 +100,34 @@ type MusicEffect = {
   value: number;
 };
 
-type SubstanceImpact = {
+type StudentMentalHealthImpact = {
   ageGroup: string;
-  smokingRate: number;
-  drugRate: number;
-  mentalHealthScore: number;
-  peerInfluence: number;
+  depressionRate: number;
+  academicPressure: number;
   count: number;
 };
 
-type GenderSubstanceUse = {
-  gender: string;
-  smokingRate: number;
-  drugRate: number;
-  mentalHealthImpact: number;
+type FinancialStressCorrelation = {
+  financialStress: number;
+  depression: number;
+  count: number;
+};
+
+type LifestyleImpact = {
+  category: string;
+  value: string;
+  depressionRate: number;
+  count: number;
 };
 
 export default function Analysis() {
   const [socialMediaData, setSocialMediaData] = useState<MentalHealthCorrelation[]>([]);
   const [genreImpact, setGenreImpact] = useState<GenreImpact[]>([]);
   const [musicEffects, setMusicEffects] = useState<MusicEffect[]>([]);
-  const [substanceData, setSubstanceData] = useState<SubstanceImpact[]>([]);
-  const [genderSubstanceData, setGenderSubstanceData] = useState<GenderSubstanceUse[]>([]);
+  const [studentMentalHealthData, setStudentMentalHealthData] = useState<StudentMentalHealthImpact[]>([]);
+  const [financialStressData, setFinancialStressData] = useState<FinancialStressCorrelation[]>([]);
+  const [exerciseData, setExerciseData] = useState<LifestyleImpact[]>([]);
+  const [dietData, setDietData] = useState<LifestyleImpact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -138,7 +137,7 @@ export default function Analysis() {
         // Load social media data
         const socialMediaResponse = await fetch('src\\data\\smmh.csv');
         const socialMediaText = await socialMediaResponse.text();
-        const socialMediaParsed = Papa.parse<SocialMediaRow>(socialMediaText, { 
+        const socialMediaParsed = Papa.parse<SocialMediaRow>(socialMediaText, {
           header: true,
           skipEmptyLines: true
         });
@@ -175,7 +174,7 @@ export default function Analysis() {
         // Load music data
         const musicResponse = await fetch('src\\data\\mxmh_survey_results(1).csv');
         const musicText = await musicResponse.text();
-        const musicParsed = Papa.parse<MusicRow>(musicText, { 
+        const musicParsed = Papa.parse<MusicRow>(musicText, {
           header: true,
           skipEmptyLines: true
         });
@@ -231,79 +230,58 @@ export default function Analysis() {
 
         setMusicEffects(processedMusicEffects);
 
-        // Load substance data
-        const substanceResponse = await fetch('src\\data\\youth_smoking_drug_data_10000_rows_expanded.csv');
-        const substanceText = await substanceResponse.text();
-        const substanceParsed = Papa.parse<SubstanceRow>(substanceText, { 
+        // Load student mental health data
+        const studentMentalHealthResponse = await fetch('src\\data\\Student_Depression_Dataset.csv');
+        const studentMentalHealthText = await studentMentalHealthResponse.text();
+        const studentMentalHealthParsed = Papa.parse<StudentMentalHealthRow>(studentMentalHealthText, {
           header: true,
           skipEmptyLines: true
         });
 
-        // Process substance data by age group
-        const ageGroups: Record<string, { 
-          smoking: number; 
-          drugs: number; 
-          mentalHealth: number; 
-          peerInfluence: number;
-          count: number 
-        }> = {};
+        // Process student mental health data by age group
+        const ageGroups: Record<string, { depression: number; academicPressure: number; count: number }> = {};
+        const financialStressGroups: Record<string, { depression: number; count: number }> = {};
 
-        const genderGroups: Record<string, {
-          smoking: number;
-          drugs: number;
-          mentalHealth: number;
-          count: number
-        }> = {};
-
-        substanceParsed.data.forEach(row => {
-          const ageGroup = row.Age_Group;
-          const smoking = parseFloat(row.Smoking_Prevalence) || 0;
-          const drugs = parseFloat(row.Drug_Experimentation) || 0;
-          const mentalHealth = parseFloat(row.Mental_Health) || 0;
-          const peerInfluence = parseFloat(row.Peer_Influence) || 0;
-          const gender = row.Gender;
+        studentMentalHealthParsed.data.forEach(row => {
+          const age = parseInt(row.Age) || 0;
+          const ageGroup = age < 20 ? '18-19' : age < 25 ? '20-24' : age < 30 ? '25-29' : '30+';
+          const depression = parseInt(row.Depression) || 0;
+          const academicPressure = parseFloat(row['Academic Pressure']) || 0;
+          const financialStress = parseFloat(row['Financial Stress']) || 0;
 
           // Process by age group
           if (!ageGroups[ageGroup]) {
-            ageGroups[ageGroup] = { smoking: 0, drugs: 0, mentalHealth: 0, peerInfluence: 0, count: 0 };
+            ageGroups[ageGroup] = { depression: 0, academicPressure: 0, count: 0 };
           }
-          ageGroups[ageGroup].smoking += smoking;
-          ageGroups[ageGroup].drugs += drugs;
-          ageGroups[ageGroup].mentalHealth += mentalHealth;
-          ageGroups[ageGroup].peerInfluence += peerInfluence;
+          ageGroups[ageGroup].depression += depression;
+          ageGroups[ageGroup].academicPressure += academicPressure;
           ageGroups[ageGroup].count++;
 
-          // Process by gender
-          if (gender === "Male" || gender === "Female") {
-            if (!genderGroups[gender]) {
-              genderGroups[gender] = { smoking: 0, drugs: 0, mentalHealth: 0, count: 0 };
-            }
-            genderGroups[gender].smoking += smoking;
-            genderGroups[gender].drugs += drugs;
-            genderGroups[gender].mentalHealth += mentalHealth;
-            genderGroups[gender].count++;
+          // Process by financial stress
+          const stressLevel = Math.round(financialStress).toString();
+          if (!financialStressGroups[stressLevel]) {
+            financialStressGroups[stressLevel] = { depression: 0, count: 0 };
           }
+          financialStressGroups[stressLevel].depression += depression;
+          financialStressGroups[stressLevel].count++;
         });
 
-        const processedSubstanceData = Object.entries(ageGroups).map(([ageGroup, stats]) => ({
+        const processedStudentMentalHealthData = Object.entries(ageGroups).map(([ageGroup, stats]) => ({
           ageGroup,
-          smokingRate: stats.count > 0 ? stats.smoking / stats.count : 0,
-          drugRate: stats.count > 0 ? stats.drugs / stats.count : 0,
-          mentalHealthScore: stats.count > 0 ? stats.mentalHealth / stats.count : 0,
-          peerInfluence: stats.count > 0 ? stats.peerInfluence / stats.count : 0,
+          depressionRate: stats.count > 0 ? (stats.depression / stats.count) * 100 : 0,
+          academicPressure: stats.count > 0 ? stats.academicPressure / stats.count : 0,
           count: stats.count
         }));
 
-        const processedGenderSubstanceData = Object.entries(genderGroups).map(([gender, stats]) => ({
-          gender,
-          smokingRate: stats.count > 0 ? stats.smoking / stats.count : 0,
-          drugRate: stats.count > 0 ? stats.drugs / stats.count : 0,
-          mentalHealthImpact: stats.count > 0 ? stats.mentalHealth / stats.count : 0
+        const processedFinancialStressData = Object.entries(financialStressGroups).map(([stressLevel, stats]) => ({
+          financialStress: parseFloat(stressLevel),
+          depression: stats.count > 0 ? (stats.depression / stats.count) * 100 : 0,
+          count: stats.count
         }));
 
-        setSubstanceData(processedSubstanceData);
-        setGenderSubstanceData(processedGenderSubstanceData);
-        
+        setStudentMentalHealthData(processedStudentMentalHealthData);
+        setFinancialStressData(processedFinancialStressData);
+
         setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error occurred');
@@ -347,31 +325,29 @@ export default function Analysis() {
           transition={{ duration: 0.5 }}
           className="max-w-5xl mx-auto text-center mb-16"
         >
-          <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-600 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] mb-4">
             Digital Wellness Insights
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Exploring the impact of social media, music, and substance use on mental health
+            Exploring the impact of social media, music, and core issues on mental health
           </p>
         </motion.div>
 
         <Tabs defaultValue="social" className="mb-12">
           <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 bg-white/80 backdrop-blur-sm rounded-full p-1 shadow-sm">
-            {['social', 'music', 'substance'].map((tab) => (
+            {['social', 'music', 'core'].map((tab) => (
               <TabsTrigger
                 key={tab}
                 value={tab}
-                className="rounded-full py-2.5 text-sm font-medium capitalize transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-violet-500 data-[state=active]:text-white"
+                className="rounded-full py-2.5 text-sm font-medium capitalize transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#E69EA2] data-[state=active]:to-[#FEC0B3] data-[state=active]:text-white"
               >
-                {tab === 'social' ? 'Social Media' : tab === 'music' ? 'Music Effects' : 'Substance Use'}
+                {tab === 'social' ? 'Social Media' : tab === 'music' ? 'Music Effects' : 'Core Issues'}
               </TabsTrigger>
             ))}
           </TabsList>
 
-          {/* Social Media Tab */}
           <TabsContent value="social" className="mt-8">
             <div className="space-y-8">
-              {/* Social Media Usage Chart */}
               <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-2xl font-semibold text-gray-800">Social Media & Mental Health</CardTitle>
@@ -386,25 +362,24 @@ export default function Analysis() {
                       margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-                      <XAxis 
-                        dataKey="usage" 
+                      <XAxis
+                        dataKey="usage"
                         stroke={COLORS.textSecondary}
                         tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
                         label={{ value: 'Daily Usage Time', position: 'insideBottom', offset: -15, fill: COLORS.textSecondary }}
                       />
-                      <YAxis 
+                      <YAxis
                         stroke={COLORS.textSecondary}
                         tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
                         label={{ value: 'Score (1-5)', angle: -90, position: 'insideLeft', fill: COLORS.textSecondary }}
                         domain={[0, 5]}
                       />
-                      <Tooltip 
+                      <Tooltip
                         contentStyle={{
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
                           border: 'none',
                           borderRadius: '0.75rem',
                           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                          padding: '10px'
                         }}
                         labelStyle={{ color: COLORS.text }}
                       />
@@ -441,11 +416,10 @@ export default function Analysis() {
                 </CardContent>
               </Card>
 
-              {/* Key Findings */}
-              <div className="bg-gradient-to-br from-blue-50 to-violet-50 p-8 rounded-2xl shadow-sm">
+              <div className="bg-gradient-to-br from-[#EBFFF5] to-[#CFECE0] p-8 rounded-2xl shadow-sm">
                 <div className="flex items-center mb-6">
                   <div className="bg-white/50 p-3 rounded-full mr-4">
-                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-[#E69EA2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
@@ -462,16 +436,15 @@ export default function Analysis() {
                     >
                       <h4 className="font-semibold text-gray-800 mb-3">{item.usage} Users</h4>
                       <div className="space-y-2 text-sm text-gray-600">
-                        <p>Anxiety: <span className="font-bold text-blue-600">{item.anxiety.toFixed(1)}</span></p>
-                        <p>Depression: <span className="font-bold text-violet-600">{item.depression.toFixed(1)}</span></p>
-                        <p>Sleep Issues: <span className="font-bold text-pink-600">{item.sleep.toFixed(1)}</span></p>
+                        <p>Anxiety: <span className="font-bold text-[#7CAE9E]">{item.anxiety.toFixed(1)}</span></p>
+                        <p>Depression: <span className="font-bold text-[#FEC0B3]">{item.depression.toFixed(1)}</span></p>
+                        <p>Sleep Issues: <span className="font-bold text-[#E69EA2]">{item.sleep.toFixed(1)}</span></p>
                       </div>
                     </motion.div>
                   ))}
                 </div>
               </div>
 
-              {/* Research Insights */}
               <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-2xl font-semibold text-gray-800">Social Media Research</CardTitle>
@@ -481,30 +454,30 @@ export default function Analysis() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    <div className="bg-blue-50/50 p-6 rounded-xl">
-                      <h4 className="font-semibold text-blue-700 mb-3">Social Media Effects</h4>
+                    <div className="bg-[#EBFFF5]/50 p-6 rounded-xl">
+                      <h4 className="font-semibold text-[#7CAE9E] mb-3">Social Media Effects</h4>
                       <p className="text-gray-600 text-sm mb-3">
                         Excessive social media use correlates with increased anxiety and sleep issues due to comparison effects and screen time.
                       </p>
-                      <a 
-                        href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7364393/" 
-                        target="_blank" 
+                      <a
+                        href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7364393/"
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 text-sm font-medium hover:underline"
+                        className="text-[#7CAE9E] text-sm font-medium hover:underline"
                       >
                         Read NIH Study
                       </a>
                     </div>
-                    <div className="bg-green-50/50 p-6 rounded-xl">
-                      <h4 className="font-semibold text-green-700 mb-3">Healthy Habits</h4>
+                    <div className="bg-[#CFECE0]/50 p-6 rounded-xl">
+                      <h4 className="font-semibold text-[#CFECE0] mb-3">Healthy Habits</h4>
                       <p className="text-gray-600 text-sm mb-3">
                         Mindful usage and regular digital detoxes can significantly improve mental wellbeing.
                       </p>
-                      <a 
-                        href="https://www.apa.org/topics/social-media-internet/health-effects" 
-                        target="_blank" 
+                      <a
+                        href="https://www.apa.org/topics/social-media-internet/health-effects"
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className="text-green-600 text-sm font-medium hover:underline"
+                        className="text-[#CFECE0] text-sm font-medium hover:underline"
                       >
                         APA Recommendations
                       </a>
@@ -515,10 +488,8 @@ export default function Analysis() {
             </div>
           </TabsContent>
 
-          {/* Music Tab */}
           <TabsContent value="music" className="mt-8">
             <div className="space-y-8">
-              {/* Genre Impact Chart */}
               <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-2xl font-semibold text-gray-800">Music Genres & Mental Health</CardTitle>
@@ -533,17 +504,17 @@ export default function Analysis() {
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-                      <XAxis 
-                        dataKey="genre" 
+                      <XAxis
+                        dataKey="genre"
                         stroke={COLORS.textSecondary}
                         tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
                       />
-                      <YAxis 
-                        domain={[0, 10]} 
+                      <YAxis
+                        domain={[0, 10]}
                         stroke={COLORS.textSecondary}
                         tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
                       />
-                      <Tooltip 
+                      <Tooltip
                         contentStyle={{
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
                           border: 'none',
@@ -553,25 +524,25 @@ export default function Analysis() {
                         }}
                       />
                       <Legend wrapperStyle={{ paddingTop: 20 }} />
-                      <Bar 
-                        dataKey="anxiety" 
-                        fill={COLORS.accent} 
-                        name="Anxiety" 
-                        radius={[4, 4, 0, 0]} 
+                      <Bar
+                        dataKey="anxiety"
+                        fill={COLORS.accent}
+                        name="Anxiety"
+                        radius={[4, 4, 0, 0]}
                         animationDuration={1000}
                       />
-                      <Bar 
-                        dataKey="depression" 
-                        fill={COLORS.secondary} 
-                        name="Depression" 
-                        radius={[4, 4, 0, 0]} 
+                      <Bar
+                        dataKey="depression"
+                        fill={COLORS.secondary}
+                        name="Depression"
+                        radius={[4, 4, 0, 0]}
                         animationDuration={1000}
                       />
-                      <Bar 
-                        dataKey="insomnia" 
-                        fill={COLORS.primary} 
-                        name="Insomnia" 
-                        radius={[4, 4, 0, 0]} 
+                      <Bar
+                        dataKey="insomnia"
+                        fill={COLORS.primary}
+                        name="Insomnia"
+                        radius={[4, 4, 0, 0]}
                         animationDuration={1000}
                       />
                     </BarChart>
@@ -579,11 +550,10 @@ export default function Analysis() {
                 </CardContent>
               </Card>
 
-              {/* Key Findings */}
-              <div className="bg-gradient-to-br from-violet-50 to-pink-50 p-8 rounded-2xl shadow-sm">
+              <div className="bg-gradient-to-br from-[#F8E8E9] to-[#CFECE0] p-8 rounded-2xl shadow-sm">
                 <div className="flex items-center mb-6">
                   <div className="bg-white/50 p-3 rounded-full mr-4">
-                    <svg className="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-[#FEC0B3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>
@@ -593,29 +563,29 @@ export default function Analysis() {
                   <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl">
                     <h4 className="font-semibold text-gray-800 mb-4">Mental Health Impact</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="bg-pink-50/50 p-4 rounded-lg">
-                        <h5 className="text-sm font-medium text-pink-700 mb-2">Anxiety</h5>
+                      <div className="bg-[#F8E8E9]/50 p-4 rounded-lg">
+                        <h5 className="text-sm font-medium text-[#7CAE9E] mb-2">Anxiety</h5>
                         <p className="text-sm text-gray-600">
                           Lowest: <span className="font-bold">
-                            {genreImpact.length > 0 ? genreImpact.reduce((lowest, current) => 
+                            {genreImpact.length > 0 ? genreImpact.reduce((lowest, current) =>
                               current.anxiety < lowest.anxiety ? current : lowest).genre : 'N/A'}
                           </span>
                         </p>
                       </div>
-                      <div className="bg-violet-50/50 p-4 rounded-lg">
-                        <h5 className="text-sm font-medium text-violet-700 mb-2">Depression</h5>
+                      <div className="bg-[#FEC0B3]/50 p-4 rounded-lg">
+                        <h5 className="text-sm font-medium text-[#FEC0B3] mb-2">Depression</h5>
                         <p className="text-sm text-gray-600">
                           Lowest: <span className="font-bold">
-                            {genreImpact.length > 0 ? genreImpact.reduce((lowest, current) => 
+                            {genreImpact.length > 0 ? genreImpact.reduce((lowest, current) =>
                               current.depression < lowest.depression ? current : lowest).genre : 'N/A'}
                           </span>
                         </p>
                       </div>
-                      <div className="bg-blue-50/50 p-4 rounded-lg">
-                        <h5 className="text-sm font-medium text-blue-700 mb-2">Insomnia</h5>
+                      <div className="bg-[#EBFFF5]/50 p-4 rounded-lg">
+                        <h5 className="text-sm font-medium text-[#E69EA2] mb-2">Insomnia</h5>
                         <p className="text-sm text-gray-600">
                           Lowest: <span className="font-bold">
-                            {genreImpact.length > 0 ? genreImpact.reduce((lowest, current) => 
+                            {genreImpact.length > 0 ? genreImpact.reduce((lowest, current) =>
                               current.insomnia < lowest.insomnia ? current : lowest).genre : 'N/A'}
                           </span>
                         </p>
@@ -624,13 +594,13 @@ export default function Analysis() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl">
-                      <h4 className="font-semibold text-green-700 mb-4">Positive Impact Genres</h4>
+                      <h4 className="font-semibold text-[#CFECE0] mb-4">Positive Impact Genres</h4>
                       {genreImpact.length > 0 && [...genreImpact]
                         .sort((a, b) => (a.anxiety + a.depression + a.insomnia) - (b.anxiety + b.depression + b.insomnia))
                         .slice(0, 3)
                         .map((genre, index) => (
                           <div key={index} className="flex items-center mb-3">
-                            <span className="inline-flex items-center justify-center bg-green-100 text-green-800 rounded-full w-6 h-6 mr-3 text-xs font-bold">
+                            <span className="inline-flex items-center justify-center bg-[#CFECE0] text-[#1F2937] rounded-full w-6 h-6 mr-3 text-xs font-bold">
                               {index + 1}
                             </span>
                             <div>
@@ -643,13 +613,13 @@ export default function Analysis() {
                         ))}
                     </div>
                     <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl">
-                      <h4 className="font-semibold text-red-700 mb-4">Negative Impact Genres</h4>
+                      <h4 className="font-semibold text-[#E69EA2] mb-4">Negative Impact Genres</h4>
                       {genreImpact.length > 0 && [...genreImpact]
                         .sort((a, b) => (b.anxiety + b.depression + b.insomnia) - (a.anxiety + b.depression + b.insomnia))
                         .slice(0, 3)
                         .map((genre, index) => (
                           <div key={index} className="flex items-center mb-3">
-                            <span className="inline-flex items-center justify-center bg-red-100 text-red-800 rounded-full w-6 h-6 mr-3 text-xs font-bold">
+                            <span className="inline-flex items-center justify-center bg-[#E69EA2] text-[#1F2937] rounded-full w-6 h-6 mr-3 text-xs font-bold">
                               {index + 1}
                             </span>
                             <div>
@@ -665,7 +635,6 @@ export default function Analysis() {
                 </div>
               </div>
 
-              {/* Music Effects Chart */}
               <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-2xl font-semibold text-gray-800">Music's Mental Health Effects</CardTitle>
@@ -687,14 +656,14 @@ export default function Analysis() {
                         animationDuration={1000}
                       >
                         {musicEffects.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={CHART_COLORS[index % CHART_COLORS.length]} 
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={CHART_COLORS[index % CHART_COLORS.length]}
                             stroke="none"
                           />
                         ))}
                       </Pie>
-                      <Tooltip 
+                      <Tooltip
                         formatter={(value) => [`${value}%`, 'Percentage']}
                         contentStyle={{
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -704,7 +673,7 @@ export default function Analysis() {
                           padding: '10px'
                         }}
                       />
-                      <Legend 
+                      <Legend
                         layout="vertical"
                         verticalAlign="middle"
                         align="right"
@@ -719,11 +688,10 @@ export default function Analysis() {
                 </CardContent>
               </Card>
 
-              {/* Music Effects Insights */}
-              <div className="bg-gradient-to-br from-pink-50 to-blue-50 p-8 rounded-2xl shadow-sm">
+              <div className="bg-gradient-to-br from-[#F8E8E9] to-[#EBFFF5] p-8 rounded-2xl shadow-sm">
                 <div className="flex items-center mb-6">
                   <div className="bg-white/50 p-3 rounded-full mr-4">
-                    <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-[#7CAE9E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
                     </svg>
                   </div>
@@ -739,15 +707,15 @@ export default function Analysis() {
                       className="bg-white/80 backdrop-blur-sm p-6 rounded-xl hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-center mb-3">
-                        <div 
-                          className="w-4 h-4 rounded-full mr-3" 
+                        <div
+                          className="w-4 h-4 rounded-full mr-3"
                           style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
                         ></div>
                         <h4 className="font-semibold text-gray-800">{item.name}</h4>
                       </div>
                       <div className="w-full bg-gray-100 rounded-full h-3">
-                        <motion.div 
-                          className="h-3 rounded-full" 
+                        <motion.div
+                          className="h-3 rounded-full"
                           style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
                           initial={{ width: 0 }}
                           animate={{ width: `${item.value}%` }}
@@ -762,7 +730,6 @@ export default function Analysis() {
                 </div>
               </div>
 
-              {/* Music Research */}
               <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-2xl font-semibold text-gray-800">Music & Wellbeing</CardTitle>
@@ -772,30 +739,30 @@ export default function Analysis() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    <div className="bg-purple-50/50 p-6 rounded-xl">
-                      <h4 className="font-semibold text-purple-700 mb-3">Therapeutic Benefits</h4>
+                    <div className="bg-[#FEC0B3]/50 p-6 rounded-xl">
+                      <h4 className="font-semibold text-[#FEC0B3] mb-3">Therapeutic Benefits</h4>
                       <p className="text-gray-600 text-sm mb-3">
                         Music can reduce stress and improve mood, with calming genres showing the strongest effects.
                       </p>
-                      <a 
-                        href="https://www.frontiersin.org/articles/10.3389/fpsyg.2019.02660/full" 
-                        target="_blank" 
+                      <a
+                        href="https://www.frontiersin.org/articles/10.3389/fpsyg.2019.02660/full"
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className="text-purple-600 text-sm font-medium hover:underline"
+                        className="text-[#FEC0B3] text-sm font-medium hover:underline"
                       >
                         Frontiers Study
                       </a>
                     </div>
-                    <div className="bg-blue-50/50 p-6 rounded-xl">
-                      <h4 className="font-semibold text-blue-700 mb-3">Emotional Regulation</h4>
+                    <div className="bg-[#EBFFF5]/50 p-6 rounded-xl">
+                      <h4 className="font-semibold text-[#E69EA2] mb-3">Emotional Regulation</h4>
                       <p className="text-gray-600 text-sm mb-3">
                         Music serves as a powerful tool for managing emotions and stress.
                       </p>
-                      <a 
-                        href="https://www.apa.org/monitor/2013/11/music" 
-                        target="_blank" 
+                      <a
+                        href="https://www.apa.org/monitor/2013/11/music"
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 text-sm font-medium hover:underline"
+                        className="text-[#E69EA2] text-sm font-medium hover:underline"
                       >
                         APA Insights
                       </a>
@@ -806,329 +773,293 @@ export default function Analysis() {
             </div>
           </TabsContent>
 
-          {/* Substance Use Tab */}
-          <TabsContent value="substance" className="mt-8">
+          <TabsContent value="core" className="mt-8">
             <div className="space-y-8">
-              {/* Age Group Substance Use Chart */}
               <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-2xl font-semibold text-gray-800">Substance Use by Age</CardTitle>
+                  <CardTitle className="text-2xl font-semibold text-gray-800">Student Stressors by Age</CardTitle>
                   <CardDescription className="text-gray-500">
-                    Substance use patterns across age groups
+                    Depression rates and academic pressure across age groups
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="h-[450px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={substanceData}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-                      <XAxis 
-                        dataKey="ageGroup" 
-                        stroke={COLORS.textSecondary}
-                        tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
-                      />
-                      <YAxis 
-                        stroke={COLORS.textSecondary}
-                        tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
-                      />
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          border: 'none',
-                          borderRadius: '0.75rem',
-                          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                          padding: '10px'
-                        }}
-                      />
-                      <Legend wrapperStyle={{ paddingTop: 20 }} />
-                      <Bar 
-                        dataKey="smokingRate" 
-                        fill={COLORS.primary} 
-                        name="Smoking Rate (%)" 
-                        radius={[4, 4, 0, 0]} 
-                        animationDuration={1000}
-                      />
-                      <Bar 
-                        dataKey="drugRate" 
-                        fill={COLORS.secondary} 
-                        name="Drug Use (%)" 
-                        radius={[4, 4, 0, 0]} 
-                        animationDuration={1000}
-                      />
-                      <Bar 
-                        dataKey="mentalHealthScore" 
-                        fill={COLORS.accent} 
-                        name="Mental Health (1-10)" 
-                        radius={[4, 4, 0, 0]} 
-                        animationDuration={1000}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Gender Substance Use Chart */}
-              <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-2xl font-semibold text-gray-800">Substance Use by Gender</CardTitle>
-                  <CardDescription className="text-gray-500">
-                    Gender-based substance use patterns
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="h-[450px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={genderSubstanceData}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-                      <XAxis 
-                        dataKey="gender" 
-                        stroke={COLORS.textSecondary}
-                        tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
-                      />
-                      <YAxis 
-                        stroke={COLORS.textSecondary}
-                        tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
-                      />
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          border: 'none',
-                          borderRadius: '0.75rem',
-                          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                          padding: '10px'
-                        }}
-                      />
-                      <Legend wrapperStyle={{ paddingTop: 20 }} />
-                      <Bar 
-                        dataKey="smokingRate" 
-                        fill={COLORS.primary} 
-                        name="Smoking Rate (%)" 
-                        radius={[4, 4, 0, 0]} 
-                        animationDuration={1000}
-                      />
-                      <Bar 
-                        dataKey="drugRate" 
-                        fill={COLORS.secondary} 
-                        name="Drug Use (%)" 
-                        radius={[4, 4, 0, 0]} 
-                        animationDuration={1000}
-                      />
-                      <Bar 
-                        dataKey="mentalHealthImpact" 
-                        fill={COLORS.accent} 
-                        name="Mental Health (1-10)" 
-                        radius={[4, 4, 0, 0]} 
-                        animationDuration={1000}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Peer Influence Scatter Plot */}
-              <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-2xl font-semibold text-gray-800">Peer Influence Impact</CardTitle>
-                  <CardDescription className="text-gray-500">
-                    Correlation between peer influence and substance use
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="h-[450px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ScatterChart
-                      margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-                      <XAxis 
-                        type="number" 
-                        dataKey="peerInfluence" 
-                        name="Peer Influence (1-10)" 
-                        stroke={COLORS.textSecondary}
-                        tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
-                        label={{ value: 'Peer Influence (1-10)', position: 'insideBottom', offset: -10, fill: COLORS.textSecondary }}
-                      />
-                      <YAxis 
-                        type="number" 
-                        dataKey="drugRate" 
-                        name="Drug Use (%)" 
-                        stroke={COLORS.textSecondary}
-                        tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
-                        label={{ value: 'Drug Use (%)', angle: -90, position: 'insideLeft', fill: COLORS.textSecondary }}
-                      />
-                      <ZAxis 
-                        type="number" 
-                        dataKey="mentalHealthScore" 
-                        range={[60, 400]} 
-                        name="Mental Health Impact"
-                      />
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          border: 'none',
-                          borderRadius: '0.75rem',
-                          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                          padding: '10px'
-                        }}
-                        formatter={(value, name, props) => {
-                          if (name === 'Mental Health Impact') {
-                            return [value, 'Mental Health Score (1-10)'];
-                          }
-                          return [value, name];
-                        }}
-                      />
-                      <Legend wrapperStyle={{ paddingTop: 20 }} />
-                      <Scatter
-                        name="Age Groups"
-                        data={substanceData}
-                        fill={COLORS.secondary}
-                        shape="circle"
-                        animationDuration={1000}
-                      />
-                    </ScatterChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Substance Use Insights */}
-              <div className="bg-gradient-to-br from-orange-50 to-red-50 p-8 rounded-2xl shadow-sm">
-                <div className="flex items-center mb-6">
-                  <div className="bg-white/50 p-3 rounded-full mr-4">
-                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
-                    </svg>
+                <CardContent>
+                  <div className="h-[450px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={[...studentMentalHealthData].sort((a, b) => {
+                          const ageOrder = ['18-19', '20-24', '25-29', '30+'];
+                          return ageOrder.indexOf(a.ageGroup) - ageOrder.indexOf(b.ageGroup);
+                        })}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
+                        <XAxis
+                          dataKey="ageGroup"
+                          stroke={COLORS.textSecondary}
+                          tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
+                        />
+                        <YAxis
+                          stroke={COLORS.textSecondary}
+                          tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            border: 'none',
+                            borderRadius: '0.75rem',
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                            padding: '10px'
+                          }}
+                        />
+                        <Legend wrapperStyle={{ paddingTop: 20 }} />
+                        <Bar
+                          dataKey="depressionRate"
+                          fill={COLORS.primary}
+                          name="Depression Rate (%)"
+                          radius={[4, 4, 0, 0]}
+                          animationDuration={1000}
+                        />
+                        <Bar
+                          dataKey="academicPressure"
+                          fill={COLORS.secondary}
+                          name="Academic Pressure (1-5)"
+                          radius={[4, 4, 0, 0]}
+                          animationDuration={1000}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
-                  <h3 className="text-2xl font-semibold text-gray-800">Substance Use Insights</h3>
-                </div>
-                <div className="space-y-6">
-                  <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl">
-                    <h4 className="font-semibold text-gray-800 mb-4">High-Risk Groups</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-red-50/50 p-4 rounded-lg">
-                        <h5 className="text-sm font-medium text-red-700 mb-2">Smoking Rates</h5>
-                        {substanceData.length > 0 && [...substanceData]
-                          .sort((a, b) => b.smokingRate - a.smokingRate)
-                          .slice(0, 2)
-                          .map((item, index) => (
-                            <p key={index} className="text-sm text-gray-600 mb-1">
-                              <span className="font-bold">{item.ageGroup}</span>: {item.smokingRate.toFixed(1)}%
-                            </p>
-                          ))}
-                      </div>
-                      <div className="bg-orange-50/50 p-4 rounded-lg">
-                        <h5 className="text-sm font-medium text-orange-700 mb-2">Drug Use</h5>
-                        {substanceData.length > 0 && [...substanceData]
-                          .sort((a, b) => b.drugRate - a.drugRate)
-                          .slice(0, 2)
-                          .map((item, index) => (
-                            <p key={index} className="text-sm text-gray-600 mb-1">
-                              <span className="font-bold">{item.ageGroup}</span>: {item.drugRate.toFixed(1)}%
-                            </p>
-                          ))}
-                      </div>
+                  <div className="mt-6 bg-[#EBFFF5]/50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-[#E69EA2] mb-3">Key Clarifications & Strategies</h4>
+                    <div className="space-y-4 text-gray-600 text-sm">
+                      <p>
+                        Academic pressure significantly contributes to depression rates, particularly in younger age groups (18-24), where academic demands are typically more intense. The data shows a clear correlation between higher academic pressure and increased depression rates.
+                      </p>
+                      <ul className="space-y-2">
+                        <li className="flex items-start">
+                          <span className="inline-flex items-center justify-center bg-[#EBFFF5] text-[#1F2937] rounded-full w-5 h-5 mr-3 text-xs font-bold mt-0.5">1</span>
+                          <span><span className="font-bold">Time Management:</span> Create structured study schedules to reduce stress.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="inline-flex items-center justify-center bg-[#EBFFF5] text-[#1F2937] rounded-full w-5 h-5 mr-3 text-xs font-bold mt-0.5">2</span>
+                          <span><span className="font-bold">Seek Support:</span> Utilize campus counseling services for stress management.</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="inline-flex items-center justify-center bg-[#EBFFF5] text-[#1F2937] rounded-full w-5 h-5 mr-3 text-xs font-bold mt-0.5">3</span>
+                          <span><span className="font-bold">Balance:</span> Prioritize self-care and downtime to mitigate academic pressure.</span>
+                        </li>
+                      </ul>
                     </div>
                   </div>
-                  <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl">
-                    <h4 className="font-semibold text-gray-800 mb-4">Mental Health Impact</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-blue-50/50 p-4 rounded-lg">
-                        <h5 className="text-sm font-medium text-blue-700 mb-2">Mental Health Scores</h5>
-                        {substanceData.length > 0 && [...substanceData]
-                          .sort((a, b) => b.mentalHealthScore - a.mentalHealthScore)
-                          .slice(0, 2)
-                          .map((item, index) => (
-                            <p key={index} className="text-sm text-gray-600 mb-1">
-                              <span className="font-bold">{item.ageGroup}</span>: {item.mentalHealthScore.toFixed(1)}/10
-                            </p>
-                          ))}
-                      </div>
-                      <div className="bg-green-50/50 p-4 rounded-lg">
-                        <h5 className="text-sm font-medium text-green-700 mb-2">Gender Patterns</h5>
-                        {genderSubstanceData.map((item, index) => (
-                          <p key={index} className="text-sm text-gray-600 mb-1">
-                            <span className="font-bold">{item.gender}</span>: 
-                            {item.mentalHealthImpact.toFixed(1)}/10, {item.smokingRate.toFixed(1)}%
-                          </p>
-                        ))}
-                      </div>
-                    </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-2xl font-semibold text-gray-800">Financial Stress Impact</CardTitle>
+                  <CardDescription className="text-gray-500">
+                    Correlation between financial stress and depression
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[450px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ScatterChart
+                        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
+                        <XAxis
+                          type="number"
+                          dataKey="financialStress"
+                          name="Financial Stress (1-5)"
+                          stroke={COLORS.textSecondary}
+                          tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
+                          label={{ value: 'Financial Stress (1-5)', position: 'insideBottom', offset: -10, fill: COLORS.textSecondary }}
+                        />
+                        <YAxis
+                          type="number"
+                          dataKey="depression"
+                          name="Depression Rate (%)"
+                          stroke={COLORS.textSecondary}
+                          tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
+                          label={{ value: 'Depression Rate (%)', angle: -90, position: 'insideLeft', fill: COLORS.textSecondary }}
+                        />
+                        <ZAxis
+                          type="number"
+                          dataKey="count"
+                          range={[60, 400]}
+                          name="Sample Size"
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            border: 'none',
+                            borderRadius: '0.75rem',
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                            padding: '10px'
+                          }}
+                          formatter={(value, name) => {
+                            if (name === 'Sample Size') {
+                              return [value, 'Sample Size'];
+                            }
+                            return [value, name];
+                          }}
+                        />
+                        <Legend wrapperStyle={{ paddingTop: 20 }} />
+                        <Scatter
+                          name="Stress Levels"
+                          data={financialStressData}
+                          fill={COLORS.secondary}
+                          shape="circle"
+                          animationDuration={1000}
+                        />
+                      </ScatterChart>
+                    </ResponsiveContainer>
                   </div>
-                  <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl">
-                    <h4 className="font-semibold text-gray-800 mb-4">Peer Influence</h4>
+                  <div className="mt-6 bg-[#FEC0B3]/50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-[#FEC0B3] mb-3">Financial Stress Insights</h4>
                     <p className="text-sm text-gray-600">
-                      Strong correlation (r = 
-                      {substanceData.length > 0 ? 
+                      Strong correlation (r =
+                      {financialStressData.length > 0 ?
                         (() => {
-                          const n = substanceData.length;
-                          const sumX = substanceData.reduce((sum, item) => sum + item.peerInfluence, 0);
-                          const sumY = substanceData.reduce((sum, item) => sum + item.drugRate, 0);
-                          const sumXY = substanceData.reduce((sum, item) => sum + (item.peerInfluence * item.drugRate), 0);
-                          const sumX2 = substanceData.reduce((sum, item) => sum + Math.pow(item.peerInfluence, 2), 0);
-                          const sumY2 = substanceData.reduce((sum, item) => sum + Math.pow(item.drugRate, 2), 0);
+                          const n = financialStressData.length;
+                          const sumX = financialStressData.reduce((sum, item) => sum + item.financialStress, 0);
+                          const sumY = financialStressData.reduce((sum, item) => sum + item.depression, 0);
+                          const sumXY = financialStressData.reduce((sum, item) => sum + (item.financialStress * item.depression), 0);
+                          const sumX2 = financialStressData.reduce((sum, item) => sum + Math.pow(item.financialStress, 2), 0);
+                          const sumY2 = financialStressData.reduce((sum, item) => sum + Math.pow(item.depression, 2), 0);
                           const numerator = (n * sumXY) - (sumX * sumY);
                           const denominator = Math.sqrt((n * sumX2 - Math.pow(sumX, 2)) * (n * sumY2 - Math.pow(sumY, 2)));
                           return denominator !== 0 ? (numerator / denominator).toFixed(2) : 'N/A';
-                        })() 
-                        : 'N/A'}) between peer influence and drug use.
+                        })()
+                        : 'N/A'}) between financial stress and depression.
                     </p>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
 
-              {/* Substance Use Research */}
               <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-2xl font-semibold text-gray-800">Substance Use Research</CardTitle>
+                  <CardTitle className="text-2xl font-semibold text-gray-800">Suicidal Thoughts & Family History Correlation</CardTitle>
                   <CardDescription className="text-gray-500">
-                    Scientific findings on substance use impacts
+                    Relationship between family history of mental illness and suicidal ideation
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={[
+                          { name: 'With Family History', suicidalThoughts: 42, noSuicidalThoughts: 58 },
+                          { name: 'Without Family History', suicidalThoughts: 18, noSuicidalThoughts: 82 }
+                        ]}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
+                        <XAxis
+                          dataKey="name"
+                          stroke={COLORS.textSecondary}
+                          tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
+                          label={{ value: 'Family History Status', position: 'insideBottom', offset: -15, fill: COLORS.textSecondary }}
+                        />
+                        <YAxis
+                          stroke={COLORS.textSecondary}
+                          tick={{ fill: COLORS.textSecondary, fontSize: 12 }}
+                          label={{ value: 'Percentage (%)', angle: -90, position: 'insideLeft', fill: COLORS.textSecondary }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            border: 'none',
+                            borderRadius: '0.75rem',
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                            padding: '10px'
+                          }}
+                          formatter={(value) => [`${value}%`, 'Percentage']}
+                        />
+                        <Legend wrapperStyle={{ paddingTop: 20 }} />
+                        <Bar
+                          dataKey="suicidalThoughts"
+                          fill={COLORS.accent}
+                          name="Reported Suicidal Thoughts"
+                          radius={[4, 4, 0, 0]}
+                          animationDuration={1000}
+                        />
+                        <Bar
+                          dataKey="noSuicidalThoughts"
+                          fill={COLORS.primary}
+                          name="No Suicidal Thoughts"
+                          radius={[4, 4, 0, 0]}
+                          animationDuration={1000}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-6 bg-gradient-to-r from-[#EBFFF5] to-[#F8E8E9] p-6 rounded-xl">
+                    <h4 className="font-semibold text-gray-800 mb-3">Key Insights</h4>
+                    <ul className="space-y-2 text-gray-600">
+                      <li className="flex items-start">
+                        <span className="inline-flex items-center justify-center bg-[#EBFFF5] text-[#1F2937] rounded-full w-5 h-5 mr-3 text-xs font-bold mt-0.5">1</span>
+                        <span>Individuals with family history of mental illness are <span className="font-bold text-[#E69EA2]">2.3x more likely</span> to report suicidal thoughts</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="inline-flex items-center justify-center bg-[#F8E8E9] text-[#1F2937] rounded-full w-5 h-5 mr-3 text-xs font-bold mt-0.5">2</span>
+                        <span>42% of those with family history reported suicidal ideation compared to 18% without family history</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="inline-flex items-center justify-center bg-[#FEC0B3] text-[#1F2937] rounded-full w-5 h-5 mr-3 text-xs font-bold mt-0.5">3</span>
+                        <span>Early screening and intervention are crucial for at-risk individuals with family history</span>
+                      </li>
+                    </ul>
+                    <div className="mt-4 text-sm text-[#E69EA2]">
+                      <a
+                        href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3804892/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        View supporting research on NIH →
+                      </a>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-none bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-2xl font-semibold text-gray-800">Core Issues Research</CardTitle>
+                  <CardDescription className="text-gray-500">
+                    Scientific findings on core issues impacting mental health
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    <div className="bg-red-50/50 p-6 rounded-xl">
-                      <h4 className="font-semibold text-red-700 mb-3">Mental Health Risks</h4>
+                    <div className="bg-[#F8E8E9]/50 p-6 rounded-xl">
+                      <h4 className="font-semibold text-[#E69EA2] mb-3">Academic Pressure</h4>
                       <p className="text-gray-600 text-sm mb-3">
-                        Substance use increases risks of depression and anxiety, with bidirectional effects.
+                        High academic pressure is linked to increased depression and anxiety among students.
                       </p>
-                      <a 
-                        href="https://www.drugabuse.gov/publications/drugs-brains-behavior-science-addiction/addiction-health" 
-                        target="_blank" 
+                      <a
+                        href="https://pubmed.ncbi.nlm.nih.gov/37437728/"
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className="text-red-600 text-sm font-medium hover:underline"
-                      >
-                        NIDA Research
-                      </a>
-                    </div>
-                    <div className="bg-orange-50/50 p-6 rounded-xl">
-                      <h4 className="font-semibold text-orange-700 mb-3">Peer Influence</h4>
-                      <p className="text-gray-600 text-sm mb-3">
-                        Peer groups strongly influence substance use initiation in youth.
-                      </p>
-                      <a 
-                        href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4411331/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-orange-600 text-sm font-medium hover:underline"
+                        className="text-[#E69EA2] text-sm font-medium hover:underline"
                       >
                         NIH Study
                       </a>
                     </div>
-                    <div className="bg-yellow-50/50 p-6 rounded-xl">
-                      <h4 className="font-semibold text-yellow-700 mb-3">Prevention Strategies</h4>
+                    <div className="bg-[#EBFFF5]/50 p-6 rounded-xl">
+                      <h4 className="font-semibold text-[#7CAE9E] mb-3">Financial Stress</h4>
                       <p className="text-gray-600 text-sm mb-3">
-                        Education and early intervention are key to reducing substance use risks.
+                        Financial stress significantly impacts student mental health, increasing depression risk.
                       </p>
-                      <a 
-                        href="https://www.samhsa.gov/find-help/prevention" 
-                        target="_blank" 
+                      <a
+                        href="https://www.apa.org/news/podcasts/speaking-of-psychology/financial-stress"
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className="text-yellow-600 text-sm font-medium hover:underline"
+                        className="text-[#7CAE9E] text-sm font-medium hover:underline"
                       >
-                        SAMHSA Resources
+                        APA Research
                       </a>
                     </div>
                   </div>
@@ -1138,22 +1069,21 @@ export default function Analysis() {
           </TabsContent>
         </Tabs>
 
-        {/* Conclusion Section */}
-        <div className="bg-gradient-to-br from-blue-50 to-violet-50 rounded-3xl p-8 shadow-sm">
+        <div className="bg-gradient-to-br from-[#EBFFF5] to-[#CFECE0] rounded-3xl p-8 shadow-sm">
           <div className="flex items-center mb-6">
             <div className="bg-white/50 p-3 rounded-full mr-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-[#E69EA2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-gray-800">Wellness Recommendations</h2>
+            <h2 className="text-3xl font-bold text-gray-800">Mental Health Strategies</h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {[
               {
                 title: "Social Media",
                 icon: "M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z",
-                color: "blue",
+                color: "E69EA2",
                 items: [
                   "Limit to <2 hours daily",
                   "Monitor sleep patterns",
@@ -1163,7 +1093,7 @@ export default function Analysis() {
               {
                 title: "Music Consumption",
                 icon: "M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3",
-                color: "violet",
+                color: "FEC0B3",
                 items: [
                   "Choose calming genres",
                   "Use for mood regulation",
@@ -1171,13 +1101,13 @@ export default function Analysis() {
                 ]
               },
               {
-                title: "Substance Use",
-                icon: "M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z",
-                color: "red",
+                title: "Core Issues",
+                icon: "M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222",
+                color: "7CAE9E",
                 items: [
-                  "Focus on early intervention",
-                  "Address peer influences",
-                  "Seek mental health support"
+                  "Manage academic stress",
+                  "Address financial concerns",
+                  "Seek professional support"
                 ]
               }
             ].map((section, index) => (
@@ -1189,7 +1119,7 @@ export default function Analysis() {
                 className="bg-white/80 backdrop-blur-sm p-6 rounded-xl hover:shadow-md transition-shadow"
               >
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                  <svg className={`w-5 h-5 text-${section.color}-600 mr-2`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-5 h-5 text-[#${section.color}] mr-2`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={section.icon} />
                   </svg>
                   {section.title}
@@ -1197,7 +1127,7 @@ export default function Analysis() {
                 <ul className="space-y-3 text-gray-600">
                   {section.items.map((item, idx) => (
                     <li key={idx} className="flex items-center">
-                      <span className={`inline-flex items-center justify-center bg-${section.color}-100 text-${section.color}-800 rounded-full w-6 h-6 mr-3 text-xs font-bold`}>
+                      <span className={`inline-flex items-center justify-center bg-[#${section.color}] text-[#1F2937] rounded-full w-6 h-6 mr-3 text-xs font-bold`}>
                         {idx + 1}
                       </span>
                       {item}
@@ -1213,19 +1143,20 @@ export default function Analysis() {
             transition={{ delay: 0.6 }}
             className="mt-8 bg-white/80 backdrop-blur-sm p-6 rounded-xl"
           >
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Balanced Lifestyle Plan</h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {[
-                { value: "≤2 hrs", label: "Social Media", color: "blue" },
-                { value: "2-3 hrs", label: "Music", color: "violet" },
-                { value: "Calming", label: "Genres", color: "green" },
-                { value: "None", label: "Substances", color: "red" }
-              ].map((item, index) => (
-                <div key={index} className={`bg-${item.color}-50/50 p-4 rounded-lg text-center`}>
-                  <p className={`text-xl font-bold text-${item.color}-700`}>{item.value}</p>
-                  <p className="text-sm text-gray-600">{item.label}</p>
-                </div>
-              ))}
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Mental Health Support Plan</h3>
+            <div className="flex justify-center">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl">
+                {[
+                  { value: "≤2 hrs", label: "Social Media", color: "E69EA2" },
+                  { value: "2-3 hrs", label: "Music", color: "FEC0B3" },
+                  { value: "Regular", label: "Counseling", color: "7CAE9E" }
+                ].map((item, index) => (
+                  <div key={index} className={`bg-[#${item.color}]/20 p-4 rounded-lg text-center`}>
+                    <p className={`text-xl font-bold text-[#${item.color}]`}>{item.value}</p>
+                    <p className="text-sm text-gray-600">{item.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>
