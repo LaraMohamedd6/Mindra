@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Send, Users, Phone, Video, Info, Ban } from "lucide-react";
+import { Send, Users, Phone, Info, Ban } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
 
 type ChatUser = {
@@ -98,8 +98,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   return (
     <div className={`flex gap-3 ${isCurrentUser ? "flex-row-reverse" : ""} animate-fade-in`}>
       <Avatar className="h-8 w-8 flex-shrink-0">
-        <AvatarImage src={message.user.avatar} alt={message.user.name} />
-        <AvatarFallback>{message.user.name[0]}</AvatarFallback>
+        <AvatarFallback 
+          className={`font-medium ${
+            isCurrentUser 
+              ? "bg-[#CFECE0] text-[#7CAE9E]" 
+              : "bg-[#F8E8E9] text-[#E69EA2]"
+          }`}
+        >
+          {message.user.username[0].toUpperCase()}
+        </AvatarFallback>
       </Avatar>
 
       <div className={`max-w-[75%] ${isCurrentUser ? "items-end" : "items-start"}`}>
@@ -231,12 +238,6 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#7CAE9E]">
               <Phone className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#7CAE9E]">
-              <Video className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#7CAE9E]">
-              <Info className="h-4 w-4" />
             </Button>
           </div>
         </div>

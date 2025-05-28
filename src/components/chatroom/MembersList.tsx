@@ -9,9 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { jwtDecode } from "jwt-decode";
 
 type ChatUser = {
   id: string;
@@ -30,17 +29,6 @@ interface UserListProps {
   isAdmin: boolean;
 }
 
-type JwtPayload = {
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": string;
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": string;
-  Username: string;
-  Avatar: string;
-  Gender: string;
-  Age: string;
-  isTemporary: string;
-  exp: number;
-};
-
 const UserList: React.FC<UserListProps> = ({
   users,
   currentUser,
@@ -48,36 +36,11 @@ const UserList: React.FC<UserListProps> = ({
   onKickUser,
   isAdmin,
 }) => {
-  // Function to get the best available avatar URL
-// Then update your getAvatarUrl function
-const getAvatarUrl = (user: ChatUser) => {
-  // First try the user's avatar property
-  if (user.avatar) return user.avatar;
-  
-  // Fallback to checking the token for current user
-  if (user.id === currentUser.id) {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode<JwtPayload>(token); // Use the JwtPayload type
-        return decoded.Avatar || ""; // Now TypeScript knows decoded has an Avatar property
-      } catch (error) {
-        console.error("Failed to decode token:", error);
-        return "";
-      }
-    }
-  }
-  
-  // Final fallback to empty string
-  return "";
-};
-
   return (
     <div className="space-y-3">
       {users.map((user) => {
         const isCurrentUserItem = user.id === currentUser.id;
         const canManageUser = isAdmin && !isCurrentUserItem;
-        const avatarUrl = getAvatarUrl(user);
 
         return (
           <div
@@ -88,16 +51,14 @@ const getAvatarUrl = (user: ChatUser) => {
           >
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
-                {/* Only show AvatarImage if we have a valid URL */}
-                {avatarUrl ? (
-                  <AvatarImage 
-                    src={avatarUrl} 
-                    alt={user.name}
-                    className="object-cover"
-                  />
-                ) : null}
-                <AvatarFallback className="bg-[#EBFFF5] text-[#7CAE9E]">
-                  {user.name[0].toUpperCase()}
+                <AvatarFallback 
+                  className={`font-medium ${
+                    isCurrentUserItem 
+                      ? "bg-[#CFECE0] text-[#7CAE9E]" 
+                      : "bg-[#F8E8E9] text-[#E69EA2]"
+                  }`}
+                >
+                  {user.username[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
 
@@ -125,7 +86,7 @@ const getAvatarUrl = (user: ChatUser) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 text-xs bg-[#EBFFF5] text-[#7CAE9E] hover:bg-[#EBFFF5]/80 hover:text-[#7CAE9E] border-[#CFECE0]"
+                  className="ml-2 h-7 text-xs bg-[#EBFFF5] text-[#7CAE9E] hover:bg-[#EBFFF5]/80 hover:text-[#7CAE9E] border-[#CFECE0]"
                   onClick={() => onPromoteUser(user.id)}
                 >
                   Make Admin
@@ -167,7 +128,7 @@ export const MembersList: React.FC<MembersListProps> = ({
   const navigate = useNavigate();
 
   return (
-    <Card className="border-[#CFECE0] md:col-span-1">
+    <Card className="border-[#CFECE0] md:col-span-1 w-full md:w-95">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <CardTitle className="text-[#7CAE9E] text-base">Members</CardTitle>
