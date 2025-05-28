@@ -278,7 +278,7 @@ export default function ChatRoomView() {
           setMessages(prev => [
             ...prev,
             {
-              id: messageId, // Use the server-generated ID
+              id: messageId,
               user: {
                 id: user,
                 name: user,
@@ -344,6 +344,26 @@ export default function ChatRoomView() {
           setKickPopup(true);
         });
 
+        // Add handler for system messages
+        connection.on("ReceiveSystemMessage", (message: string) => {
+          setMessages(prev => [
+            ...prev,
+            {
+              id: Date.now(), // Temporary ID for frontend display
+              user: {
+                id: "system",
+                name: "System",
+                username: "system",
+                avatar: "",
+              },
+              content: message,
+              timestamp: new Date().toISOString(),
+              reactions: [],
+              isSystemMessage: true,
+            },
+          ]);
+        });
+
         await connection.invoke("JoinRoom", parseInt(roomId), currentUser.username);
       } catch (err) {
         console.error("SignalR connection error:", err);
@@ -362,6 +382,7 @@ export default function ChatRoomView() {
         connection.off("ReceiveReaction");
         connection.off("CannotKickCreator");
         connection.off("Kicked");
+        connection.off("ReceiveSystemMessage"); // Clean up new handler
       }
     };
   }, [connection, roomId, currentUser, navigate, toast]);
@@ -374,7 +395,6 @@ export default function ChatRoomView() {
     if (!messageText.trim() || !connection || !roomId || !currentUser) return;
   
     try {
-      // Remove temporary ID generation
       await connection.invoke(
         "SendMessage",
         currentUser.username,
@@ -409,7 +429,6 @@ export default function ChatRoomView() {
         connectionState: connection.state
       });
       
-      // Use the correct method name and parameters
       await connection.invoke("ReactToMessage", messageId, reactionType);
       
       console.log("Reaction sent successfully");
@@ -466,27 +485,6 @@ export default function ChatRoomView() {
         userToKick,
         selectedReason
       );
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          user: {
-            id: "system",
-            name: "System",
-            username: "system",
-            avatar: "",
-          },
-          content: `To maintain a safe space, ${
-            currentUser?.username
-          } has removed ${userToKick}${
-            selectedReason === "Other" ? "" : ` due to ${selectedReason}`
-          }`,
-          timestamp: new Date().toISOString(),
-          reactions: [],
-          isSystemMessage: true,
-        },
-      ]);
 
       setShowKickModal(false);
       setSelectedReason("");
