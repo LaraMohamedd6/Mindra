@@ -41,6 +41,7 @@ type Message = {
   reactions: MessageReaction[];
   roomId?: number;
   isSystemMessage?: boolean;
+  replyTo?: Message | null; // Added for reply feature
 };
 
 type ChatRoom = {
@@ -201,6 +202,30 @@ export default function ChatRoomView() {
     };
   }, [navigate]);
 
+  const parseMessageForReply = (messageText: string, messageId: number): { content: string; replyTo: Message | null } => {
+    const replyRegex = /^> Replying to ([^:]+): (.*?)\n\n([\s\S]*)$/;
+    const match = messageText.match(replyRegex);
+    if (!match) {
+      return { content: messageText, replyTo: null };
+    }
+
+    const [, replyToName, replyContent, content] = match;
+    const replyToMessage = messages.find(
+      (msg) => msg.user.name === replyToName && msg.content === replyContent
+    );
+
+    return {
+      content,
+      replyTo: replyToMessage || {
+        id: Date.now(),
+        user: { id: replyToName, name: replyToName, username: replyToName, avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${replyToName}` },
+        content: replyContent,
+        timestamp: new Date().toISOString(),
+        reactions: [],
+      },
+    };
+  };
+
   useEffect(() => {
     if (!roomId || !currentUser) return;
 
@@ -222,19 +247,23 @@ export default function ChatRoomView() {
           })
         ]);
 
-        const transformedMessages = messagesResponse.data.map((msg) => ({
-          id: msg.id,
-          content: msg.messageText,
-          timestamp: msg.timestamp,
-          roomId: msg.roomId,
-          user: {
-            id: msg.user,
-            name: msg.user,
-            username: msg.user,
-            avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${msg.user}`,
-          },
-          reactions: reactionsResponse.data.filter(r => r.messageId === msg.id),
-        }));
+        const transformedMessages = messagesResponse.data.map((msg) => {
+          const { content, replyTo } = parseMessageForReply(msg.messageText, msg.id);
+          return {
+            id: msg.id,
+            content,
+            timestamp: msg.timestamp,
+            roomId: msg.roomId,
+            user: {
+              id: msg.user,
+              name: msg.user,
+              username: msg.user,
+              avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${msg.user}`,
+            },
+            reactions: reactionsResponse.data.filter(r => r.messageId === msg.id),
+            replyTo,
+          };
+        });
 
         setRoom({
           id: roomResponse.data.id,
@@ -275,6 +304,7 @@ export default function ChatRoomView() {
         console.log("SignalR Connected");
 
         connection.on("ReceiveMessage", (user: string, message: string, messageId: number) => {
+          const { content, replyTo } = parseMessageForReply(message, messageId);
           setMessages(prev => [
             ...prev,
             {
@@ -285,9 +315,10 @@ export default function ChatRoomView() {
                 username: user,
                 avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${user}`,
               },
-              content: message,
+              content,
               timestamp: new Date().toISOString(),
               reactions: [],
+              replyTo,
             },
           ]);
         });
@@ -344,12 +375,11 @@ export default function ChatRoomView() {
           setKickPopup(true);
         });
 
-        // Add handler for system messages
         connection.on("ReceiveSystemMessage", (message: string) => {
           setMessages(prev => [
             ...prev,
             {
-              id: Date.now(), // Temporary ID for frontend display
+              id: Date.now(),
               user: {
                 id: "system",
                 name: "System",
@@ -382,7 +412,7 @@ export default function ChatRoomView() {
         connection.off("ReceiveReaction");
         connection.off("CannotKickCreator");
         connection.off("Kicked");
-        connection.off("ReceiveSystemMessage"); // Clean up new handler
+        connection.off("ReceiveSystemMessage");
       }
     };
   }, [connection, roomId, currentUser, navigate, toast]);
@@ -391,14 +421,14 @@ export default function ChatRoomView() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!messageText.trim() || !connection || !roomId || !currentUser) return;
+  const handleSendMessage = async (formattedMessage: string) => {
+    if (!formattedMessage.trim() || !connection || !roomId || !currentUser) return;
   
     try {
       await connection.invoke(
         "SendMessage",
         currentUser.username,
-        messageText,
+        formattedMessage,
         parseInt(roomId)
       );
       setMessageText("");
@@ -547,6 +577,7 @@ export default function ChatRoomView() {
             onMessageTextChange={setMessageText}
             onAddReaction={handleAddReaction}
             users={users}
+            connection={connection}
           />
         </div>
 
