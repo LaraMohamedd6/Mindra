@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { VerificationStep } from "./VerificationStep";
-import axios from "axios";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Key, AlertCircle, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import axios from "axios";
 
 export function VerifyEmailPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [code, setCode] = useState("");
   const [verificationError, setVerificationError] = useState("");
   const [verificationSuccess, setVerificationSuccess] = useState("");
   const [resendTimer, setResendTimer] = useState(30);
@@ -27,17 +28,13 @@ export function VerifyEmailPage() {
     return () => clearInterval(timer);
   }, [resendTimer]);
 
-  const handleVerify = async (code: string) => {
+  const handleVerify = async () => {
     setIsLoading(true);
     setVerificationError("");
     setVerificationSuccess("");
 
     try {
-      const response = await axios.post(
-        "https://localhost:7223/api/Account/verify",
-        { email, code }
-      );
-
+      await axios.post("https://localhost:7223/api/Account/verify", { email, code });
       setVerificationSuccess("Verification successful! Redirecting...");
       setTimeout(() => navigate("/login?verified=true"), 1500);
     } catch (err) {
@@ -65,49 +62,111 @@ export function VerifyEmailPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#F8E8E9] to-[#EBFFF5] p-4">
-      <div className="w-full max-w-xl">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-white w-full max-w-lg mx-auto">
-            <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
-            
-            <CardHeader className="pb-6 px-10">
-              <div className="flex flex-col items-center space-y-2">
-                <h1 className="text-3xl font-bold text-[#7CAE9E]">You're Almost There!</h1>
-                <p className="text-gray-500 text-md">
-                  Verify your email to complete your account setup
-                </p>
-              </div>
-            </CardHeader>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-lg bg-white rounded-2xl shadow-lg overflow-hidden border border-[#CFECE0]" // Changed max-w-md to max-w-lg
+      >
+        {/* Header accent - made slightly thicker */}
+        <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
+        
+        {/* Increased padding from p-8 to p-10 */}
+        <div className="p-10">
+          {/* Increased text size for heading */}
+          <h1 className="text-3xl font-bold text-[#7CAE9E] mb-4">Verify Your Email</h1>
+          
+          {/* Slightly larger text */}
+          <p className="text-gray-600 text-lg mb-8">
+            We've sent a 6-digit code to <span className="font-medium text-[#7CAE9E]">{email}</span>.
+            Please enter it below to verify your account.
+          </p>
 
-            <CardContent className="px-10 pb-8">
-              <VerificationStep
-                email={email}
-                onBack={() => navigate(-1)}
-                onVerify={handleVerify}
-                onResendCode={handleResendCode}
-                verificationError={verificationError}
-                verificationSuccess={verificationSuccess}
-                resendTimer={resendTimer}
-                isLoading={isLoading}
+          {/* Verification code input - increased size */}
+          <div className="space-y-6 mb-8">
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="Enter verification code"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="pl-12 h-16 text-lg rounded-xl border-[#CFECE0] focus:ring-2 focus:ring-[#7CAE9E]/50" // Increased height and text size
               />
-            </CardContent>
-
-            <div className="flex justify-center pb-10">
-              <Link
-                to="/"
-                className="text-md text-[#7CAE9E] hover:text-[#6a9d8d] flex items-center justify-center transition-colors duration-200"
-              >
-                Return to home page
-                <ChevronRight className="h-5 w-5 ml-1.5 mt-0.5" />
-              </Link>
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Key className="h-6 w-6 text-[#E69EA2]" /> {/* Slightly larger icon */}
+              </div>
             </div>
-          </Card>
-        </motion.div>
-      </div>
+
+            {verificationError && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center p-4 bg-[#F8E8E9]/80 text-[#E69EA2] rounded-lg text-lg" // Increased padding and text size
+              >
+                <AlertCircle className="h-6 w-6 mr-3" />
+                <span>{verificationError}</span>
+              </motion.div>
+            )}
+
+            {verificationSuccess && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center p-4 bg-[#EBFFF5]/80 text-[#7CAE9E] rounded-lg text-lg" // Increased padding and text size
+              >
+                <CheckCircle className="h-6 w-6 mr-3" />
+                <span>{verificationSuccess}</span>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Verify button - increased size */}
+          <Button
+            onClick={handleVerify}
+            className="w-full h-16 text-lg bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] hover:from-[#d18e92] hover:to-[#eeb0a5] text-white rounded-xl shadow-md mb-6" // Increased height
+            disabled={isLoading || !code}
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="h-7 w-7 border-2 border-white border-t-transparent rounded-full mr-3" // Slightly larger spinner
+                />
+                Verifying...
+              </div>
+            ) : (
+              "Verify Email"
+            )}
+          </Button>
+
+          {/* Resend code - slightly larger text */}
+          <div className="text-center">
+            <button
+              onClick={handleResendCode}
+              disabled={resendTimer > 0}
+              className={`text-lg ${resendTimer > 0 ? 'text-gray-400' : 'text-[#7CAE9E] hover:text-[#6a9d8d]'} transition-colors`}
+            >
+              {resendTimer > 0 ? (
+                `Resend code in ${resendTimer}s`
+              ) : (
+                "Didn't receive a code? Resend"
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Footer link - slightly larger */}
+        <div className="border-t border-[#CFECE0] p-5 text-center">
+          <Link
+            to="/"
+            className="text-lg text-[#7CAE9E] hover:text-[#6a9d8d] inline-flex items-center"
+          >
+            Return to home page
+            <ChevronRight className="h-6 w-6 ml-2" />
+          </Link>
+        </div>
+      </motion.div>
     </div>
   );
 }
