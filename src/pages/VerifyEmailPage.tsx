@@ -19,11 +19,11 @@ export function VerifyEmailPage() {
 
   useEffect(() => {
     if (resendTimer <= 0) return;
-    
+
     const timer = setInterval(() => {
       setResendTimer((prev) => prev - 1);
     }, 1000);
-    
+
     return () => clearInterval(timer);
   }, [resendTimer]);
 
@@ -64,26 +64,26 @@ export function VerifyEmailPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#F8E8E9] to-[#EBFFF5] p-4">
-      <div className="w-full max-w-xl">
+    <div className="min-h-screen flex items-center justify-center bg-[#f8f5f2] p-4">
+      <div className="w-full max-w-lg">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-white w-full max-w-lg mx-auto">
-            <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
-            
-            <CardHeader className="pb-6 px-10">
+          <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-[#FFFFFF] backdrop-blur-sm w-full max-w-xl">
+            <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-2 w-full" />
+
+            <CardHeader className="pb-2 pt-8 px-10">
               <div className="flex flex-col items-center space-y-2">
                 <h1 className="text-3xl font-bold text-[#7CAE9E]">You're Almost There!</h1>
-                <p className="text-gray-500 text-md">
+                <p className="text-gray-500 text-sm">
                   Verify your email to complete your account setup
                 </p>
               </div>
             </CardHeader>
 
-            <CardContent className="px-10 pb-8">
+            <CardContent className="px-8 pb-6">
               <VerificationStep
                 email={email}
                 onBack={() => navigate(-1)}
@@ -96,18 +96,24 @@ export function VerifyEmailPage() {
               />
             </CardContent>
 
-            <div className="flex justify-center pb-10">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="pb-8 px-8"
+            >
               <Link
                 to="/"
-                className="text-md text-[#7CAE9E] hover:text-[#6a9d8d] flex items-center justify-center transition-colors duration-200"
+                className="text-xs text-[#7CAE9E] hover:text-[#6a9d8d] flex items-center justify-center transition-colors duration-200"
               >
                 Return to home page
-                <ChevronRight className="h-5 w-5 ml-1.5 mt-0.5" />
+                <ChevronRight className="h-4 w-4 ml-1" />
               </Link>
-            </div>
+            </motion.div>
           </Card>
         </motion.div>
       </div>
     </div>
   );
+
 }

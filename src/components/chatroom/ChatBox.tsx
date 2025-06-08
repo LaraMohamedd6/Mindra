@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef, useEffect } from "react";
-import { Send, Users, Phone, Video, Info, Ban } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Send, Users, Phone, Ban, Reply } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -10,8 +10,21 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
+import * as signalR from "@microsoft/signalr";
+
+
+// Debounce utility to limit frequent function calls
+const debounce = <T extends (...args: P) => void, P extends unknown[]>(func: T, wait: number) => {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: P) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
+
 
 type ChatUser = {
   id: string;
@@ -38,6 +51,7 @@ type Message = {
   reactions: MessageReaction[];
   roomId?: number;
   isSystemMessage?: boolean;
+  replyTo?: Message | null; // Added for reply feature
 };
 
 type ChatRoom = {
@@ -57,16 +71,19 @@ interface ChatMessageProps {
   message: Message;
   currentUser: ChatUser;
   onAddReaction: (messageId: number, reactionType: string) => void;
+  onReply: (message: Message) => void;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   currentUser,
   onAddReaction,
+  onReply,
 }) => {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const isCurrentUser = message.user.id === currentUser.id;
   const reactionEmojis = ["👍", "❤️", "😄", "😢", "👏", "🙏"];
+  const messageRef = useRef<HTMLDivElement>(null);
 
   const groupedReactions = message.reactions.reduce((acc, reaction) => {
     const existing = acc.find(r => r.reactionType === reaction.reactionType);
@@ -96,10 +113,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   }
 
   return (
-    <div className={`flex gap-3 ${isCurrentUser ? "flex-row-reverse" : ""} animate-fade-in`}>
+    <div ref={messageRef} className={`flex gap-3 ${isCurrentUser ? "flex-row-reverse" : ""} animate-fade-in`} id={`message-${message.id}`}>
       <Avatar className="h-8 w-8 flex-shrink-0">
-        <AvatarImage src={message.user.avatar} alt={message.user.name} />
-        <AvatarFallback>{message.user.name[0]}</AvatarFallback>
+        <AvatarFallback 
+          className={`font-medium ${
+            isCurrentUser 
+              ? "bg-[#CFECE0] text-[#7CAE9E]" 
+              : "bg-[#F8E8E9] text-[#E69EA2]"
+          }`}
+        >
+          {message.user.username[0].toUpperCase()}
+        </AvatarFallback>
       </Avatar>
 
       <div className={`max-w-[75%] ${isCurrentUser ? "items-end" : "items-start"}`}>
@@ -118,6 +142,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             ? "bg-[#EBFFF5] text-[#7CAE9E] rounded-tr-none border-[#CFECE0] border"
             : "bg-[#F8E8E9] text-[#E69EA2] rounded-tl-none border-[#FEC0B3] border"
         }`}>
+          {message.replyTo && (
+            <div
+              className={`mb-2 p-2 rounded bg-white/50 cursor-pointer hover:bg-white/70 transition-colors`}
+              onClick={() => {
+                document.getElementById(`message-${message.replyTo?.id}`)?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              <p className="text-xs font-medium text-gray-600">
+                Replying to {message.replyTo.user.name}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {message.replyTo.content}
+              </p>
+            </div>
+          )}
+
           <p className="text-sm whitespace-pre-wrap">{message.content}</p>
 
           {groupedReactions.length > 0 && (
@@ -142,18 +182,28 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
           )}
 
-          <button
-            onClick={() => setShowReactionPicker(!showReactionPicker)}
-            className={`absolute ${
-              isCurrentUser ? "-left-3" : "-right-3"
-            } -bottom-3 opacity-0 group-hover:opacity-100 hover:scale-110 transition-all rounded-full p-1 ${
-              isCurrentUser
-                ? "bg-[#EBFFF5] text-[#7CAE9E]"
-                : "bg-[#F8E8E9] text-[#E69EA2]"
-            }`}
-          >
-            <span className="text-sm">😊</span>
-          </button>
+          <div className="absolute flex gap-1 -bottom-4 opacity-0 group-hover:opacity-100 transition-all">
+            <button
+              onClick={() => setShowReactionPicker(!showReactionPicker)}
+              className={`rounded-full p-1 hover:scale-110 ${
+                isCurrentUser
+                  ? "bg-[#EBFFF5] text-[#7CAE9E]"
+                  : "bg-[#F8E8E9] text-[#E69EA2]"
+              } ${isCurrentUser ? "-left-3" : "-right-3"}`}
+            >
+              <span className="text-sm">😊</span>
+            </button>
+            <button
+              onClick={() => onReply(message)}
+              className={`rounded-full p-1 hover:scale-110 ${
+                isCurrentUser
+                  ? "bg-[#EBFFF5] text-[#7CAE9E]"
+                  : "bg-[#F8E8E9] text-[#E69EA2]"
+              } ${isCurrentUser ? "-left-8" : "-right-8"}`}
+            >
+              <Reply className="h-4 w-4" />
+            </button>
+          </div>
 
           {showReactionPicker && (
             <div
@@ -186,10 +236,11 @@ interface ChatBoxProps {
   messages: Message[];
   currentUser: ChatUser;
   messageText: string;
-  onSendMessage: () => void;
+  onSendMessage: (message: string) => void; // Updated to accept formatted message
   onMessageTextChange: (text: string) => void;
   onAddReaction: (messageId: number, reactionType: string) => void;
   users: ChatUser[];
+  connection?: signalR.HubConnection | null;
 }
 
 export const ChatBox: React.FC<ChatBoxProps> = ({
@@ -201,15 +252,86 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
   onMessageTextChange,
   onAddReaction,
   users,
+  connection,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const typingTimeoutRef = useRef<{ [username: string]: NodeJS.Timeout }>({});
+  const [selectedReplyMessage, setSelectedReplyMessage] = useState<Message | null>(null);
+
+  // Debounced typing notification for server
+  const sendTypingNotification = useCallback(
+    debounce((roomId: number, username: string) => {
+      if (!connection) return;
+      connection.invoke("SendTypingNotification", roomId, username).catch(err => {
+        console.error("Error sending typing notification:", err);
+      });
+    }, 0),
+    [connection]
+  );
+
+  const handleTyping = useCallback(() => {
+    if (!connection || !room.id || !currentUser || !messageText.trim()) {
+      if (typingTimeoutRef.current[currentUser.username]) {
+        clearTimeout(typingTimeoutRef.current[currentUser.username]);
+        delete typingTimeoutRef.current[currentUser.username];
+      }
+      return;
+    }
+
+    sendTypingNotification(room.id, currentUser.username);
+  }, [connection, room.id, currentUser, sendTypingNotification, messageText]);
+
+  useEffect(() => {
+    if (!connection) return;
+
+    connection.on("ReceiveTypingNotification", (username: string) => {
+      if (username !== currentUser.username) {
+        setTypingUsers(prev => {
+          if (!prev.includes(username)) {
+            return [...prev, username];
+          }
+          return prev;
+        });
+
+        if (typingTimeoutRef.current[username]) {
+          clearTimeout(typingTimeoutRef.current[username]);
+        }
+        typingTimeoutRef.current[username] = setTimeout(() => {
+          setTypingUsers(prev => prev.filter(user => user !== username));
+          delete typingTimeoutRef.current[username];
+        }, 1000);
+      }
+    });
+
+    return () => {
+      connection.off("ReceiveTypingNotification");
+      Object.values(typingTimeoutRef.current).forEach(clearTimeout);
+      typingTimeoutRef.current = {};
+    };
+  }, [connection, currentUser.username]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, typingUsers]);
+
+  const handleSend = () => {
+    if (!messageText.trim()) return;
+    let formattedMessage = messageText;
+    if (selectedReplyMessage) {
+      // Prepend reply context
+      formattedMessage = `> Replying to ${selectedReplyMessage.user.name}: ${selectedReplyMessage.content}\n\n${messageText}`;
+    }
+    onSendMessage(formattedMessage);
+    setSelectedReplyMessage(null);
+  };
+
+  const handleReply = (message: Message) => {
+    setSelectedReplyMessage(message);
+  };
 
   return (
-    <Card className="border-[#CFECE0] md:col-span-3">
+    <Card className="border-[#CFECE0] md:col-span-3 ml-5">
       <CardHeader className="pb-2 border-b border-[#CFECE0]">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -231,12 +353,6 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#7CAE9E]">
               <Phone className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#7CAE9E]">
-              <Video className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#7CAE9E]">
-              <Info className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -264,28 +380,66 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
               message={message}
               currentUser={currentUser}
               onAddReaction={onAddReaction}
+              onReply={handleReply}
             />
           ))}
+          {typingUsers.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="flex justify-start items-center gap-2 my-2"
+            >
+              <div className="bg-[#F8E8E9] px-3 py-1 rounded-full text-xs text-[#E69EA2] animate-pulse">
+                {typingUsers.length === 1
+                  ? `${typingUsers[0]} is typing...`
+                  : `${typingUsers.length} users are typing...`}
+              </div>
+            </motion.div>
+          )}
           <div ref={messagesEndRef} />
         </div>
       </CardContent>
 
-      <CardFooter className="border-t border-[#CFECE0] p-4">
+      <CardFooter className="border-t border-[#CFECE0] p-4 flex flex-col gap-2">
+        {selectedReplyMessage && (
+          <div className="flex items-center gap-2 w-full bg-[#EBFFF5] p-2 rounded border border-[#CFECE0]">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-[#7CAE9E]">
+                Replying to {selectedReplyMessage.user.name}
+              </p>
+              <p className="text-xs text-[#7CAE9E] truncate">
+                {selectedReplyMessage.content}
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSelectedReplyMessage(null)}
+              className="text-[#7CAE9E]"
+            >
+              <span className="text-sm">✖</span>
+            </Button>
+          </div>
+        )}
         <div className="flex items-center gap-2 w-full">
           <Input
             placeholder="Type your message..."
             value={messageText}
-            onChange={(e) => onMessageTextChange(e.target.value)}
+            onChange={(e) => {
+              onMessageTextChange(e.target.value);
+              handleTyping();
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
-                onSendMessage();
+                handleSend();
               }
             }}
             className="border-[#CFECE0] focus-visible:ring-[#7CAE9E]"
           />
           <Button
-            onClick={onSendMessage}
+            onClick={handleSend}
             className="bg-[#7CAE9E] hover:bg-[#7CAE9E]/90"
           >
             <Send className="h-4 w-4" />
@@ -429,13 +583,6 @@ export const KickPopup: React.FC<KickPopupProps> = ({
               className="flex items-center justify-between"
             >
               <CardTitle className="text-white flex items-center gap-2">
-                <motion.div
-                  animate={{
-                    rotate: [0, 10, -10, 0],
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                ></motion.div>
                 <span>ChatRoom Notification</span>
               </CardTitle>
             </motion.div>

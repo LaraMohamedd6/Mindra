@@ -14,8 +14,6 @@ type JwtPayload = {
   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": string;
   Username: string;
   Age: string;
-  Avatar: string;  // Add this
-
 };
 
 type ChatUser = {
@@ -43,6 +41,7 @@ type Message = {
   reactions: MessageReaction[];
   roomId?: number;
   isSystemMessage?: boolean;
+  replyTo?: Message | null; // Added for reply feature
 };
 
 type ChatRoom = {
@@ -148,36 +147,13 @@ const getUserFromToken = (): ChatUser | null => {
       id: decoded.Username,
       name: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"],
       username: decoded.Username,
-            avatar: decoded.Avatar,  // Use the avatar from token
+      avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${decoded.Username}`,
       isAdmin: false,
     };
   } catch (error) {
     console.error("Failed to decode token:", error);
     return null;
   }
-};
-
-
-const getUserAvatar = (username: string, users: ChatUser[] = []): string => {
-  // First try to find the user in the provided list
-  const existingUser = users.find(u => u.username === username);
-  if (existingUser?.avatar) return existingUser.avatar;
-
-  // If current user, get from token
-  const token = localStorage.getItem("token");
-  if (token) {
-    try {
-      const decoded = jwtDecode<JwtPayload>(token);
-      if (decoded.Username === username && decoded.Avatar) {
-        return decoded.Avatar;
-      }
-    } catch (error) {
-      console.error("Error decoding token for avatar:", error);
-    }
-  }
-
-  // Fallback to empty string (you can set a default avatar here if needed)
-  return "";
 };
 
 export default function ChatRoomView() {
@@ -226,6 +202,30 @@ export default function ChatRoomView() {
     };
   }, [navigate]);
 
+  const parseMessageForReply = (messageText: string, messageId: number): { content: string; replyTo: Message | null } => {
+    const replyRegex = /^> Replying to ([^:]+): (.*?)\n\n([\s\S]*)$/;
+    const match = messageText.match(replyRegex);
+    if (!match) {
+      return { content: messageText, replyTo: null };
+    }
+
+    const [, replyToName, replyContent, content] = match;
+    const replyToMessage = messages.find(
+      (msg) => msg.user.name === replyToName && msg.content === replyContent
+    );
+
+    return {
+      content,
+      replyTo: replyToMessage || {
+        id: Date.now(),
+        user: { id: replyToName, name: replyToName, username: replyToName, avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${replyToName}` },
+        content: replyContent,
+        timestamp: new Date().toISOString(),
+        reactions: [],
+      },
+    };
+  };
+
   useEffect(() => {
     if (!roomId || !currentUser) return;
 
@@ -247,24 +247,23 @@ export default function ChatRoomView() {
           })
         ]);
 
-const transformedMessages = messagesResponse.data.map((msg) => {
-  // Try to find the user in the room to get their avatar
-  const userInRoom = users.find(u => u.username === msg.user);
-  
-  return {
-    id: msg.id,
-    content: msg.messageText,
-    timestamp: msg.timestamp,
-    roomId: msg.roomId,
-    user: {
-      id: msg.user,
-      name: msg.user,
-      username: msg.user,
-      avatar: userInRoom?.avatar ,
-    },
-    reactions: reactionsResponse.data.filter(r => r.messageId === msg.id),
-  };
-});
+        const transformedMessages = messagesResponse.data.map((msg) => {
+          const { content, replyTo } = parseMessageForReply(msg.messageText, msg.id);
+          return {
+            id: msg.id,
+            content,
+            timestamp: msg.timestamp,
+            roomId: msg.roomId,
+            user: {
+              id: msg.user,
+              name: msg.user,
+              username: msg.user,
+              avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${msg.user}`,
+            },
+            reactions: reactionsResponse.data.filter(r => r.messageId === msg.id),
+            replyTo,
+          };
+        });
 
         setRoom({
           id: roomResponse.data.id,
@@ -304,46 +303,40 @@ const transformedMessages = messagesResponse.data.map((msg) => {
         await connection.start();
         console.log("SignalR Connected");
 
-connection.on("ReceiveMessage", (user: string, message: string, messageId: number) => {
-  // Try to find the user in the room to get their avatar
-  const userInRoom = users.find(u => u.username === user);
-  
-  setMessages(prev => [
-    ...prev,
-    {
-      id: messageId,
-      user: {
-        id: user,
-        name: user,
-        username: user,
-        avatar: userInRoom?.avatar ,
-      },
-      content: message,
-      timestamp: new Date().toISOString(),
-      reactions: [],
-    },
-  ]);
-});
+        connection.on("ReceiveMessage", (user: string, message: string, messageId: number) => {
+          const { content, replyTo } = parseMessageForReply(message, messageId);
+          setMessages(prev => [
+            ...prev,
+            {
+              id: messageId,
+              user: {
+                id: user,
+                name: user,
+                username: user,
+                avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${user}`,
+              },
+              content,
+              timestamp: new Date().toISOString(),
+              reactions: [],
+              replyTo,
+            },
+          ]);
+        });
 
-connection.on("UpdateUserList", (userList: string[], adminUsername: string) => {
-  const updatedUsers = userList.map((username) => {
-    // Check if we already have this user with their avatar
-    const existingUser = users.find(u => u.username === username);
-    
-    return {
-      id: username,
-      name: username,
-      username: username,
-      avatar: existingUser?.avatar ,
-      isAdmin: username === adminUsername,
-    };
-  });
+        connection.on("UpdateUserList", (userList: string[], adminUsername: string) => {
+          const updatedUsers = userList.map((username) => ({
+            id: username,
+            name: username,
+            username: username,
+            avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${username}`,
+            isAdmin: username === adminUsername,
+          }));
 
-  setUsers(updatedUsers);
-  setIsAdmin(updatedUsers.some(
-    (user) => user.id === currentUser?.username && user.isAdmin
-  ));
-});
+          setUsers(updatedUsers);
+          setIsAdmin(updatedUsers.some(
+            (user) => user.id === currentUser.username && user.isAdmin
+          ));
+        });
 
         connection.on("MessageReactionUpdated", (messageId: number, reactions: Record<string, number>) => {
           setMessages(prev => prev.map(msg => {
@@ -382,6 +375,25 @@ connection.on("UpdateUserList", (userList: string[], adminUsername: string) => {
           setKickPopup(true);
         });
 
+        connection.on("ReceiveSystemMessage", (message: string) => {
+          setMessages(prev => [
+            ...prev,
+            {
+              id: Date.now(),
+              user: {
+                id: "system",
+                name: "System",
+                username: "system",
+                avatar: "",
+              },
+              content: message,
+              timestamp: new Date().toISOString(),
+              reactions: [],
+              isSystemMessage: true,
+            },
+          ]);
+        });
+
         await connection.invoke("JoinRoom", parseInt(roomId), currentUser.username);
       } catch (err) {
         console.error("SignalR connection error:", err);
@@ -400,6 +412,7 @@ connection.on("UpdateUserList", (userList: string[], adminUsername: string) => {
         connection.off("ReceiveReaction");
         connection.off("CannotKickCreator");
         connection.off("Kicked");
+        connection.off("ReceiveSystemMessage");
       }
     };
   }, [connection, roomId, currentUser, navigate, toast]);
@@ -408,15 +421,14 @@ connection.on("UpdateUserList", (userList: string[], adminUsername: string) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!messageText.trim() || !connection || !roomId || !currentUser) return;
+  const handleSendMessage = async (formattedMessage: string) => {
+    if (!formattedMessage.trim() || !connection || !roomId || !currentUser) return;
   
     try {
-      // Remove temporary ID generation
       await connection.invoke(
         "SendMessage",
         currentUser.username,
-        messageText,
+        formattedMessage,
         parseInt(roomId)
       );
       setMessageText("");
@@ -447,7 +459,6 @@ connection.on("UpdateUserList", (userList: string[], adminUsername: string) => {
         connectionState: connection.state
       });
       
-      // Use the correct method name and parameters
       await connection.invoke("ReactToMessage", messageId, reactionType);
       
       console.log("Reaction sent successfully");
@@ -504,27 +515,6 @@ connection.on("UpdateUserList", (userList: string[], adminUsername: string) => {
         userToKick,
         selectedReason
       );
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          user: {
-            id: "system",
-            name: "System",
-            username: "system",
-            avatar: "",
-          },
-          content: `To maintain a safe space, ${
-            currentUser?.username
-          } has removed ${userToKick}${
-            selectedReason === "Other" ? "" : ` due to ${selectedReason}`
-          }`,
-          timestamp: new Date().toISOString(),
-          reactions: [],
-          isSystemMessage: true,
-        },
-      ]);
 
       setShowKickModal(false);
       setSelectedReason("");
@@ -587,6 +577,7 @@ connection.on("UpdateUserList", (userList: string[], adminUsername: string) => {
             onMessageTextChange={setMessageText}
             onAddReaction={handleAddReaction}
             users={users}
+            connection={connection}
           />
         </div>
 
