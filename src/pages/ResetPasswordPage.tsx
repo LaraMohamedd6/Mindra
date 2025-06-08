@@ -65,7 +65,7 @@ export function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#F8E8E9] to-[#EBFFF5] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#f8f5f2] p-4">
       <div className="w-full max-w-xl">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
