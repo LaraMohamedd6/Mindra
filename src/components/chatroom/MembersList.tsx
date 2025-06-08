@@ -128,7 +128,7 @@ export const MembersList: React.FC<MembersListProps> = ({
   const navigate = useNavigate();
 
   return (
-    <Card className="border-[#CFECE0] md:col-span-1 w-full md:w-95">
+<Card className="border-[#CFECE0] md:col-span-1 w-full md:w-[107%] mr-70">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <CardTitle className="text-[#7CAE9E] text-base">Members</CardTitle>
