@@ -331,7 +331,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
   };
 
   return (
-    <Card className="border-[#CFECE0] md:col-span-3">
+    <Card className="border-[#CFECE0] md:col-span-3 ml-5">
       <CardHeader className="pb-2 border-b border-[#CFECE0]">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">

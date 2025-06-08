@@ -42,15 +42,15 @@ export function VerificationStep({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#F8E8E9] to-[#EBFFF5] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-white p-4">
       <div className="w-full max-w-xl">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-white w-full max-w-lg mx-auto">
-            <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
+          <Card className="border-none bg-white w-full max-w-lg mx-auto">
+            <div className="bg-[#FFFFFF] h-3 w-full" />
             
             <CardHeader className="pb-6 px-10">
               <div className="flex flex-col items-center space-y-2">

@@ -83,7 +83,7 @@ const ChatBot = () => {
 
       try {
         const response = await fetch(
-          `https://localhost:7223/api/prediction/chat-history`,
+          `https://localhost:7223/api/Prediction/chat-history`,
           {
             method: "GET",
             headers: {
@@ -163,29 +163,7 @@ const ChatBot = () => {
     );
   };
 
-  const saveMessageToHistory = async (
-    message: string,
-    isUserMessage: boolean
-  ) => {
-    if (!token) return;
-
-    try {
-      await fetch(`https://localhost:7223/api/ChatHistory`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          message,
-          isUserMessage,
-          timestamp: new Date().toISOString(),
-        }),
-      });
-    } catch (error) {
-      console.error("Error saving message to history:", error);
-    }
-  };
+  
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -200,7 +178,6 @@ const ChatBot = () => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    await saveMessageToHistory(input, true);
     setInput("");
     setIsLoading(true);
 
@@ -235,7 +212,6 @@ const ChatBot = () => {
       };
 
       setMessages((prev) => [...prev, botMessage]);
-      await saveMessageToHistory(botResponse, false);
     } catch (error) {
       console.error("Error calling chatbot API:", error);
       toast.error("Failed to get response from chatbot");
@@ -251,7 +227,6 @@ const ChatBot = () => {
       };
 
       setMessages((prev) => [...prev, errorMessage]);
-      await saveMessageToHistory(errorMessage.content, false);
     } finally {
       setIsLoading(false);
     }

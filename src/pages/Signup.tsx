@@ -25,7 +25,6 @@ import {
   ChevronLeft,
   RotateCw,
   Mail,
-  X,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
@@ -57,7 +56,6 @@ export default function Signup() {
     email: { exists: null as boolean | null, message: "" },
   });
   const [checkingAvailability, setCheckingAvailability] = useState(false);
-  const [showTermsPopup, setShowTermsPopup] = useState(false);
 
   const navigate = useNavigate();
 
@@ -97,8 +95,8 @@ export default function Signup() {
   };
 
   const checkAvailability = async () => {
-    if ((!formData.username && !formData.email) || 
-        (formData.username.length < 3 && !formData.email)) {
+    if ((!formData.username && !formData.email) ||
+      (formData.username.length < 3 && !formData.email)) {
       return false;
     }
 
@@ -122,7 +120,7 @@ export default function Signup() {
           message: response.data.emailMessage
         }
       });
-      
+
       return {
         usernameAvailable: !response.data.usernameExists,
         emailAvailable: !response.data.emailExists
@@ -174,13 +172,13 @@ export default function Signup() {
     }
 
     setErrors(newErrors);
-    
+
     if (Object.keys(newErrors).length > 0) {
       return false;
     }
 
     const availabilityResult = await checkAvailability();
-    
+
     if (!availabilityResult) {
       setErrors(prev => ({
         ...prev,
@@ -191,15 +189,15 @@ export default function Signup() {
 
     if (!availabilityResult.usernameAvailable || !availabilityResult.emailAvailable) {
       const availabilityErrors: { [key: string]: string } = {};
-      
+
       if (!availabilityResult.usernameAvailable) {
         availabilityErrors.username = "Username is already registered";
       }
-      
+
       if (!availabilityResult.emailAvailable) {
         availabilityErrors.email = "Email is already registered";
       }
-      
+
       setErrors(prev => ({ ...prev, ...availabilityErrors }));
       return false;
     }
@@ -310,13 +308,12 @@ export default function Signup() {
         <React.Fragment key={stepNumber}>
           <div className="flex flex-col items-center">
             <div
-              className={`rounded-full w-8 h-8 flex items-center justify-center ${
-                step === stepNumber
-                  ? "bg-[#7CAE9E] text-white"
-                  : step > stepNumber
+              className={`rounded-full w-8 h-8 flex items-center justify-center ${step === stepNumber
+                ? "bg-[#7CAE9E] text-white"
+                : step > stepNumber
                   ? "bg-[#7CAE9E]/30 text-white"
                   : "bg-gray-100"
-              }`}
+                }`}
             >
               {stepNumber}
             </div>
@@ -324,12 +321,11 @@ export default function Signup() {
               {stepNumber === 1 ? "Details" : "Security"}
             </span>
           </div>
-          
+
           {stepNumber < 2 && (
-            <div 
-              className={`h-0.5 flex-1 mx-2 ${
-                step > stepNumber ? "bg-[#7CAE9E]" : "bg-gray-200"
-              }`}
+            <div
+              className={`h-0.5 flex-1 mx-2 ${step > stepNumber ? "bg-[#7CAE9E]" : "bg-gray-200"
+                }`}
             />
           )}
         </React.Fragment>
@@ -338,143 +334,29 @@ export default function Signup() {
   );
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#F8E8E9] to-[#EBFFF5] p-4">
-      {/* Terms & Conditions Popup */}
-      {showTermsPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
-          >
-            <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
-            <div className="p-6 max-h-[70vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-2xl font-bold text-[#7CAE9E]">Terms & Conditions</h3>
-                <button 
-                  onClick={() => setShowTermsPopup(false)}
-                  className="text-[#E69EA2] hover:text-[#d18e92]"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              
-              <div className="space-y-4 text-gray-700">
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">1. Acceptance of Terms</h5>
-                  <p className="mt-1">By accessing or using our services, you agree to be bound by these terms and all applicable laws and regulations.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">2. User Responsibilities</h5>
-                  <p className="mt-1">You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">3. Privacy Policy</h5>
-                  <p className="mt-1">Your privacy is important to us. Our Privacy Policy explains how we collect, use, and protect your personal information.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">4. Intellectual Property</h5>
-                  <p className="mt-1">All content, trademarks, and data on this website are the property of our company and are protected by intellectual property laws.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">5. Prohibited Activities</h5>
-                  <p className="mt-1">You agree not to engage in any illegal activities, spamming, hacking, or any activity that disrupts the service.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">6. Account Termination</h5>
-                  <p className="mt-1">We may terminate or suspend your account immediately for any violation of these terms without prior notice.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">7. Limitation of Liability</h5>
-                  <p className="mt-1">In no event shall we be liable for any indirect, incidental, special, consequential or punitive damages arising from your use of the service.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">8. Governing Law</h5>
-                  <p className="mt-1">These terms shall be governed by and construed in accordance with the laws of the jurisdiction where our company is registered.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">9. Changes to Terms</h5>
-                  <p className="mt-1">We reserve the right to modify these terms at any time. Your continued use constitutes acceptance of the modified terms.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">10. Contact Information</h5>
-                  <p className="mt-1">For any questions about these Terms, please contact us at legal@example.com or through our contact page.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">11. User Content</h5>
-                  <p className="mt-1">You retain ownership of any content you submit, but grant us a worldwide license to use, reproduce, and display such content.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">12. Third-Party Services</h5>
-                  <p className="mt-1">We may use third-party services to provide our services, and you agree to their terms where applicable.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">13. Dispute Resolution</h5>
-                  <p className="mt-1">Any disputes shall first attempt to be resolved through mediation before pursuing legal action.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">14. Refund Policy</h5>
-                  <p className="mt-1">Refunds will be processed within 30 days of request, subject to our refund policy conditions.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">15. Service Availability</h5>
-                  <p className="mt-1">We do not guarantee uninterrupted service and may perform maintenance that temporarily limits access.</p>
-                </div>
-                
-                <div>
-                  <h5 className="text-[#E69EA2] text-lg font-medium">16. Age Restrictions</h5>
-                  <p className="mt-1">Users must be at least 13 years old to use our services, or older depending on local regulations.</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 border-t border-[#CFECE0] flex justify-end">
-              <Button
-                onClick={() => setShowTermsPopup(false)}
-                className="bg-[#7CAE9E] hover:bg-[#6a9d8d] text-white"
-              >
-                I Understand
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
+    <div className="min-h-screen flex items-center justify-center bg-[#f8f5f2] p-4">
       <div className="w-full max-w-xl">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-white w-full max-w-lg mx-auto">
+          <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-white w-full max-w-xl mx-auto">
             <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
-            <CardHeader className="pb-6 px-10">
+            <CardHeader className="pb-2 pt-8 px-8">
               <div className="flex items-center space-x-6">
-                <img 
-                  src={Logo} 
-                  alt="Mindra Logo" 
-                  className="h-20 object-contain" 
+                <img
+                  src={Logo}
+                  alt="Mindra Logo"
+                  className="h-20 object-contain"
                 />
                 <div className="flex flex-col space-y-2">
                   <h1 className="text-3xl font-bold text-[#7CAE9E]">
                     {step === 1 ? "Create Account" : "Account Security"}
                   </h1>
                   <p className="text-gray-500 text-md mt-2">
-                    {step === 1 
-                      ? "Join our community for better mental wellness" 
+                    {step === 1
+                      ? "Join our community for better mental wellness"
                       : "Set up your account security"}
                   </p>
                 </div>
@@ -497,15 +379,15 @@ export default function Signup() {
               )}
 
               {step === 1 && (
-                <div className="space-y-6">
-                  {/* Full Name */}
-                  <div className="space-y-3">
-                    <Label htmlFor="fullName" className="text-[#7CAE9E] font-medium text-md">
+                <div className="space-y-4">
+                  {/* Full Name Field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName" className="text-[#7CAE9E] font-medium text-sm">
                       Full Name
                     </Label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <User className="h-6 w-6 text-[#E69EA2]" />
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <User className="h-5 w-5 text-[#E69EA2]" />
                       </div>
                       <Input
                         id="fullName"
@@ -513,9 +395,8 @@ export default function Signup() {
                         placeholder="Your full name"
                         value={formData.fullName}
                         onChange={handleChange}
-                        className={`pl-12 h-14 rounded-xl text-md ${
-                          errors.fullName ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-10 h-11 rounded-xl text-md ${errors.fullName ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                       />
                     </div>
                     {errors.fullName && <ErrorMessage message={errors.fullName} />}
@@ -536,9 +417,8 @@ export default function Signup() {
                         placeholder="yourusername"
                         value={formData.username}
                         onChange={handleChange}
-                        className={`pl-12 h-14 rounded-xl text-md ${
-                          errors.username ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-12 h-14 rounded-xl text-md ${errors.username ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                       />
                     </div>
                     {errors.username && <ErrorMessage message={errors.username} />}
@@ -571,9 +451,8 @@ export default function Signup() {
                           if (errors.age) setErrors((prev) => ({ ...prev, age: "" }));
                         }}
                         min="13"
-                        className={`pl-12 h-14 rounded-xl text-md ${
-                          errors.age ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-12 h-14 rounded-xl text-md ${errors.age ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                         onKeyDown={(e) => {
                           if (["-", "+", "e", "E", "."].includes(e.key)) {
                             e.preventDefault();
@@ -593,22 +472,20 @@ export default function Signup() {
                       {genderOptions.map((option) => (
                         <label
                           key={option.value}
-                          className={`flex-1 cursor-pointer rounded-lg border p-3 transition-all h-14 flex items-center justify-center ${
-                            formData.gender === option.value
-                              ? "border-[#7CAE9E] bg-[#7CAE9E]/10 ring-1 ring-[#7CAE9E]"
-                              : "border-[#CFECE0] hover:border-[#7CAE9E]/50"
-                          }`}
+                          className={`flex-1 cursor-pointer rounded-lg border p-3 transition-all h-14 flex items-center justify-center ${formData.gender === option.value
+                            ? "border-[#7CAE9E] bg-[#7CAE9E]/10 ring-1 ring-[#7CAE9E]"
+                            : "border-[#CFECE0] hover:border-[#7CAE9E]/50"
+                            }`}
                         >
                           <div className="flex items-center justify-between w-full px-2">
                             <span className="text-md font-medium text-[#7CAE9E]">
                               {option.label}
                             </span>
                             <div
-                              className={`flex h-5 w-5 items-center justify-center rounded-full border ${
-                                formData.gender === option.value
-                                  ? "border-[#7CAE9E] bg-[#7CAE9E]"
-                                  : "border-[#CFECE0]"
-                              }`}
+                              className={`flex h-5 w-5 items-center justify-center rounded-full border ${formData.gender === option.value
+                                ? "border-[#7CAE9E] bg-[#7CAE9E]"
+                                : "border-[#CFECE0]"
+                                }`}
                             >
                               {formData.gender === option.value && (
                                 <div className="h-2.5 w-2.5 rounded-full bg-white"></div>
@@ -645,9 +522,8 @@ export default function Signup() {
                         placeholder="your@email.com"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`pl-12 h-14 rounded-xl text-md ${
-                          errors.email ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-12 h-14 rounded-xl text-md ${errors.email ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                       />
                     </div>
                     {errors.email && <ErrorMessage message={errors.email} />}
@@ -673,9 +549,8 @@ export default function Signup() {
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={handleChange}
-                        className={`pl-12 pr-12 h-14 rounded-xl text-md ${
-                          errors.password ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-12 pr-12 h-14 rounded-xl text-md ${errors.password ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                       />
                       <button
                         type="button"
@@ -703,11 +578,10 @@ export default function Signup() {
                                 <AlertCircle className="h-4 w-4 text-[#CFECE0]" />
                               )}
                             </div>
-                            <span className={`text-xs mt-1 ${
-                              req.validator(formData.password)
-                                ? "text-[#7CAE9E]"
-                                : "text-gray-400"
-                            }`}>
+                            <span className={`text-xs mt-1 ${req.validator(formData.password)
+                              ? "text-[#7CAE9E]"
+                              : "text-gray-400"
+                              }`}>
                               {req.text}
                             </span>
                           </div>
@@ -734,9 +608,8 @@ export default function Signup() {
                         placeholder="••••••••"
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className={`pl-12 pr-12 h-14 rounded-xl text-md ${
-                          errors.confirmPassword ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-12 pr-12 h-14 rounded-xl text-md ${errors.confirmPassword ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                       />
                       <button
                         type="button"
@@ -757,40 +630,37 @@ export default function Signup() {
                   </div>
 
                   {/* Terms Checkbox */}
-                  <div className="flex items-start space-x-3 mt-4">
-                    <Checkbox
-                      id="terms"
-                      checked={agreedToTerms}
-                      onCheckedChange={(checked) =>
-                        setAgreedToTerms(checked as boolean)
-                      }
-                      className="mt-1 data-[state=checked]:bg-[#7CAE9E] data-[state=checked]:border-[#7CAE9E]"
-                    />
-                    <div className="grid gap-1.5 leading-none">
+                  <div className="flex flex-col mb-4">
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="terms"
+                        checked={agreedToTerms}
+                        onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
+                        className="data-[state=checked]:bg-[#7CAE9E] data-[state=checked]:border-[#7CAE9E]"
+                      />
                       <label
                         htmlFor="terms"
                         className="text-sm text-[#7CAE9E] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
-                        I agree to the{' '}
-                        <button 
-                          type="button" 
-                          onClick={() => setShowTermsPopup(true)}
-                          className="underline hover:text-[#6a9d8d]"
-                        >
-                          Terms of Service and Privacy Policy
-                        </button>
+                        I agree to the Terms of Service and Privacy Policy
                       </label>
-                      {errors.terms && <ErrorMessage message={errors.terms} />}
                     </div>
+
+                    {errors.terms && (
+                      <div className="mt-1">
+                        <ErrorMessage message={errors.terms} />
+                      </div>
+                    )}
                   </div>
+
                 </div>
               )}
             </CardContent>
 
-            <CardFooter className="justify-center flex-col space-y-6 pb-10 px-10">
+            <CardFooter className="justify-center flex-col space-y-6 pb-8 px-8">
               <Button
                 onClick={handleNextStep}
-                className="w-full bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] hover:from-[#d18e92] hover:to-[#eeb0a5] text-white h-14 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-md"
+                className="w-full bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] hover:from-[#d18e92] hover:to-[#eeb0a5] text-white h-11 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 text-sm font-medium"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -802,7 +672,7 @@ export default function Signup() {
                         repeat: Infinity,
                         ease: "linear",
                       }}
-                      className="h-6 w-6 border-2 border-white border-t-transparent rounded-full mr-3"
+                      className="h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"
                     />
                     {step === 1 ? "Checking..." : "Creating Account..."}
                   </div>
@@ -816,7 +686,7 @@ export default function Signup() {
               {step === 1 && (
                 <>
                   <div className="text-md text-gray-500">
-                    Already have an account?{' '}
+                    Already have an account?{" "}
                     <Link
                       to="/login"
                       className="text-[#7CAE9E] hover:text-[#6a9d8d] hover:underline font-medium transition-colors"
@@ -872,10 +742,10 @@ export default function Signup() {
         >
           <Link
             to="/"
-            className="text-md text-[#7CAE9E] hover:text-[#6a9d8d] flex items-center justify-center transition-colors duration-200"
+            className="text-xs text-[#7CAE9E] hover:text-[#6a9d8d] flex items-center justify-center transition-colors duration-200 mb-5"
           >
             Return to home page
-            <ChevronRight className="h-5 w-5 ml-1.5 mt-0.5" />
+            <ChevronRight className="h-4 w-4 ml-1" />
           </Link>
         </motion.div>
       </div>
