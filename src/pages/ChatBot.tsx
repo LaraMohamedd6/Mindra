@@ -170,7 +170,7 @@ const ChatBot = () => {
     if (!token) return;
 
     try {
-      await fetch(`https://localhost:7223/api/ChatHistory`, {
+      await fetch(`https://localhost:7223/api/Prediction/chat-history`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
