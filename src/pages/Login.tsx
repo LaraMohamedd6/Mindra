@@ -166,57 +166,61 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#F8E8E9] to-[#EBFFF5] p-4">
-      <div className="w-full max-w-xl">
+    <div className="min-h-screen flex items-center justify-center bg-[#f8f5f2] p-4">
+      <div className="w-full max-w-lg">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-white w-full max-w-lg mx-auto">
-            <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
-            <CardHeader className="pb-6 px-10">
-              <div className="flex items-center space-x-6">
-                <img 
-                  src={Logo} 
-                  alt="Mindra Logo" 
-                  className="h-20 object-contain" 
-                />
-                <div className="flex flex-col space-y-2">
-                  <h1 className="text-3xl font-bold text-[#7CAE9E]">Welcome Back</h1>
-                  <p className="text-gray-500 text-md mt-2">
-                    Sign in to continue your wellness journey
-                  </p>
+          <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-[#FFFFFF] backdrop-blur-sm w-full max-w-xl">
+            <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-2 w-full" />
+            <CardHeader className="pb-2 pt-8 px-10">
+              <div className="flex flex-col items-start"> {/* Changed to items-start */}
+                <div className="flex items-start gap-4"> {/* Horizontal alignment */}
+                  {/* Logo on the left */}
+                  <img
+                    src={Logo}
+                    alt="Mindra Logo"
+                    className="h-24 w-24 object-contain rounded-full border-4 border-white"
+                  />
+                  {/* Header and paragraph stacked to the right */}
+                  <div className="flex flex-col">
+                    <h1 className="text-3xl font-bold text-[#7CAE9E] mt-3">Welcome Back</h1>
+                    <p className="text-gray-500 text-sm mt-1">
+                      Sign in to continue your wellness journey
+                    </p>
+                  </div>
                 </div>
               </div>
             </CardHeader>
 
-            <CardContent className="px-10 pb-8">
+            <CardContent className="px-8 pb-6">
               {errors.general && (
                 <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-6 p-4 bg-[#F8E8E9]/80 text-[#E69EA2] rounded-lg flex flex-col border border-[#FEC0B3]/50"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="mb-6 p-3 bg-[#F8E8E9]/80 text-[#E69EA2] rounded-lg border border-[#FEC0B3]/50 flex flex-col"
                 >
                   <div className="flex items-center">
-                    <AlertCircle className="h-6 w-6 mr-3" />
-                    <span className="font-medium text-md">{errors.general}</span>
+                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                    <span className="font-medium text-sm">{errors.general}</span>
                   </div>
 
                   {showVerificationPrompt && (
-                    <div className="mt-4 p-4 bg-[#EBFFF5]/80 rounded-md border border-[#CFECE0]">
-                      <div className="flex items-start mb-3">
-                        <Mail className="h-6 w-6 text-[#7CAE9E] mr-3 mt-0.5 flex-shrink-0" />
-                        <p className="text-md text-[#7CAE9E]">
+                    <div className="mt-3 p-3 bg-[#EBFFF5]/80 rounded-md border border-[#CFECE0]">
+                      <div className="flex items-start">
+                        <Mail className="h-5 w-5 text-[#7CAE9E] mr-2 mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-[#7CAE9E]">
                           Didn't receive a verification email? We can send you a new one.
                         </p>
                       </div>
-                      <div className="flex gap-3 mt-3">
+                      <div className="flex gap-2 mt-3">
                         <Button
                           onClick={handleResendVerification}
-                          className="bg-[#7CAE9E] hover:bg-[#6a9d8d] text-white shadow-sm text-md h-11"
+                          className="bg-[#7CAE9E] hover:bg-[#6a9d8d] text-white text-sm h-9 px-4"
                           disabled={isLoading}
-                          size="lg"
+                          size="sm"
                         >
                           {isLoading ? (
                             <div className="flex items-center">
@@ -227,7 +231,7 @@ export default function Login() {
                                   repeat: Infinity,
                                   ease: "linear",
                                 }}
-                                className="h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-3"
+                                className="h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"
                               />
                               Sending...
                             </div>
@@ -238,9 +242,9 @@ export default function Login() {
                         <Button
                           onClick={() => setShowVerificationPrompt(false)}
                           variant="outline"
-                          size="lg"
+                          size="sm"
                           disabled={isLoading}
-                          className="border-[#CFECE0] text-[#7CAE9E] hover:bg-[#EBFFF5] h-11 text-md"
+                          className="border-[#CFECE0] text-[#7CAE9E] hover:bg-[#EBFFF5] h-9 px-4"
                         >
                           Cancel
                         </Button>
@@ -251,13 +255,13 @@ export default function Login() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-3">
-                  <Label htmlFor="email" className="text-[#7CAE9E] font-medium text-md">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-[#7CAE9E] font-medium text-sm">
                     Email Address
                   </Label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <AtSign className="h-6 w-6 text-[#E69EA2]" />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <AtSign className="h-5 w-5 text-[#E69EA2]" />
                     </div>
                     <Input
                       id="email"
@@ -266,30 +270,37 @@ export default function Login() {
                       placeholder="your@email.com"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`pl-12 h-14 rounded-xl text-md ${
-                        errors.email ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                      } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                      className={`pl-10 h-14 rounded-lg text-sm ${errors.email ? "border-[#E69EA2] focus:ring-[#F8E8E9]" : "border-[#CFECE0] focus:ring-[#EBFFF5]"
+                        } focus:ring-2 focus:border-transparent`}
                     />
                   </div>
                   {errors.email && (
                     <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-[#E69EA2] text-sm mt-2 flex items-center"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-[#E69EA2] text-xs mt-1 flex items-start"
                     >
-                      <AlertCircle className="h-4 w-4 mr-2" />
+                      <AlertCircle className="h-3.5 w-3.5 mr-1.5 mt-0.5 flex-shrink-0" />
                       {errors.email}
                     </motion.p>
                   )}
                 </div>
 
-                <div className="space-y-3">
-                  <Label htmlFor="password" className="text-[#7CAE9E] font-medium text-md">
-                    Password
-                  </Label>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="text-[#7CAE9E] font-medium text-sm">
+                      Password
+                    </Label>
+                    <Link
+                      to="/forgot-password"
+                      className="text-xs text-[#7CAE9E] hover:text-[#6a9d8d] hover:underline transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Key className="h-6 w-6 text-[#E69EA2]" />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Key className="h-5 w-5 text-[#E69EA2]" />
                     </div>
                     <Input
                       id="password"
@@ -298,26 +309,25 @@ export default function Login() {
                       placeholder="••••••••"
                       value={formData.password}
                       onChange={handleChange}
-                      className={`pl-12 pr-12 h-14 rounded-xl text-md ${
-                        errors.password ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                      } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                      className={`pl-10 pr-10 h-14 rounded-lg text-sm ${errors.password ? "border-[#E69EA2] focus:ring-[#F8E8E9]" : "border-[#CFECE0] focus:ring-[#EBFFF5]"
+                        } focus:ring-2 focus:border-transparent`}
                     />
                     <button
                       type="button"
-                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#E69EA2] hover:text-[#d18e92] transition-colors"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#E69EA2] hover:text-[#d18e92] transition-colors"
                       onClick={() => setShowPassword(!showPassword)}
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-6 w-6" />
+                        <EyeOff className="h-5 w-5" />
                       ) : (
-                        <Eye className="h-6 w-6" />
+                        <Eye className="h-5 w-5" />
                       )}
                     </button>
                   </div>
 
                   {formData.password && (
-                    <div className="mt-3 grid grid-cols-5 gap-1">
+                    <div className="mt-2 grid grid-cols-5 gap-1">
                       {passwordRequirements.map((req) => (
                         <div key={req.id} className="flex flex-col items-center">
                           <div className="flex items-center space-x-1">
@@ -327,11 +337,10 @@ export default function Login() {
                               <AlertCircle className="h-4 w-4 text-[#CFECE0]" />
                             )}
                           </div>
-                          <span className={`text-xs mt-1 ${
-                            req.validator(formData.password)
-                              ? "text-[#7CAE9E]"
-                              : "text-gray-400"
-                          }`}>
+                          <span className={`text-[10px] mt-0.5 ${req.validator(formData.password)
+                            ? "text-[#7CAE9E]"
+                            : "text-gray-400"
+                            }`}>
                             {req.text}
                           </span>
                         </div>
@@ -341,28 +350,19 @@ export default function Login() {
 
                   {errors.password && (
                     <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-[#E69EA2] text-sm mt-2 flex items-center"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-[#E69EA2] text-xs mt-1 flex items-start"
                     >
-                      <AlertCircle className="h-4 w-4 mr-2" />
+                      <AlertCircle className="h-3.5 w-3.5 mr-1.5 mt-0.5 flex-shrink-0" />
                       {errors.password}
                     </motion.p>
                   )}
                 </div>
 
-                <div className="flex items-center justify-between pt-3">
-                  <Link
-                    to="/forgot-password"
-                    className="text-md text-[#7CAE9E] hover:text-[#6a9d8d] hover:underline font-medium transition-colors"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] hover:from-[#d18e92] hover:to-[#eeb0a5] text-white h-14 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-md"
+                  className="w-full bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] hover:from-[#d18e92] hover:to-[#eeb0a5] text-white h-14 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 text-sm font-medium"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -374,48 +374,39 @@ export default function Login() {
                           repeat: Infinity,
                           ease: "linear",
                         }}
-                        className="h-6 w-6 border-2 border-white border-t-transparent rounded-full mr-3"
+                        className="h-6 w-6 border-2 border-white border-t-transparent rounded-full mr-2"
                       />
                       Signing In...
                     </div>
                   ) : (
-                    <span className="font-medium">Sign In</span>
+                    <span className="flex items-center">
+                      <LogIn className="h-4 w-4 mr-2" />
+                      Sign In
+                    </span>
                   )}
                 </Button>
               </form>
-            </CardContent>
 
-            <CardFooter className="justify-center flex-col space-y-6 pb-10 px-10">
-              <div className="text-md text-gray-500">
-                Don't have an account?{" "}
-                <Link
-                  to="/signup"
-                  className="text-[#7CAE9E] hover:text-[#6a9d8d] hover:underline font-medium transition-colors"
-                >
-                  Sign up now
-                </Link>
-              </div>
-
-              <div className="relative w-full">
+              <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-[#CFECE0]" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="px-3 bg-white text-md text-gray-500">
+                  <span className="px-2 bg-white text-xs text-gray-500">
                     or continue with
                   </span>
                 </div>
               </div>
 
-              <div className="w-full">
+              <div className="grid grid-cols-1 gap-3">
                 <Button
                   variant="outline"
-                  className="w-full h-14 rounded-xl border-[#CFECE0] hover:bg-[#EBFFF5] flex items-center justify-center space-x-3 transition-colors text-[#7CAE9E] text-md"
+                  className="w-full h-11 rounded-lg border-[#CFECE0] hover:bg-[#EBFFF5] flex items-center justify-center space-x-2 transition-colors text-[#7CAE9E] text-md"
                   onClick={handleGoogleLogin}
                   disabled={isLoading}
                 >
                   <svg
-                    className="h-6 w-6"
+                    className="h-5 w-5"
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                   >
@@ -426,27 +417,39 @@ export default function Login() {
                       <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z" />
                     </g>
                   </svg>
-                  <span className="font-medium">Google</span>
+                  <span>Google</span>
                 </Button>
               </div>
+            </CardContent>
+
+            <CardFooter className="justify-center pb-8 px-8">
+              <p className="text-xs text-gray-500 text-center">
+                Don't have an account?{" "}
+                <Link
+                  to="/signup"
+                  className="text-[#7CAE9E] hover:text-[#6a9d8d] hover:underline font-medium transition-colors"
+                >
+                  Sign up now
+                </Link>
+              </p>
             </CardFooter>
           </Card>
-        </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-10 text-center"
-        >
-          <Link
-            to="/"
-            className="text-md text-[#7CAE9E] hover:text-[#6a9d8d] flex items-center justify-center transition-colors duration-200"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mt-6 text-center"
           >
-            Return to home page
-            <ChevronRight className="h-5 w-5 ml-1.5 mt-0.5" />
-          </Link>
-        </motion.div>
+            <Link
+              to="/"
+              className="text-xs text-[#7CAE9E] hover:text-[#6a9d8d] flex items-center justify-center transition-colors duration-200"
+            >
+              Return to home page
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Link>
+          </motion.div>
+        </motion.div> 
       </div>
     </div>
   );
