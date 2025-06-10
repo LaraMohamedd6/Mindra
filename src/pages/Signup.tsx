@@ -29,7 +29,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
 import React from "react";
-import Logo from "@/assets/images/LOGO.jpg";
+import Logo from "@/assets/images/UpdatedLOGO.jpg";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -351,12 +351,12 @@ export default function Signup() {
                   className="h-20 object-contain"
                 />
                 <div className="flex flex-col space-y-2">
-                  <h1 className="text-3xl font-bold text-[#7CAE9E]">
-                    {step === 1 ? "Create Account" : "Account Security"}
+                  <h1 className="text-2xl font-bold text-[#7CAE9E]">
+                    {step === 1 ? "Start your Journey with MINDRA" : "Account Security"}
                   </h1>
                   <p className="text-gray-500 text-md mt-2">
                     {step === 1
-                      ? "Join our community for better mental wellness"
+                      ? "Create your account to join our commuinity"
                       : "Set up your account security"}
                   </p>
                 </div>
