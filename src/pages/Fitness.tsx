@@ -225,15 +225,15 @@ const Fitness = () => {
   const motivationalQuotes = [
     {
       text: "The only bad workout is the one that didn't happen.",
-      author: "Unknown"
+      author: "Abraham Lincoln"
     },
     {
       text: "Success starts with self-discipline.",
-      author: "Unknown"
+      author: "Mark Twain"
     },
     {
       text: "You don't have to be extreme, just consistent.",
-      author: "Unknown"
+      author: "Abraham Lincoln"
     },
     {
       text: "The secret of getting ahead is getting started.",
@@ -245,11 +245,11 @@ const Fitness = () => {
     },
     {
       text: "Every workout is a step closer to your goal.",
-      author: "Unknown"
+      author: "Mark Twain"
     },
     {
       text: "Your body hears everything your mind says. Stay positive!",
-      author: "Unknown"
+      author: "Abraham Lincoln"
     }
   ];
 
