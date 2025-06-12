@@ -372,7 +372,7 @@ export default function UserProfile() {
         throw new Error((await response.text()) || "Failed to delete account");
       }
 
-      localStorage.removeItem("token");
+      localStorage.clear();
       window.location.href = "/";
       toast({
         title: "Account Deleted",

@@ -136,7 +136,7 @@ export const MembersList: React.FC<MembersListProps> = ({
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-[#7CAE9E]"
-            onClick={() => navigate("/chat-room")}
+            onClick={() => navigate("/chatroom")}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>

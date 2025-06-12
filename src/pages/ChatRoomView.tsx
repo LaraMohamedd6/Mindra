@@ -288,7 +288,7 @@ export default function ChatRoomView() {
           description: axiosError.message || "Failed to load room data",
           variant: "destructive",
         });
-        navigate("/chat-room");
+        navigate("/chatroom");
       }
     };
 

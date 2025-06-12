@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Header from "../components/layout/Header";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 // Types for chat messages and history
 interface ChatMessage {
@@ -163,7 +164,8 @@ const ChatBot = () => {
     );
   };
 
-  
+    const navigate = useNavigate();
+
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -438,14 +440,10 @@ const ChatBot = () => {
               <p className="mb-4 text-[#7E676B]">
                 Your conversations are private and not used to train our models.
                 For serious mental health concerns, please contact a mental
-                health professional or emergency services.
+                health professional or emergency services.Your privacy matters to us.
+
+
               </p>
-              <Button
-                variant="link"
-                className="text-[#E69EA2] p-0 h-auto font-medium"
-              >
-                View Privacy Policy →
-              </Button>
             </CardContent>
           </Card>
 
@@ -459,9 +457,7 @@ const ChatBot = () => {
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
               <p className="text-[#7E676B]">
-                MindfulBot uses AI to provide supportive resources and
-                techniques for managing stress, anxiety, and other common
-                student concerns.
+  MindfulBot uses AI to provide supportive resources and techniques for managing stress, anxiety, and other common mental health concerns.
               </p>
             </CardContent>
           </Card>
@@ -483,6 +479,7 @@ const ChatBot = () => {
               <Button
                 variant="outline"
                 className="w-full border-[#E69EA2] text-[#E69EA2] hover:bg-[#F8E8E9]"
+                 onClick={() => navigate("/emergency")}
               >
                 Visit Emergency Page
               </Button>
