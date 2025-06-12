@@ -22,7 +22,7 @@ import {
   Mail,
 } from "lucide-react";
 import axios from "axios";
-import Logo from "@/assets/images/LOGO.jpg";
+import Logo from "@/assets/images/UpdatedLOGO.jpg";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -186,7 +186,7 @@ export default function Login() {
                   />
                   {/* Header and paragraph stacked to the right */}
                   <div className="flex flex-col">
-                    <h1 className="text-3xl font-bold text-[#7CAE9E] mt-3">Welcome Back</h1>
+                    <h1 className="text-2xl font-bold text-[#7CAE9E] mt-3">Welcome Back to MINDRA</h1>
                     <p className="text-gray-500 text-sm mt-1">
                       Sign in to continue your wellness journey
                     </p>

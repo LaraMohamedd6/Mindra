@@ -10,7 +10,7 @@ export default function QuoteSection() {
   const quotes = [
     {
       text: "Your mental health is a priority. Your happiness is essential. Your self-care is a necessity.",
-      author: "Unknown"
+      author: "Dan Millman"
     },
     {
       text: "You don't have to control your thoughts. You just have to stop letting them control you.",

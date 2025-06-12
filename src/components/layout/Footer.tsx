@@ -1,6 +1,6 @@
-
 import { Link } from "react-router-dom";
-import { Heart, Mail, Phone, MessageCircle } from "lucide-react";
+import { Mail, Phone, MessageCircle } from "lucide-react";
+import UpdatedLogo from "@/assets/images/UpdatedLOGO.jpg"; // Import the new logo
 
 export default function Footer() {
   return (
@@ -9,9 +9,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <Link to="/" className="flex items-center space-x-2 mb-4">
-              <div className="rounded-full bg-gradient-to-br from-zenPink to-zenPeach p-1.5">
-                <Heart className="w-5 h-5 text-white" />
-              </div>
+              <img 
+                src={UpdatedLogo} 
+                alt="Mindra Logo" 
+                className="h-14 w-auto" 
+              />
               <span className="font-display font-semibold text-xl">Mindra</span>
             </Link>
             <p className="text-gray-600 text-sm">

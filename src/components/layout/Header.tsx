@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion } from "framer-motion";
-import { Menu, X, Brain, Heart, ChevronDown, LogOut } from "lucide-react";
+import { Menu, X, ChevronDown, LogOut } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -13,13 +13,14 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/use-auth"; // You'll need to create this hook
+import { useAuth } from "@/hooks/use-auth";
+import UpdatedLogo from "@/assets/images/UpdatedLOGO.jpg"; // Import the new logo
 
 export default function Header() {
   const { pathname } = useLocation();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuth(); // Get auth state and logout function
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
@@ -36,14 +37,11 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex space-x-1">
-              <div className="w-8 h-8 rounded-full bg-zenPink flex items-center justify-center">
-                <Brain className="h-4 w-4 text-white" />
-              </div>
-              <div className="w-8 h-8 rounded-full bg-zenSeafoam flex items-center justify-center">
-                <Heart className="h-4 w-4 text-white" />
-              </div>
-            </div>
+            <img 
+              src={UpdatedLogo} 
+              alt="Mindra Logo" 
+              className="h-12 w-auto" 
+            />
             <span className="text-xl font-display font-semibold">Mindra</span>
           </Link>
 
