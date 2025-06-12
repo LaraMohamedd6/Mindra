@@ -99,22 +99,27 @@ interface MoodTrackerProps {
   setSelectedMood: (mood: number | null) => void;
 }
 
-interface JournalProps {
-  journalData: any;
-  setJournalData: (data: any) => void;
+interface JournalEntry {
+  id: string;
+  date: string;
+  content: string;
+  mood: number;
+}
+
+interface JournalData {
+  entries: JournalEntry[];
 }
 
 interface OverviewProps {
-  journalData: any;
+  journalData: JournalData | null;
 }
 
 interface ProgressProps {
-  journalData: any;
+  journalData: JournalData | null;
 }
 
 const TypedLayout = Layout as FC<LayoutProps>;
 const TypedMoodTracker = MoodTracker as FC<MoodTrackerProps>;
-const TypedJournal = Journal as FC<JournalProps>;
 const TypedOverview = Overview as FC<OverviewProps>;
 const TypedProgress = Progress as FC<ProgressProps>;
 
@@ -127,7 +132,7 @@ export default function UserProfile() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [editProfile, setEditProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [journalData, setJournalData] = useState<any>(null);
+  const [journalData, setJournalData] = useState<JournalData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -181,8 +186,9 @@ export default function UserProfile() {
       setSelectedAvatar(userData.avatar);
       setError(null);
       return updatedProfile;
-    } catch (err: any) {
-      console.error("Fetch User Data Error:", err.message);
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error("Fetch User Data Error:", error.message);
 
       try {
         const decoded: JwtPayload = jwtDecode(token);
@@ -209,8 +215,8 @@ export default function UserProfile() {
         return fallbackProfile;
       } catch (decodeErr) {
         console.error("JWT Decode Error:", decodeErr);
-        setError(err.message || "Failed to load user data");
-        throw err;
+        setError(error.message || "Failed to load user data");
+        throw error;
       }
     }
   };
@@ -366,11 +372,12 @@ export default function UserProfile() {
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
       });
-    } catch (err: any) {
-      console.error("Profile update error:", err);
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error("Profile update error:", error);
       toast({
         title: "Error",
-        description: err.message || "Failed to update profile",
+        description: error.message || "Failed to update profile",
         variant: "destructive",
       });
     } finally {
@@ -402,11 +409,12 @@ export default function UserProfile() {
         title: "Account Deleted",
         description: "Your account has been permanently deleted.",
       });
-    } catch (err: any) {
-      console.error("Account deletion error:", err);
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error("Account deletion error:", error);
       toast({
         title: "Error",
-        description: err.message || "Failed to delete account",
+        description: error.message || "Failed to delete account",
         variant: "destructive",
       });
     } finally {
@@ -444,9 +452,10 @@ export default function UserProfile() {
 
       setIsLoading(true);
       await fetchUserData(token, username);
-    } catch (err: any) {
-      console.error("Retry fetch error:", err);
-      setError(err.message);
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error("Retry fetch error:", error);
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -857,7 +866,7 @@ export default function UserProfile() {
                 />
               </TabsContent>
               <TabsContent value="journal">
-                <TypedJournal
+                <Journal
                   journalData={journalData}
                   setJournalData={setJournalData}
                 />
