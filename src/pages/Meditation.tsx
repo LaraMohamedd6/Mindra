@@ -445,51 +445,6 @@ const Meditation = () => {
     },
   ];
 
-  const TimeSummaryPanel = () => {
-    return (
-      <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg z-50 w-72">
-        <h3 className="text-lg font-semibold mb-4">Meditation Time</h3>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-gray-50 p-3 rounded">
-            <div className="text-sm text-gray-500">Today</div>
-            <div className="font-medium">
-              {formatTime(timeSummary.todayTotal)}
-            </div>
-          </div>
-          <div className="bg-gray-50 p-3 rounded">
-            <div className="text-sm text-gray-500">This Week</div>
-            <div className="font-medium">
-              {formatTime(timeSummary.weekTotal)}
-            </div>
-          </div>
-          <div className="bg-gray-50 p-3 rounded">
-            <div className="text-sm text-gray-500">This Month</div>
-            <div className="font-medium">
-              {formatTime(timeSummary.monthTotal)}
-            </div>
-          </div>
-          <div className="bg-gray-50 p-3 rounded">
-            <div className="text-sm text-gray-500">All Time</div>
-            <div className="font-medium">
-              {formatTime(timeSummary.allTimeTotal)}
-            </div>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <h4 className="font-medium text-sm">By Content Type</h4>
-          {Object.entries(timeSummary.byContentType).map(([type, seconds]) => (
-            <div key={type} className="flex justify-between text-sm">
-              <span className="capitalize">{type}:</span>
-              <span>
-                {Math.floor(seconds / 60)}m {Math.floor(seconds % 60)}s
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <Layout>
       <section className="relative h-[600px] py-16 bg-gradient-to-br from-zenLightPink/30 to-white/30 overflow-hidden rounded-b-[40px]">
@@ -789,7 +744,7 @@ const Meditation = () => {
         </div>
       </section>
 
-      {isAuthenticated && <TimeSummaryPanel />}
+      {isAuthenticated}
     </Layout>
   );
 };

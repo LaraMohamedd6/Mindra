@@ -73,53 +73,6 @@ const YogaTipModal = ({ tip, onClose }: { tip: any, onClose: () => void }) => {
   );
 };
 
-// Tracking Panel Component
-const TrackingPanel = ({ totals, isLoading, error }: { totals: { daily: number, weekly: number, monthly: number } | null, isLoading: boolean, error: string | null }) => {
-  return (
-    <section className="py-14 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <SectionHeading
-          title="Your Yoga Progress"
-          subtitle="Track your daily, weekly, and monthly practice time"
-        />
-        <Card className="border-none shadow-sm">
-          <CardContent className="pt-6">
-            {error ? (
-              <div className="text-center py-4">
-                <p className="text-red-500">Error: {error}</p>
-                <p className="text-gray-500 text-sm mt-2">Please try again or contact support.</p>
-              </div>
-            ) : isLoading ? (
-              <div className="text-center py-4">
-                <p className="text-gray-500">Loading your progress...</p>
-              </div>
-            ) : totals ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center">
-                  <h4 className="text-lg font-semibold text-gray-800">Daily</h4>
-                  <p className="text-2xl font-bold text-zenPink">{totals.daily.toFixed(2)} hours</p>
-                </div>
-                <div className="text-center">
-                  <h4 className="text-lg font-semibold text-gray-800">Weekly</h4>
-                  <p className="text-2xl font-bold text-zenPink">{totals.weekly.toFixed(2)} hours</p>
-                </div>
-                <div className="text-center">
-                  <h4 className="text-lg font-semibold text-gray-800">Monthly</h4>
-                  <p className="text-2xl font-bold text-zenPink">{totals.monthly.toFixed(2)} hours</p>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-4">
-                <p className="text-gray-500">No progress data available. Start practicing to track your time!</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </section>
-  );
-};
-
 export default function Yoga() {
   const [selectedPose, setSelectedPose] = useState<any>(null);
   const [showMoreContent, setShowMoreContent] = useState(false);
@@ -608,9 +561,6 @@ export default function Yoga() {
 
       {/* Scroll target div */}
       <div ref={powerSectionRef} className="scroll-mt-20"></div>
-
-      {/* Tracking Panel */}
-      <TrackingPanel totals={totals} isLoading={isLoadingTotals} error={totalsError} />
 
       {/* Expanded Content Section */}
       {showMoreContent && (

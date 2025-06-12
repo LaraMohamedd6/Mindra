@@ -518,8 +518,8 @@ export default function StudyHelper() {
   const completedPercentage =
     tasks.length > 0
       ? Math.round(
-          (tasks.filter((task) => task.completed).length / tasks.length) * 100
-        )
+        (tasks.filter((task) => task.completed).length / tasks.length) * 100
+      )
       : 0;
 
   // Update timer settings
@@ -536,6 +536,18 @@ export default function StudyHelper() {
 
   const playSound = (sound: Sound | null) => {
     try {
+      // If the same sound is already playing → pause it
+      if (
+        isPlaying &&
+        currentSound?.name === sound?.name &&
+        audioRefs.current[sound.name]
+      ) {
+        audioRefs.current[sound.name]!.pause();
+        setIsPlaying(false);
+        return;
+      }
+
+      // Stop all other sounds
       Object.values(audioRefs.current).forEach((audio) => {
         if (audio) {
           audio.pause();
@@ -549,6 +561,7 @@ export default function StudyHelper() {
         return;
       }
 
+      // Create a new audio instance if not already created
       if (
         !audioRefs.current[sound.name] ||
         audioRefs.current[sound.name]?.src !== sound.sound
@@ -563,6 +576,7 @@ export default function StudyHelper() {
         };
       }
 
+      // Play sound
       audioRefs.current[sound.name]!.play()
         .then(() => {
           setCurrentSound(sound);
@@ -573,12 +587,14 @@ export default function StudyHelper() {
           setCurrentSound(null);
           setIsPlaying(false);
         });
+
     } catch (error) {
       console.error("Error in playSound:", error);
       setCurrentSound(null);
       setIsPlaying(false);
     }
   };
+
 
   const togglePlayPause = () => {
     if (!currentSound) return;
@@ -717,20 +733,19 @@ export default function StudyHelper() {
             >
               <Card className="overflow-hidden border-2">
                 <CardHeader
-                  className={`${
-                    mode === "pomodoro"
+                  className={`${mode === "pomodoro"
                       ? "bg-red-50"
                       : mode === "shortBreak"
-                      ? "bg-emerald-50"
-                      : "bg-blue-50"
-                  }`}
+                        ? "bg-emerald-50"
+                        : "bg-blue-50"
+                    }`}
                 >
                   <CardTitle className="text-center text-2xl">
                     {mode === "pomodoro"
                       ? "Focus Session"
                       : mode === "shortBreak"
-                      ? "Short Break"
-                      : "Long Break"}
+                        ? "Short Break"
+                        : "Long Break"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
@@ -744,33 +759,30 @@ export default function StudyHelper() {
                     <Button
                       variant={mode === "pomodoro" ? "default" : "outline"}
                       onClick={() => setTimerMode("pomodoro")}
-                      className={`${
-                        mode === "pomodoro"
+                      className={`${mode === "pomodoro"
                           ? "bg-zenPink hover:bg-zenPink/90 text-white"
                           : ""
-                      }`}
+                        }`}
                     >
                       Pomodoro
                     </Button>
                     <Button
                       variant={mode === "shortBreak" ? "default" : "outline"}
                       onClick={() => setTimerMode("shortBreak")}
-                      className={`${
-                        mode === "shortBreak"
+                      className={`${mode === "shortBreak"
                           ? "bg-zenSage hover:bg-zenSage/90 text-white"
                           : ""
-                      }`}
+                        }`}
                     >
                       Short Break
                     </Button>
                     <Button
                       variant={mode === "longBreak" ? "default" : "outline"}
                       onClick={() => setTimerMode("longBreak")}
-                      className={`${
-                        mode === "longBreak"
+                      className={`${mode === "longBreak"
                           ? "bg-blue-500 hover:bg-blue-500/90 text-white"
                           : ""
-                      }`}
+                        }`}
                     >
                       Long Break
                     </Button>
@@ -955,11 +967,10 @@ export default function StudyHelper() {
                       tasks.map((task) => (
                         <div
                           key={task.id}
-                          className={`border rounded-lg overflow-hidden ${
-                            task.completed
+                          className={`border rounded-lg overflow-hidden ${task.completed
                               ? "bg-gray-50 border-gray-200"
                               : "bg-white border-gray-200"
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center p-3">
                             <Checkbox
@@ -972,11 +983,10 @@ export default function StudyHelper() {
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
                                 <span
-                                  className={`${
-                                    task.completed
+                                  className={`${task.completed
                                       ? "text-gray-500 line-through"
                                       : "text-gray-900"
-                                  }`}
+                                    }`}
                                 >
                                   {task.text}
                                 </span>
@@ -1217,11 +1227,10 @@ export default function StudyHelper() {
                     variant={
                       currentSound?.name === sound.name ? "default" : "outline"
                     }
-                    className={`h-20 text-lg flex-col ${
-                      currentSound?.name === sound.name
+                    className={`h-20 text-lg flex-col ${currentSound?.name === sound.name
                         ? "bg-zenSage hover:bg-zenSage/90 text-white"
                         : ""
-                    }`}
+                      }`}
                     onClick={() => playSound(sound)}
                   >
                     <span className="text-2xl mb-1">{sound.icon}</span>

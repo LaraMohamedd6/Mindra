@@ -176,24 +176,24 @@ export default function Login() {
           <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-[#FFFFFF] backdrop-blur-sm w-full max-w-xl">
             <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-2 w-full" />
             <CardHeader className="pb-2 pt-8 px-10">
-              <div className="flex flex-col items-start"> {/* Changed to items-start */}
-                <div className="flex items-start gap-4"> {/* Horizontal alignment */}
-                  {/* Logo on the left */}
-                  <img
-                    src={Logo}
-                    alt="Mindra Logo"
-                    className="h-24 w-24 object-contain rounded-full border-4 border-white"
-                  />
-                  {/* Header and paragraph stacked to the right */}
-                  <div className="flex flex-col">
-                    <h1 className="text-2xl font-bold text-[#7CAE9E] mt-3">Welcome Back to MINDRA</h1>
-                    <p className="text-gray-500 text-sm mt-1">
-                      Sign in to continue your wellness journey
-                    </p>
-                  </div>
+              <div className="flex items-center gap-3"> {/* Align logo + text horizontally */}
+                {/* Logo on the left */}
+                <img
+                  src={Logo}
+                  alt="Mindra Logo"
+                  className="h-24 w-24 object-contain rounded-full border-4 border-white"
+                />
+
+                {/* Text on the right */}
+                <div>
+                  <h1 className="text-2xl font-bold text-[#7CAE9E]">Welcome Back to MINDRA</h1>
+                  <p className="text-gray-500 text-sm mt-1 ml-1">
+                    Sign in to continue your wellness journey
+                  </p>
                 </div>
               </div>
             </CardHeader>
+
 
             <CardContent className="px-8 pb-6">
               {errors.general && (
@@ -449,7 +449,7 @@ export default function Login() {
               <ChevronRight className="h-4 w-4 ml-1" />
             </Link>
           </motion.div>
-        </motion.div> 
+        </motion.div>
       </div>
     </div>
   );

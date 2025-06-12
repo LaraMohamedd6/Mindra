@@ -344,23 +344,27 @@ export default function Signup() {
           <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-white w-full max-w-xl mx-auto">
             <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
             <CardHeader className="pb-2 pt-8 px-8">
-              <div className="flex items-center space-x-6">
+              <div className="flex items-center gap-1"> {/* Horizontal alignment */}
+                {/* Logo on the left */}
                 <img
                   src={Logo}
                   alt="Mindra Logo"
-                  className="h-20 object-contain"
+                  className="h-24 w-24 object-contain rounded-full border-4 border-white"
                 />
-                <div className="flex flex-col space-y-2">
+
+                {/* Text on the right */}
+                <div>
                   <h1 className="text-2xl font-bold text-[#7CAE9E]">
                     {step === 1 ? "Start your Journey with MINDRA" : "Account Security"}
                   </h1>
-                  <p className="text-gray-500 text-md mt-2">
+                  <p className="text-gray-500 text-md mt-1 ml-1">
                     {step === 1
-                      ? "Create your account to join our commuinity"
+                      ? "Create your account to join our community"
                       : "Set up your account security"}
                   </p>
                 </div>
               </div>
+
               <StepIndicator />
             </CardHeader>
 
