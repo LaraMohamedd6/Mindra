@@ -19,5 +19,5 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   }, 
-  base: process.env.VITE_BASE_PATH || "/zen-zone-connect",
+  base: process.env.VITE_BASE_PATH || "/",
 }));
