@@ -15,7 +15,7 @@ const restrictedPaths = [
   "/fitness",
   "/lifestyle",
   "/studyhelper",
-  "/depression-test",
+  "/DST-9",
 ];
 
 const ProtectedRoute = ({ children }) => {

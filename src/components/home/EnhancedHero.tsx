@@ -79,7 +79,7 @@ export default function EnhancedHero() {
                 asChild
                 className="bg-zenSage hover:bg-zenSage/90 text-white rounded-full px-8 py-6"
               >
-                <Link to="/k10test">Depression Severity Test (DST-9)</Link>
+                <Link to="/DST-9">Depression Severity Test (DST-9)</Link>
               </Button>
               <Button
                 asChild
