@@ -54,115 +54,11 @@ import {
 const API_BASE_URL = "https://localhost:7223";
 
 const avatarOptions = [
-
-
   "https://api.dicebear.com/9.x/micah/svg?seed=Caleb&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
   "https://api.dicebear.com/9.x/micah/svg?seed=Leah&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
   "https://api.dicebear.com/9.x/micah/svg?seed=Easton&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
   "https://api.dicebear.com/9.x/micah/svg?seed=Ryan&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
   "https://api.dicebear.com/9.x/micah/svg?seed=Liam&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
-  "https://api.dicebear.com/9.x/micah/svg?seed=Eliza&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
-  "https://api.dicebear.com/9.x/micah/svg?seed=Eden&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
-  "https://api.dicebear.com/9.x/micah/svg?seed=Sawyer&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
-  "https://api.dicebear.com/9.x/micah/svg?seed=Mason&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
-  "https://api.dicebear.com/9.x/micah/svg?seed=Aiden&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
-  "https://api.dicebear.com/9.x/micah/svg?seed=Christian&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
-  "https://api.dicebear.com/9.x/micah/svg?seed=Emery&hair=fonze,full,pixie,dannyPhantom&hairColor=000000,77311d,ac6651,e0ddff,f4d150,ffeba4&mouth=laughing,smile,smirk",
-
-
-  "https://api.dicebear.com/9.x/personas/svg?seed=Caleb&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-
-
-  "https://api.dicebear.com/9.x/personas/svg?seed=Leah&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-
-
-  "https://api.dicebear.com/9.x/personas/svg?seed=Easton&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-
-
-  "https://api.dicebear.com/9.x/personas/svg?seed=Katherine&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-
-
-  "https://api.dicebear.com/9.x/personas/svg?seed=Ryan&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-
-
-  "https://api.dicebear.com/9.x/personas/svg?seed=Liam&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-
-
-  "https://api.dicebear.com/9.x/personas/svg?seed=Eliza&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-
-
-  "https://api.dicebear.com/9.x/personas/svg?seed=Robert&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-
-
-  "https://api.dicebear.com/9.x/personas/svg?seed=Christian&skinColor=b16a5b,d78774,e5a07e,e7a391,eeb4a4",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Caleb&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Leah&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Easton&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Katherine&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Wyatt&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Kingston&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Ryan&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Liam&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Nolan&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Robert&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Eden&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Alexander&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Kimberly&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Aiden&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
-
-  "https://api.dicebear.com/9.x/adventurer/svg?seed=Mackenzie&hairColor=0e0e0e,562306,592454,6a4e35,796a45,85c2c6,ab2a18,ac6511,afafaf,b9a05f,cb6820,dba3be,e5d7a3&mouth=variant01,variant02,variant03,variant04,variant05,variant06,variant07,variant08,variant09,variant10,variant11,variant12,variant16,variant17,variant18,variant19,variant20,variant21,variant22,variant23,variant24,variant25,variant26,variant27,variant28,variant29,variant30&skinColor=9e5622,ecad80,f2d3b1",
-
 ];
 
 const mentalHealthQuotes = [
@@ -196,7 +92,31 @@ interface LayoutProps {
   children: ReactNode;
 }
 
+interface MoodTrackerProps {
+  selectedDate: Date | undefined;
+  setSelectedDate: (date: Date | undefined) => void;
+  selectedMood: number | null;
+  setSelectedMood: (mood: number | null) => void;
+}
+
+interface JournalProps {
+  journalData: any;
+  setJournalData: (data: any) => void;
+}
+
+interface OverviewProps {
+  journalData: any;
+}
+
+interface ProgressProps {
+  journalData: any;
+}
+
 const TypedLayout = Layout as FC<LayoutProps>;
+const TypedMoodTracker = MoodTracker as FC<MoodTrackerProps>;
+const TypedJournal = Journal as FC<JournalProps>;
+const TypedOverview = Overview as FC<OverviewProps>;
+const TypedProgress = Progress as FC<ProgressProps>;
 
 export default function UserProfile() {
   const [selectedTab, setSelectedTab] = useState("overview");
@@ -476,7 +396,7 @@ export default function UserProfile() {
         throw new Error((await response.text()) || "Failed to delete account");
       }
 
-      localStorage.clear();
+      localStorage.removeItem("token");
       window.location.href = "/";
       toast({
         title: "Account Deleted",
@@ -926,10 +846,10 @@ export default function UserProfile() {
               </TabsList>
 
               <TabsContent value="overview">
-                <Overview journalData={journalData} />
+                <TypedOverview journalData={journalData} />
               </TabsContent>
               <TabsContent value="mood-tracker">
-                <MoodTracker
+                <TypedMoodTracker
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
                   selectedMood={selectedMood}
@@ -937,13 +857,13 @@ export default function UserProfile() {
                 />
               </TabsContent>
               <TabsContent value="journal">
-                <Journal
+                <TypedJournal
                   journalData={journalData}
                   setJournalData={setJournalData}
                 />
               </TabsContent>
               <TabsContent value="progress">
-                <Progress journalData={journalData} />
+                <TypedProgress journalData={journalData} />
               </TabsContent>
             </Tabs>
           )}
