@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
-import UpdatedLogo from "@/assets/images/UpdatedLOGO.jpg"; // Import the new logo
+import UpdatedLogo from "@/assets/images/UpdatedLOGO.jpg";
 
 export default function Header() {
   const { pathname } = useLocation();
@@ -33,16 +33,19 @@ export default function Header() {
   };
 
   return (
-    <header className="py-4 bg-white border-b border-gray-100 sticky top-0 z-50">
+    <header className="py-1 bg-white border-b border-gray-100 sticky top-0 z-50"> {/* Reduced padding */}
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <img 
-              src={UpdatedLogo} 
-              alt="Mindra Logo" 
-              className="h-12 w-auto" 
+        <div className="flex items-center justify-between h-14"> {/* Fixed height */}
+          {/* Larger Logo - Negative margin to make it appear bigger without increasing header height */}
+          <Link to="/" className="flex items-center gap-1 -my-2">
+            <img
+              src={UpdatedLogo}
+              alt="Mindra Logo"
+              className="h-16 w-auto"
             />
-            <span className="text-xl font-display font-semibold">Mindra</span>
+            <span className="text-[1.8rem] font-extrabold font-['Nunito'] text-gray-800 tracking-tight">
+              Mindra
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -50,7 +53,9 @@ export default function Header() {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-zenPink">Wellness</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-zenPink h-8 text-sm">
+                    Wellness
+                  </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {[
@@ -76,14 +81,16 @@ export default function Header() {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-zenPink">Resources</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-zenPink h-8 text-sm">
+                    Resources
+                  </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {[
                         { title: "Mental Health Info", href: "/information", description: "Evidence-based resources" },
                         { title: "Emergency Support", href: "/emergency", description: "Crisis resources" },
                         { title: "Study Helper", href: "/study-helper", description: "Tools for academic success" },
-                        { title: "Depression Severity Test", href: "/k10test", description: "Mental wellbeing check" }
+                        { title: "Depression Severity Test", href: "/DST-9", description: "Mental wellbeing check" }
                       ].map((item) => (
                         <li key={item.title}>
                           <Link
@@ -102,7 +109,9 @@ export default function Header() {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-zenPink">Connect</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-zenPink h-8 text-sm">
+                    Connect
+                  </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {[
@@ -128,7 +137,9 @@ export default function Header() {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-zenPink">Tracking</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-zenPink h-8 text-sm">
+                    Tracking
+                  </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {[
@@ -155,26 +166,33 @@ export default function Header() {
             </NavigationMenu>
           )}
 
-          {/* Auth Buttons */}
+          {/* Auth Buttons - Made more compact */}
           <div className="flex items-center space-x-2">
             {!isMobile && (
               <>
                 {!isAuthenticated ? (
                   <>
-                    <Button variant="outline" asChild className="border-zenSage text-zenSage hover:bg-zenSage/10">
+                    <Button
+                      variant="outline"
+                      asChild
+                      className="border-zenSage text-zenSage hover:bg-zenSage/10 h-8 px-3 text-sm"
+                    >
                       <Link to="/login">Log In</Link>
                     </Button>
-                    <Button asChild className="bg-zenSage hover:bg-zenSage/90 text-white">
+                    <Button
+                      asChild
+                      className="bg-zenSage hover:bg-zenSage/90 text-white h-8 px-3 text-sm"
+                    >
                       <Link to="/signup">Sign Up</Link>
                     </Button>
                   </>
                 ) : (
-                  <Button 
-                    variant="outline" 
-                    className="border-zenPink text-zenPink hover:bg-zenPink/10"
+                  <Button
+                    variant="outline"
+                    className="border-zenPink text-zenPink hover:bg-zenPink/10 h-8 px-3 text-sm"
                     onClick={handleLogout}
                   >
-                    <LogOut className="h-4 w-4 mr-2" />
+                    <LogOut className="h-3 w-3 mr-1" />
                     Logout
                   </Button>
                 )}
@@ -185,11 +203,12 @@ export default function Header() {
             {isMobile && (
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={toggleMobileMenu}
                 aria-label="Toggle Menu"
+                className="h-8 w-8"
               >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
               </Button>
             )}
           </div>
@@ -201,11 +220,11 @@ export default function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-4"
+            className="mt-1"
           >
-            <nav className="py-4">
-              <div className="mb-4">
-                <div className="text-sm font-semibold text-gray-500 mb-2 px-3">Wellness</div>
+            <nav className="py-1">
+              <div className="mb-3">
+                <div className="text-sm font-semibold text-gray-500 mb-1 px-3">Wellness</div>
                 {[
                   { text: "Meditation", path: "/meditation" },
                   { text: "Yoga", path: "/yoga" },
@@ -215,33 +234,95 @@ export default function Header() {
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`block py-2 px-3 text-base ${pathname === link.path ? "text-zenPink" : "text-gray-700"}`}
+                    className={`block py-1 px-3 text-sm ${pathname === link.path ? "text-zenPink" : "text-gray-700"}`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {link.text}
                   </Link>
                 ))}
               </div>
-              
-              {/* Other menu sections... */}
-              
-              <div className="pt-4 flex flex-col space-y-3 border-t border-gray-100">
+
+              <div className="mb-3">
+                <div className="text-sm font-semibold text-gray-500 mb-1 px-3">Resources</div>
+                {[
+                  { text: "Mental Health Info", path: "/information" },
+                  { text: "Emergency Support", path: "/emergency" },
+                  { text: "Study Helper", path: "/study-helper" },
+                  { text: "Depression Test", path: "/DST-9" }
+                ].map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`block py-1 px-3 text-sm ${pathname === link.path ? "text-zenPink" : "text-gray-700"}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.text}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="mb-3">
+                <div className="text-sm font-semibold text-gray-500 mb-1 px-3">Connect</div>
+                {[
+                  { text: "Chat Room", path: "/chatroom" },
+                  { text: "Chat Bot", path: "/chatbot" },
+                  { text: "About Us", path: "/about" },
+                  { text: "Contact Us", path: "/contact" }
+                ].map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`block py-1 px-3 text-sm ${pathname === link.path ? "text-zenPink" : "text-gray-700"}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.text}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="mb-3">
+                <div className="text-sm font-semibold text-gray-500 mb-1 px-3">Tracking</div>
+                {[
+                  { text: "Analysis", path: "/analysis" },
+                  { text: "Profile", path: "/profile" }
+                ].map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`block py-1 px-3 text-sm ${pathname === link.path ? "text-zenPink" : "text-gray-700"}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.text}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="pt-3 flex flex-col space-y-2 border-t border-gray-100 px-3">
                 {!isAuthenticated ? (
                   <>
-                    <Button variant="outline" asChild className="w-full border-zenSage text-zenSage hover:bg-zenSage/10">
+                    <Button
+                      variant="outline"
+                      asChild
+                      className="border-zenSage text-zenSage hover:bg-zenSage/10 h-8 text-sm"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
                       <Link to="/login">Log In</Link>
                     </Button>
-                    <Button asChild className="w-full bg-zenSage hover:bg-zenSage/90 text-white">
+                    <Button
+                      asChild
+                      className="bg-zenSage hover:bg-zenSage/90 text-white h-8 text-sm"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
                       <Link to="/signup">Sign Up</Link>
                     </Button>
                   </>
                 ) : (
-                  <Button 
-                    variant="outline" 
-                    className="w-full border-zenPink text-zenPink hover:bg-zenPink/10"
+                  <Button
+                    variant="outline"
+                    className="border-zenPink text-zenPink hover:bg-zenPink/10 h-8 text-sm"
                     onClick={handleLogout}
                   >
-                    <LogOut className="h-4 w-4 mr-2" />
+                    <LogOut className="h-3 w-3 mr-1" />
                     Logout
                   </Button>
                 )}

@@ -52,7 +52,7 @@ const suggestedQuestions = [
 const initialBotMessage = {
   id: 1,
   type: "bot" as const,
-  content: "Hi there! Welcome to Zenith. I'm your mental wellness assistant. How can I help you today?",
+  content: "Hi there! Welcome to Pandora. I'm your mental wellness assistant. How can I help you today?",
   timestamp: new Date().toISOString(),
   liked: false,
   disliked: false,

@@ -30,6 +30,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
 import React from "react";
 import Logo from "@/assets/images/UpdatedLOGO.jpg";
+import { VerificationStep } from "./VerificationStep"; // Import the VerificationStep component
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -47,7 +48,7 @@ export default function Signup() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(1); // 1: Details, 2: Security, 3: Verification
   const [verificationError, setVerificationError] = useState("");
   const [verificationSuccess, setVerificationSuccess] = useState("");
   const [resendTimer, setResendTimer] = useState(30);
@@ -234,8 +235,11 @@ export default function Signup() {
       if (isValid) {
         setStep(2);
       }
-    } else if (step === 2 && validateStep2()) {
-      handleSubmit();
+    } else if (step === 2) {
+      const isValid = validateStep2();
+      if (isValid) {
+        await handleSubmit();
+      }
     }
   };
 
@@ -256,7 +260,10 @@ export default function Signup() {
         }
       );
 
-      navigate("/verify-email", { state: { email: formData.email } });
+      // Move to verification step instead of navigating away
+      setStep(3);
+      setVerificationSuccess("Verification code sent to your email");
+      setResendTimer(30);
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
 
@@ -277,6 +284,63 @@ export default function Signup() {
       setErrors({ ...errors, form: errorMessage });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleVerify = async (code: string) => {
+    setIsLoading(true);
+    setVerificationError("");
+    setVerificationSuccess("");
+
+    try {
+      const response = await axios.post(
+        "https://localhost:7223/api/Account/verify-email",
+        {
+          email: formData.email,
+          token: code,
+        }
+      );
+
+      setVerificationSuccess("Email verified successfully!");
+      setTimeout(() => {
+        navigate("/login", { state: { email: formData.email } });
+      }, 1500);
+    } catch (error) {
+      setVerificationError(
+        "Invalid verification code. Please try again or request a new code."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    setVerificationError("");
+    setVerificationSuccess("");
+
+    try {
+      const response = await axios.post(
+        "https://localhost:7223/api/Account/resend-verification",
+        {
+          email: formData.email,
+        }
+      );
+
+      setVerificationSuccess("New verification code sent to your email");
+      setResendTimer(30);
+    } catch (error) {
+      setVerificationError("Failed to resend code. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBack = () => {
+    if (step === 2) {
+      setStep(1);
+    } else if (step === 3) {
+      setStep(2);
     }
   };
 
@@ -304,34 +368,51 @@ export default function Signup() {
 
   const StepIndicator = () => (
     <div className="flex items-center w-full justify-between mt-4 px-8">
-      {[1, 2].map((stepNumber) => (
+      {[1, 2, 3].map((stepNumber) => (
         <React.Fragment key={stepNumber}>
           <div className="flex flex-col items-center">
             <div
-              className={`rounded-full w-8 h-8 flex items-center justify-center ${step === stepNumber
-                ? "bg-[#7CAE9E] text-white"
-                : step > stepNumber
+              className={`rounded-full w-8 h-8 flex items-center justify-center ${
+                step === stepNumber
+                  ? "bg-[#7CAE9E] text-white"
+                  : step > stepNumber
                   ? "bg-[#7CAE9E]/30 text-white"
                   : "bg-gray-100"
-                }`}
+              }`}
             >
               {stepNumber}
             </div>
             <span className="text-xs mt-1">
-              {stepNumber === 1 ? "Details" : "Security"}
+              {stepNumber === 1 ? "Details" : stepNumber === 2 ? "Security" : "Verify"}
             </span>
           </div>
 
-          {stepNumber < 2 && (
+          {stepNumber < 3 && (
             <div
-              className={`h-0.5 flex-1 mx-2 ${step > stepNumber ? "bg-[#7CAE9E]" : "bg-gray-200"
-                }`}
+              className={`h-0.5 flex-1 mx-2 ${
+                step > stepNumber ? "bg-[#7CAE9E]" : "bg-gray-200"
+              }`}
             />
           )}
         </React.Fragment>
       ))}
     </div>
   );
+
+  if (step === 3) {
+    return (
+      <VerificationStep
+        email={formData.email}
+        onBack={handleBack}
+        onVerify={handleVerify}
+        onResendCode={handleResendCode}
+        verificationError={verificationError}
+        verificationSuccess={verificationSuccess}
+        resendTimer={resendTimer}
+        isLoading={isLoading}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f8f5f2] p-4">
@@ -344,23 +425,27 @@ export default function Signup() {
           <Card className="border-none shadow-xl rounded-2xl overflow-hidden bg-white w-full max-w-xl mx-auto">
             <div className="bg-gradient-to-r from-[#E69EA2] to-[#FEC0B3] h-3 w-full" />
             <CardHeader className="pb-2 pt-8 px-8">
-              <div className="flex items-center space-x-6">
+              <div className="flex items-center gap-1">
                 <img
                   src={Logo}
                   alt="Mindra Logo"
-                  className="h-20 object-contain"
+                  className="h-24 w-24 object-contain rounded-full border-4 border-white"
                 />
-                <div className="flex flex-col space-y-2">
+
+                <div>
                   <h1 className="text-2xl font-bold text-[#7CAE9E]">
-                    {step === 1 ? "Start your Journey with MINDRA" : "Account Security"}
-                  </h1>
-                  <p className="text-gray-500 text-md mt-2">
                     {step === 1
-                      ? "Create your account to join our commuinity"
+                      ? "Start your Journey with MINDRA"
+                      : "Account Security"}
+                  </h1>
+                  <p className="text-gray-500 text-md mt-1 ml-1">
+                    {step === 1
+                      ? "Create your account to join our community"
                       : "Set up your account security"}
                   </p>
                 </div>
               </div>
+
               <StepIndicator />
             </CardHeader>
 
@@ -395,8 +480,9 @@ export default function Signup() {
                         placeholder="Your full name"
                         value={formData.fullName}
                         onChange={handleChange}
-                        className={`pl-10 h-11 rounded-xl text-md ${errors.fullName ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-10 h-11 rounded-xl text-md ${
+                          errors.fullName ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                       />
                     </div>
                     {errors.fullName && <ErrorMessage message={errors.fullName} />}
@@ -417,8 +503,9 @@ export default function Signup() {
                         placeholder="yourusername"
                         value={formData.username}
                         onChange={handleChange}
-                        className={`pl-12 h-14 rounded-xl text-md ${errors.username ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-12 h-14 rounded-xl text-md ${
+                          errors.username ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                       />
                     </div>
                     {errors.username && <ErrorMessage message={errors.username} />}
@@ -451,8 +538,9 @@ export default function Signup() {
                           if (errors.age) setErrors((prev) => ({ ...prev, age: "" }));
                         }}
                         min="13"
-                        className={`pl-12 h-14 rounded-xl text-md ${errors.age ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-12 h-14 rounded-xl text-md ${
+                          errors.age ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                         onKeyDown={(e) => {
                           if (["-", "+", "e", "E", "."].includes(e.key)) {
                             e.preventDefault();
@@ -472,20 +560,22 @@ export default function Signup() {
                       {genderOptions.map((option) => (
                         <label
                           key={option.value}
-                          className={`flex-1 cursor-pointer rounded-lg border p-3 transition-all h-14 flex items-center justify-center ${formData.gender === option.value
-                            ? "border-[#7CAE9E] bg-[#7CAE9E]/10 ring-1 ring-[#7CAE9E]"
-                            : "border-[#CFECE0] hover:border-[#7CAE9E]/50"
-                            }`}
+                          className={`flex-1 cursor-pointer rounded-lg border p-3 transition-all h-14 flex items-center justify-center ${
+                            formData.gender === option.value
+                              ? "border-[#7CAE9E] bg-[#7CAE9E]/10 ring-1 ring-[#7CAE9E]"
+                              : "border-[#CFECE0] hover:border-[#7CAE9E]/50"
+                          }`}
                         >
                           <div className="flex items-center justify-between w-full px-2">
                             <span className="text-md font-medium text-[#7CAE9E]">
                               {option.label}
                             </span>
                             <div
-                              className={`flex h-5 w-5 items-center justify-center rounded-full border ${formData.gender === option.value
-                                ? "border-[#7CAE9E] bg-[#7CAE9E]"
-                                : "border-[#CFECE0]"
-                                }`}
+                              className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+                                formData.gender === option.value
+                                  ? "border-[#7CAE9E] bg-[#7CAE9E]"
+                                  : "border-[#CFECE0]"
+                              }`}
                             >
                               {formData.gender === option.value && (
                                 <div className="h-2.5 w-2.5 rounded-full bg-white"></div>
@@ -522,8 +612,9 @@ export default function Signup() {
                         placeholder="your@email.com"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`pl-12 h-14 rounded-xl text-md ${errors.email ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-12 h-14 rounded-xl text-md ${
+                          errors.email ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                       />
                     </div>
                     {errors.email && <ErrorMessage message={errors.email} />}
@@ -549,8 +640,9 @@ export default function Signup() {
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={handleChange}
-                        className={`pl-12 pr-12 h-14 rounded-xl text-md ${errors.password ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-12 pr-12 h-14 rounded-xl text-md ${
+                          errors.password ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                       />
                       <button
                         type="button"
@@ -578,10 +670,11 @@ export default function Signup() {
                                 <AlertCircle className="h-4 w-4 text-[#CFECE0]" />
                               )}
                             </div>
-                            <span className={`text-xs mt-1 ${req.validator(formData.password)
-                              ? "text-[#7CAE9E]"
-                              : "text-gray-400"
-                              }`}>
+                            <span className={`text-xs mt-1 ${
+                              req.validator(formData.password)
+                                ? "text-[#7CAE9E]"
+                                : "text-gray-400"
+                            }`}>
                               {req.text}
                             </span>
                           </div>
@@ -608,8 +701,9 @@ export default function Signup() {
                         placeholder="••••••••"
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className={`pl-12 pr-12 h-14 rounded-xl text-md ${errors.confirmPassword ? "border-[#E69EA2]" : "border-[#CFECE0]"
-                          } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
+                        className={`pl-12 pr-12 h-14 rounded-xl text-md ${
+                          errors.confirmPassword ? "border-[#E69EA2]" : "border-[#CFECE0]"
+                        } focus:ring-2 focus:ring-[#7CAE9E]/50 focus:border-transparent`}
                       />
                       <button
                         type="button"
@@ -652,7 +746,6 @@ export default function Signup() {
                       </div>
                     )}
                   </div>
-
                 </div>
               )}
             </CardContent>
@@ -674,7 +767,11 @@ export default function Signup() {
                       }}
                       className="h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"
                     />
-                    {step === 1 ? "Checking..." : "Creating Account..."}
+                    {step === 1
+                      ? "Checking..."
+                      : step === 2
+                      ? "Creating Account..."
+                      : "Verifying..."}
                   </div>
                 ) : step === 1 ? (
                   "Continue to Security"
