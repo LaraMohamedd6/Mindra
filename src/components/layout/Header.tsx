@@ -37,13 +37,15 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14"> {/* Fixed height */}
           {/* Larger Logo - Negative margin to make it appear bigger without increasing header height */}
-          <Link to="/" className="flex items-center gap-2 -my-2">
-            <img 
-              src={UpdatedLogo} 
-              alt="Mindra Logo" 
-              className="h-16 w-auto"  // Large logo
+          <Link to="/" className="flex items-center gap-1 -my-2">
+            <img
+              src={UpdatedLogo}
+              alt="Mindra Logo"
+              className="h-16 w-auto"
             />
-            <span className="text-2xl font-semibold">Mindra</span>
+            <span className="text-[1.8rem] font-extrabold font-['Nunito'] text-gray-800 tracking-tight">
+              Mindra
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -170,23 +172,23 @@ export default function Header() {
               <>
                 {!isAuthenticated ? (
                   <>
-                    <Button 
-                      variant="outline" 
-                      asChild 
+                    <Button
+                      variant="outline"
+                      asChild
                       className="border-zenSage text-zenSage hover:bg-zenSage/10 h-8 px-3 text-sm"
                     >
                       <Link to="/login">Log In</Link>
                     </Button>
-                    <Button 
-                      asChild 
+                    <Button
+                      asChild
                       className="bg-zenSage hover:bg-zenSage/90 text-white h-8 px-3 text-sm"
                     >
                       <Link to="/signup">Sign Up</Link>
                     </Button>
                   </>
                 ) : (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="border-zenPink text-zenPink hover:bg-zenPink/10 h-8 px-3 text-sm"
                     onClick={handleLogout}
                   >
@@ -239,7 +241,7 @@ export default function Header() {
                   </Link>
                 ))}
               </div>
-              
+
               <div className="mb-3">
                 <div className="text-sm font-semibold text-gray-500 mb-1 px-3">Resources</div>
                 {[
@@ -258,7 +260,7 @@ export default function Header() {
                   </Link>
                 ))}
               </div>
-              
+
               <div className="mb-3">
                 <div className="text-sm font-semibold text-gray-500 mb-1 px-3">Connect</div>
                 {[
@@ -277,7 +279,7 @@ export default function Header() {
                   </Link>
                 ))}
               </div>
-              
+
               <div className="mb-3">
                 <div className="text-sm font-semibold text-gray-500 mb-1 px-3">Tracking</div>
                 {[
@@ -294,20 +296,20 @@ export default function Header() {
                   </Link>
                 ))}
               </div>
-              
+
               <div className="pt-3 flex flex-col space-y-2 border-t border-gray-100 px-3">
                 {!isAuthenticated ? (
                   <>
-                    <Button 
-                      variant="outline" 
-                      asChild 
+                    <Button
+                      variant="outline"
+                      asChild
                       className="border-zenSage text-zenSage hover:bg-zenSage/10 h-8 text-sm"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <Link to="/login">Log In</Link>
                     </Button>
-                    <Button 
-                      asChild 
+                    <Button
+                      asChild
                       className="bg-zenSage hover:bg-zenSage/90 text-white h-8 text-sm"
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -315,8 +317,8 @@ export default function Header() {
                     </Button>
                   </>
                 ) : (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="border-zenPink text-zenPink hover:bg-zenPink/10 h-8 text-sm"
                     onClick={handleLogout}
                   >

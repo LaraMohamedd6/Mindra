@@ -8,13 +8,15 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <Link to="/" className="flex items-center space-x-2 mb-4">
+            <Link to="/" className="flex items-center space-x-1 mb-4">
               <img 
                 src={UpdatedLogo} 
                 alt="Mindra Logo" 
                 className="h-16 w-auto" 
               />
-              <span className="font-display font-semibold text-2xl">Mindra</span>
+                 <span className="text-[1.7rem] font-extrabold font-['Nunito'] text-gray-800 tracking-tight">
+              Mindra
+            </span>
             </Link>
             <p className="text-gray-600 text-sm">
               Supporting student mental wellness with interactive tools, resources, 

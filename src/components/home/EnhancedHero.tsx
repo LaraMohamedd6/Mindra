@@ -18,7 +18,7 @@ import third from "@/assets/images/third.avif";
 export default function EnhancedHero() { 
   const heroImages = [
     {
-      url: first,
+      url: third,
       alt: "Students supporting each other"
     },
     {
@@ -26,7 +26,7 @@ export default function EnhancedHero() {
       alt: "Students studying together"
     },
     {
-      url: third,
+      url: first,
       alt: "Student practicing meditation"
     }
   ];
