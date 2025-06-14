@@ -357,7 +357,7 @@ export default function Journal() {
             </CardContent>
             <CardFooter className="p-6 flex justify-end">
               <Button
-                className="bg-gradient-to-r from-zenSage to-zenPink hover:from-zenSage/90 hover:to-zenPink/90 text-white px-6 py-2 rounded-lg"
+                className="bg-zenSage hover:bg-zenSage/90 text-white px-4 py-2 rounded-lg"
                 onClick={handleAddJournal}
                 aria-label="Save journal entry"
               >

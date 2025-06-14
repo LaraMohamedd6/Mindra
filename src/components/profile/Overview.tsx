@@ -209,9 +209,9 @@ export default function Overview({ journalData }: OverviewProps) {
   let moodImprovement =
     earlyAverage > 0 && laterAverage > earlyAverage
       ? Math.min(
-          Math.round(((laterAverage - earlyAverage) / earlyAverage) * 100),
-          100
-        )
+        Math.round(((laterAverage - earlyAverage) / earlyAverage) * 100),
+        100
+      )
       : 0;
 
   // Fallback: If no improvement, use average mood relative to max mood (5)
@@ -324,103 +324,115 @@ export default function Overview({ journalData }: OverviewProps) {
               Weekly Progress
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col items-center">
-            <div className="h-64 w-full">
-              {loading || journalLoading || yogaError ? (
-                <div className="flex justify-center items-center h-64">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  >
-                    <div className="h-8 w-8 border-2 border-zenSage border-t-transparent rounded-full" />
-                  </motion.div>
-                </div>
-              ) : activityData.every((entry) => entry.value === 0) ? (
-                <div className="flex justify-center items-center h-64 text-gray-500">
-                  No activity data available
-                </div>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart
-                    cx="50%"
-                    cy="50%"
-                    innerRadius="20%"
-                    outerRadius="80%"
-                    barSize={20}
-                    data={activityData}
-                    startAngle={90}
-                    endAngle={-270}
-                  >
-                    <RadialBar
-                      minAngle={15}
-                      background={{ fill: "#e5e7eb" }}
-                      clockWise
-                      dataKey="value"
-                      fill="url(#gradient)"
-                    />
-                    <Legend
-                      verticalAlign="bottom"
-                      height={36}
-                      formatter={(value) => (
-                        <span className="text-sm text-gray-800 dark:text-white">{value}</span>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {loading || journalLoading || yogaError ? (
+              <div className="flex justify-center items-center h-64 col-span-2">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  <div className="h-8 w-8 border-2 border-zenSage border-t-transparent rounded-full" />
+                </motion.div>
+              </div>
+            ) : (
+              <>
+                <Card className="p-6 bg-white/80 dark:bg-gray-800/80 shadow-sm rounded-lg">
+                  <div className="flex items-start space-x-4">
+                    <div className="p-3 rounded-full bg-zenSage/10">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-6 w-6 text-zenSage"
+                      >
+                        <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path>
+                        <path d="M8.5 8.5v.01"></path>
+                        <path d="M16 15.5v.01"></path>
+                        <path d="M12 12v.01"></path>
+                        <path d="M11 17v.01"></path>
+                        <path d="M7 14v.01"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                        Meditation
+                      </h3>
+                      {loading ? (
+                        <div className="text-3xl font-bold text-zenSage">...</div>
+                      ) : error ? (
+                        <div className="text-red-500 text-sm">Error loading data</div>
+                      ) : (
+                        <div className="text-3xl font-bold text-zenSage">
+                          {weeklyMeditation?.toFixed(1) || 0}<span className="text-lg font-normal ml-1">hours</span>
+                        </div>
                       )}
-                    />
-                    <RechartsTooltip
-                      formatter={(value, name, props) =>
-                        `${props.payload.value.toFixed(0)}% (${props.payload.goal} ${props.payload.unit})`
-                      }
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "8px",
-                        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                      }}
-                    />
-                    <defs>
-                      <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#7CAE9E" />
-                        <stop offset="100%" stopColor="#E69EA2" />
-                      </linearGradient>
-                    </defs>
-                  </RadialBarChart>
-                </ResponsiveContainer>
-              )}
-            </div>
+                      <div className="mt-3">
+                        <Progress
+                          value={weeklyMeditation ? Math.min((weeklyMeditation / 5) * 100, 100) : 0}
+                          className="h-2 bg-gray-200 dark:bg-gray-700"
+                          indicatorClassName="bg-zenSage"
+                        />
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Weekly goal: 5 hours
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
 
-            <div className="grid grid-cols-2 gap-4 mt-4 w-full">
-              <Card className="p-4 bg-white dark:bg-gray-800 shadow-sm">
-                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                  Weekly Meditation
-                </h3>
-                {loading ? (
-                  <div className="text-3xl font-bold text-zenSage mt-1">...</div>
-                ) : error ? (
-                  <div className="text-red-500 text-sm mt-1">
-                    Error loading data
+                <Card className="p-6 bg-white/80 dark:bg-gray-800/80 shadow-sm rounded-lg">
+                  <div className="flex items-start space-x-4">
+                    <div className="p-3 rounded-full bg-zenPink/10">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-6 w-6 text-zenPink"
+                      >
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                        Journal Entries
+                      </h3>
+                      {journalLoading ? (
+                        <div className="text-3xl font-bold text-zenPink">...</div>
+                      ) : journalError ? (
+                        <div className="text-red-500 text-sm">Error loading data</div>
+                      ) : (
+                        <div className="text-3xl font-bold text-zenPink">
+                          {journalStats?.totalEntries || 0}
+                        </div>
+                      )}
+                      <div className="mt-3">
+                        <Progress
+                          value={journalStats ? Math.min((journalStats.lastWeekEntries / 5) * 100, 100) : 0}
+                          className="h-2 bg-gray-200 dark:bg-gray-700"
+                          indicatorClassName="bg-zenPink"
+                        />
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Weekly goal: 5 entries
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-3xl font-bold text-zenSage mt-1">
-                    {weeklyMeditation?.toFixed(1) || 0} hrs
-                  </div>
-                )}
-              </Card>
-              <Card className="p-4 bg-white dark:bg-gray-800 shadow-sm">
-                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                  Journal Entries
-                </h3>
-                {journalLoading ? (
-                  <div className="text-3xl font-bold text-zenPink mt-1">...</div>
-                ) : journalError ? (
-                  <div className="text-red-500 text-sm mt-1">
-                    Error loading data
-                  </div>
-                ) : (
-                  <div className="text-3xl font-bold text-zenPink mt-1">
-                    {journalStats?.totalEntries || 0}
-                  </div>
-                )}
-              </Card>
-            </div>
+                </Card>
+              </>
+            )}
           </CardContent>
         </Card>
       </motion.div>
@@ -446,9 +458,9 @@ export default function Overview({ journalData }: OverviewProps) {
                 <span className="font-medium text-gray-800 dark:text-white">
                   {weeklyMeditation
                     ? `${Math.min(
-                        Math.round((weeklyMeditation / 5) * 100),
-                        100
-                      )}%`
+                      Math.round((weeklyMeditation / 5) * 100),
+                      100
+                    )}%`
                     : "0%"}
                 </span>
               </div>
