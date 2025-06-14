@@ -162,7 +162,7 @@ const egyptianProfessionals = [
     specialty: "Psychotherapist Specialist",
     photo: phsy4,
     bio: "Psychiatrist specializing in the treatment of depression and adolescent psychiatric conditions. My expertise spans from early intervention for teens to complex dual diagnosis cases.",
-    phone: "16676 - through vezeeta",
+    phone: "Contact Through Vezeeta",
     location: "Heliopolis ,Cairo",
     languages: ["Arabic", "English"]
   }
@@ -320,9 +320,17 @@ export default function Information() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {egyptianProfessionals.map((doctor, index) => {
-              // Format phone number for WhatsApp (remove spaces and special characters)
-              const whatsappNumber = doctor.phone.replace(/[\s\-]/g, '');
-              const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+              // Special case for Dr. Nourhan Hamdy
+              const isFourthDoctor = index === 3;
+
+              // For other doctors, create WhatsApp link
+              const whatsappNumber = !isFourthDoctor ? doctor.phone.replace(/[\s\-]/g, '') : '';
+              const whatsappUrl = !isFourthDoctor ? `https://wa.me/${whatsappNumber}` : '';
+
+              // For Dr. Nourhan, use Vezeeta link
+              const phoneLink = isFourthDoctor
+                ? "https://www.vezeeta.com/en/dr/psychologist-nourhan-hamdy-psychiatry"
+                : whatsappUrl;
 
               return (
                 <motion.div
@@ -351,7 +359,7 @@ export default function Information() {
                         <div className="flex items-start gap-2">
                           <Phone className="h-5 w-5 text-zenPink mt-0.5" />
                           <a
-                            href={whatsappUrl}
+                            href={phoneLink}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-gray-700 hover:text-zenPink transition-colors"
