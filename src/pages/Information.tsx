@@ -153,7 +153,7 @@ const egyptianProfessionals = [
     specialty: "Consultant of addiction treatment",
     photo: phsy3,
     bio: "Psychiatrist specialized in stress, adult psychiatry, and pediatric psychiatry. I provide comprehensive treatment plans that address mental health.",
-    phone: "+20 225983999",
+    phone: "+20 120 111 1344",
     location: "New Cairo, Cairo",
     languages: ["Arabic", "English"]
   },
