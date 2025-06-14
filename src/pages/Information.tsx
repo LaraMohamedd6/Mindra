@@ -5,14 +5,14 @@ import { Book, Brain, Coffee, HeartPulse, Moon, Sun, Calendar, HeadingIcon, Arro
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import SectionHeading from "@/components/common/SectionHeading";
 import { Link } from 'react-router-dom';
-import selfCareImage from "@/assets/images/selfcare.jpg"; 
-import depImage from "@/assets/images/dep.jpg";  
-import academicStress from "@/assets/images/acstress.jpg"; 
-import sleepHygiene from "@/assets/images/sleep.jpg"; 
-import phsy1 from "@/assets/images/phsy1.png"; 
-import phsy2 from "@/assets/images/phsy2.png"; 
-import phsy3 from "@/assets/images/phsy3.png"; 
-import phsy4 from "@/assets/images/phsy4.png"; 
+import selfCareImage from "@/assets/images/selfcare.jpg";
+import depImage from "@/assets/images/dep.jpg";
+import academicStress from "@/assets/images/acstress.jpg";
+import sleepHygiene from "@/assets/images/sleep.jpg";
+import phsy1 from "@/assets/images/phsy1.png";
+import phsy2 from "@/assets/images/phsy2.png";
+import phsy3 from "@/assets/images/phsy3.png";
+import phsy4 from "@/assets/images/phsy4.png";
 
 
 const mentalHealthTopics = [
@@ -23,7 +23,7 @@ const mentalHealthTopics = [
     image: depImage,
     url: "https://www.nimh.nih.gov/health/topics/depression"
   },
-    {
+  {
     title: "Self-Care Practices",
     icon: Sun,
     content: "Self-care isn't selfish—it's necessary. Discover simple yet effective self-care practices for busy students.",
@@ -153,7 +153,7 @@ const egyptianProfessionals = [
     specialty: "Consultant of addiction treatment",
     photo: phsy3,
     bio: "Psychiatrist specialized in stress, adult psychiatry, and pediatric psychiatry. I provide comprehensive treatment plans that address mental health.",
-    phone: "+20 225983999",
+    phone: "+20 120 111 1344",
     location: "New Cairo, Cairo",
     languages: ["Arabic", "English"]
   },
@@ -162,7 +162,7 @@ const egyptianProfessionals = [
     specialty: "Psychotherapist Specialist",
     photo: phsy4,
     bio: "Psychiatrist specializing in the treatment of depression and adolescent psychiatric conditions. My expertise spans from early intervention for teens to complex dual diagnosis cases.",
-    phone: "16676 - through vezeeta",
+    phone: "Contact Through Vezeeta",
     location: "Heliopolis ,Cairo",
     languages: ["Arabic", "English"]
   }
@@ -194,13 +194,13 @@ export default function Information() {
 
         {/* Topics Grid */}
         <section className="mb-20">
-          <SectionHeading 
-            title="Explore Mental Health Resources" 
+          <SectionHeading
+            title="Explore Mental Health Resources"
             subtitle="Click to visit trusted .org websites for each topic"
             centered={true}
             className="mb-12"
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {mentalHealthTopics.map((topic, index) => (
               <motion.div
@@ -213,10 +213,10 @@ export default function Information() {
                 <a href={topic.url} target="_blank" rel="noopener noreferrer" className="block h-full">
                   <Card className="h-full hover:shadow-lg transition-all duration-300 overflow-hidden group border border-gray-100">
                     <div className="h-48 overflow-hidden relative">
-                      <img 
-                        src={topic.image} 
-                        alt={topic.title} 
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                      <img
+                        src={topic.image}
+                        alt={topic.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-80" />
                       <div className="absolute bottom-4 left-4">
@@ -244,8 +244,8 @@ export default function Information() {
 
         {/* Organized FAQ Sections */}
         <section className="mb-20">
-          <SectionHeading 
-            title="Frequently Asked Questions" 
+          <SectionHeading
+            title="Frequently Asked Questions"
             subtitle="Organized by topic for easy navigation"
             centered={true}
             className="mb-12"
@@ -263,8 +263,8 @@ export default function Information() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <AccordionItem 
-                        value={`item-${catIndex}-${index}`} 
+                      <AccordionItem
+                        value={`item-${catIndex}-${index}`}
                         className="border border-gray-200 rounded-lg overflow-hidden hover:border-zenPink transition-colors duration-300"
                       >
                         <AccordionTrigger className="px-6 py-4 hover:no-underline text-left font-medium text-gray-800 hover:text-zenPink transition-colors duration-300">
@@ -284,8 +284,8 @@ export default function Information() {
 
         {/* Myths vs Facts Section */}
         <section className="mb-20">
-          <SectionHeading 
-            title="Mental Health Myths vs Facts" 
+          <SectionHeading
+            title="Mental Health Myths vs Facts"
             subtitle="Separating fact from fiction when it comes to student mental health"
             centered={true}
             className="mb-12"
@@ -311,62 +311,81 @@ export default function Information() {
 
         {/* Egyptian Professionals Section */}
         <section id="egyptian-professionals" className="mb-20 scroll-mt-20">
-          <SectionHeading 
-            title="Mental Health Professionals in Egypt" 
+          <SectionHeading
+            title="Mental Health Professionals in Egypt"
             subtitle="Trusted doctors who can help with student mental health"
             centered={true}
             className="mb-12"
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {egyptianProfessionals.map((doctor, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-              >
-                <Card className="h-full hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100">
-                  <div className="h-48 overflow-hidden relative">
-                    <img 
-                      src={doctor.photo} 
-                      alt={doctor.name} 
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                      <h3 className="text-xl font-semibold text-white">{doctor.name}</h3>
-                      <p className="text-zenLightPink">{doctor.specialty}</p>
-                    </div>
-                  </div>
-                  <CardContent className="p-6">
-                    <p className="text-gray-600 mb-4">{doctor.bio}</p>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-2">
-                        <Phone className="h-5 w-5 text-zenPink mt-0.5" />
-                        <a href={`tel:${doctor.phone}`} className="text-gray-700 hover:text-zenPink transition-colors">
-                          {doctor.phone}
-                        </a>
-                      </div>
-                      
-                      <div className="flex items-start gap-2">
-                        <MapPin className="h-5 w-5 text-zenPink mt-0.5" />
-                        <p className="text-gray-700">{doctor.location}</p>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {doctor.languages.map((lang, i) => (
-                          <span key={i} className="bg-zenLightPink/20 text-zenPink px-2 py-1 rounded-full text-xs">
-                            {lang}
-                          </span>
-                        ))}
+            {egyptianProfessionals.map((doctor, index) => {
+              // Special case for Dr. Nourhan Hamdy
+              const isFourthDoctor = index === 3;
+
+              // For other doctors, create WhatsApp link
+              const whatsappNumber = !isFourthDoctor ? doctor.phone.replace(/[\s\-]/g, '') : '';
+              const whatsappUrl = !isFourthDoctor ? `https://wa.me/${whatsappNumber}` : '';
+
+              // For Dr. Nourhan, use Vezeeta link
+              const phoneLink = isFourthDoctor
+                ? "https://www.vezeeta.com/en/dr/psychologist-nourhan-hamdy-psychiatry"
+                : whatsappUrl;
+
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -5 }}
+                >
+                  <Card className="h-full hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100">
+                    <div className="h-48 overflow-hidden relative">
+                      <img
+                        src={doctor.photo}
+                        alt={doctor.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                        <h3 className="text-xl font-semibold text-white">{doctor.name}</h3>
+                        <p className="text-zenLightPink">{doctor.specialty}</p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                    <CardContent className="p-6">
+                      <p className="text-gray-600 mb-4">{doctor.bio}</p>
+
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-2">
+                          <Phone className="h-5 w-5 text-zenPink mt-0.5" />
+                          <a
+                            href={phoneLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-700 hover:text-zenPink transition-colors"
+                          >
+                            {doctor.phone}
+                          </a>
+                        </div>
+
+                        <div className="flex items-start gap-2">
+                          <MapPin className="h-5 w-5 text-zenPink mt-0.5" />
+                          <p className="text-gray-700">{doctor.location}</p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {doctor.languages.map((lang, i) => (
+                            <span key={i} className="bg-zenLightPink/20 text-zenPink px-2 py-1 rounded-full text-xs">
+                              {lang}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </section>
 
@@ -382,16 +401,16 @@ export default function Information() {
             If you're in crisis or experiencing thoughts of self-harm, please reach out to these resources:
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <a 
-              href="https://suicidepreventionlifeline.org" 
+            <a
+              href="https://suicidepreventionlifeline.org"
               className="px-6 py-3 bg-zenPink text-white rounded-lg font-medium hover:bg-zenDarkPink transition-colors duration-300"
               target="_blank"
               rel="noopener noreferrer"
             >
               National Suicide Prevention Lifeline
             </a>
-            <a 
-              href="https://crisistextline.org" 
+            <a
+              href="https://crisistextline.org"
               className="px-6 py-3 bg-zenSage text-white rounded-lg font-medium hover:bg-zenDarkSage transition-colors duration-300"
               target="_blank"
               rel="noopener noreferrer"
