@@ -661,25 +661,6 @@ const Meditation = () => {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-zenPink hover:text-zenPink/90 hover:bg-zenLightPink/10 p-0"
-                      onClick={() =>
-                        setSavedItems((prev) =>
-                          prev.includes(meditationClass.id)
-                            ? prev.filter((id) => id !== meditationClass.id)
-                            : [...prev, meditationClass.id]
-                        )
-                      }
-                    >
-                      {savedItems.includes(meditationClass.id) ? (
-                        <Heart className="h-4 w-4 mr-1 fill-zenPink" />
-                      ) : (
-                        <Heart className="h-4 w-4 mr-1" />
-                      )}
-                      Save
-                    </Button>
                   </div>
                 </div>
               </motion.div>
